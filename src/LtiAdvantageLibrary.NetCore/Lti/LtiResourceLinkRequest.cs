@@ -6,7 +6,7 @@ using LtiAdvantageLibrary.NetCore.Common;
 using LtiAdvantageLibrary.NetCore.Extensions;
 using Newtonsoft.Json;
 
-namespace LtiAdvantageLibrary.NetCore.Lti.v1p3
+namespace LtiAdvantageLibrary.NetCore.Lti
 {
     /// <summary>
     /// https://purl.imsglobal.org/spec/lti/v1p3/schema/json/LtiResourceLinkRequest.json

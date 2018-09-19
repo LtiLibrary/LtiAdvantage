@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace LtiAdvantageLibrary.NetCore.Lti.v1p3
+namespace LtiAdvantageLibrary.NetCore.Lti
 {
     /// <summary>
     /// Properties of the context from which the launch originated (for example, course id and title).

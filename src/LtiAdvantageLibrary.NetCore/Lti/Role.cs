@@ -1,7 +1,7 @@
 using LtiAdvantageLibrary.NetCore.Common;
 using Newtonsoft.Json;
 
-namespace LtiAdvantageLibrary.NetCore.Lti.v1p3
+namespace LtiAdvantageLibrary.NetCore.Lti
 {
     /// <summary>
     /// The role of the user within a given context.

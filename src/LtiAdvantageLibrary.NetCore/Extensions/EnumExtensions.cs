@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using LtiAdvantageLibrary.NetCore.Common;
-using LtiAdvantageLibrary.NetCore.Lti.v1p3;
 
 namespace LtiAdvantageLibrary.NetCore.Extensions
 {

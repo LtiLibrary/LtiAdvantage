@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace LtiAdvantageLibrary.NetCore.Lti.v1p3
+namespace LtiAdvantageLibrary.NetCore.Lti
 {
     /// <summary>
     /// Properties about available Learning Information Services (LIS),
@@ -9,19 +9,16 @@ namespace LtiAdvantageLibrary.NetCore.Lti.v1p3
     public class Lis
     {
         /// <summary>
-        /// 
         /// </summary>
         [JsonProperty("course_offering_sourcedid")]
         public string CourseOfferingSourcedId { get; set; }
 
         /// <summary>
-        /// 
         /// </summary>
         [JsonProperty("course_section_sourcedid")]
         public string CourseSectionSourcedId { get; set; }
 
         /// <summary>
-        /// 
         /// </summary>
         [JsonProperty("person_sourcedid")]
         public string PersonSourcedId { get; set; }

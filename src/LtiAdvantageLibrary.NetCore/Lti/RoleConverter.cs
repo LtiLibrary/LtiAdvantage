@@ -5,14 +5,14 @@ using LtiAdvantageLibrary.NetCore.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace LtiAdvantageLibrary.NetCore.Lti.v1p3
+namespace LtiAdvantageLibrary.NetCore.Lti
 {
-    internal class ContextTypeConverter : StringEnumConverter
+    internal class RoleConverter : StringEnumConverter
     {
-        private static readonly Hashtable Uris;
-        static ContextTypeConverter()
+        private static readonly Hashtable Roles;
+        static RoleConverter()
         {
-            Uris = GetUris(typeof(ContextType));
+            Roles = GetUris(typeof(Role));
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -22,7 +22,7 @@ namespace LtiAdvantageLibrary.NetCore.Lti.v1p3
                 return base.ReadJson(reader, objectType, existingValue, serializer);
             }
 
-            if (!objectType.GetTypeInfo().IsAssignableFrom(typeof(ContextType)))
+            if (!objectType.GetTypeInfo().IsAssignableFrom(typeof(Role)))
             {
                 return base.ReadJson(reader, objectType, existingValue, serializer);
             }
@@ -33,13 +33,13 @@ namespace LtiAdvantageLibrary.NetCore.Lti.v1p3
             }
 
             var value = reader.Value.ToString();
-            if (Uris.ContainsKey(value))
+            if (Roles.ContainsKey(value))
             {
-                var contextType = (ContextType) Uris[value];
-                return contextType;
+                var role = (Role) Roles[value];
+                return role;
             }
 
-            return ContextType.Unknown;
+            return Role.Unknown;
         }
 
         private static Hashtable GetUris(Type type)
@@ -73,9 +73,9 @@ namespace LtiAdvantageLibrary.NetCore.Lti.v1p3
                 return;
             }
 
-            if (Uris.ContainsKey(value))
+            if (Roles.ContainsKey(value))
             {
-                var uri = Uris[value];
+                var uri = Roles[value];
                 writer.WriteValue(uri);
                 return;
             }

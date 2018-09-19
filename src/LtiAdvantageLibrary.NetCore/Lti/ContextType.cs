@@ -1,7 +1,7 @@
 ﻿using LtiAdvantageLibrary.NetCore.Common;
 using Newtonsoft.Json;
 
-namespace LtiAdvantageLibrary.NetCore.Lti.v1p3
+namespace LtiAdvantageLibrary.NetCore.Lti
 {
     /// <summary>
     /// Represents LIS Context Types

@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Converters;
 
 // ReSharper disable InconsistentNaming
-namespace LtiAdvantageLibrary.NetCore.Lti.v1p3
+namespace LtiAdvantageLibrary.NetCore.Lti
 {
     /// <summary>
     /// Represents launch_presentation document_target values.

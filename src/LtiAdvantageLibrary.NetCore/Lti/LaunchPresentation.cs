@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace LtiAdvantageLibrary.NetCore.Lti.v1p3
+namespace LtiAdvantageLibrary.NetCore.Lti
 {
     /// <summary>
     /// Information to help the Tool present itself appropriately.

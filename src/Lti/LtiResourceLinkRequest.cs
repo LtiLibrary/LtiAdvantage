@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using LtiAdvantageLibrary.NetCore.Common;
-using LtiAdvantageLibrary.NetCore.Extensions;
+using LtiAdvantageLibrary.NetCore.Utilities;
 using Newtonsoft.Json;
 
 namespace LtiAdvantageLibrary.NetCore.Lti

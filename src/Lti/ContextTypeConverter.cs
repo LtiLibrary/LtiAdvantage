@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Reflection;
-using LtiAdvantageLibrary.NetCore.Extensions;
+using LtiAdvantageLibrary.NetCore.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

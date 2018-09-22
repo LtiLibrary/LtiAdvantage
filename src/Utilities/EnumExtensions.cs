@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using LtiAdvantageLibrary.NetCore.Common;
 
-namespace LtiAdvantageLibrary.NetCore.Extensions
+namespace LtiAdvantageLibrary.NetCore.Utilities
 {
     /// <summary>
     /// Enum extensions.

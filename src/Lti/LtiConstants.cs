@@ -1,4 +1,4 @@
-﻿namespace LtiAdvantageLibrary.NetCore.Common
+﻿namespace LtiAdvantageLibrary.NetCore.Lti
 {
     /// <summary>
     /// LTI Advantage constants.

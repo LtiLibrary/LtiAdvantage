@@ -1,4 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using Newtonsoft.Json;
@@ -61,9 +63,23 @@ namespace LtiAdvantageLibrary.NetCore.Extensions
                 payload.Remove(type);
             }
 
-            var json = JsonConvert.SerializeObject(value);
-            var claim = new Claim(type, json, "JSON");
-            payload.AddClaim(claim);
+            if (typeof(T) == typeof(string))
+            {
+                payload.AddClaim(new Claim(type, value.ToString(), ClaimValueTypes.String));
+            } 
+            else if (typeof(T) == typeof(int))
+            {
+                payload.AddClaim(new Claim(type, value.ToString(), ClaimValueTypes.Integer));
+            }
+            else if (typeof(T).IsArray)
+            {
+                payload.AddClaim(new Claim(type, JsonConvert.SerializeObject(value), JsonClaimValueTypes.JsonArray));
+            }
+            else
+            {
+                var json = JsonConvert.SerializeObject(value);
+                payload.AddClaim(new Claim(type, json, JsonClaimValueTypes.Json));
+            }
         }
     }
 }

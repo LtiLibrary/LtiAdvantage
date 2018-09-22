@@ -134,6 +134,11 @@
             "https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor";
 
         /// <summary>
+        /// LTI version.
+        /// </summary>
+        public const string Version = "1.3.0";
+
+        /// <summary>
         /// The minimum LTI version required.
         /// </summary>
         public const string VersionClaim = "https://purl.imsglobal.org/spec/lti/claim/version";

@@ -35,11 +35,9 @@ namespace LtiAdvantageLibrary.NetCore.Utilities
 
             if (payload.TryGetValue(type, out var value))
             {
-                if (typeof(T) == typeof(string))
-                {
-                    return JsonConvert.DeserializeObject<T>($"\"{value}\"");
-                }
-                return JsonConvert.DeserializeObject<T>(value.ToString());
+                return typeof(T) == typeof(string)
+                    ? JsonConvert.DeserializeObject<T>($"\"{value}\"")
+                    : JsonConvert.DeserializeObject<T>(value.ToString());
             }
 
             return default(T);

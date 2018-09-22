@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using LtiAdvantageLibrary.NetCore.Common;
 
 namespace LtiAdvantageLibrary.NetCore.Utilities
 {

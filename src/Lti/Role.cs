@@ -1,4 +1,3 @@
-using LtiAdvantageLibrary.NetCore.Common;
 using Newtonsoft.Json;
 
 namespace LtiAdvantageLibrary.NetCore.Lti

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LtiAdvantageLibrary.NetCore.Common
+namespace LtiAdvantageLibrary.NetCore
 {
     /// <summary>
     /// URIs are used to describe enumerated field values.

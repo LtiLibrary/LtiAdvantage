@@ -1,4 +1,4 @@
 # LtiAdvantageLibrary
 LTI Advantage class library for .NET
 
-Simple Tool here: https://github.com/andyfmiller/LtiAdvantageTool
+Sample Tool here: https://github.com/andyfmiller/LtiAdvantageTool

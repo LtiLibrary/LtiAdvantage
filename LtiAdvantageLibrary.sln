@@ -3,12 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantageLibrary.NetCore", "src\LtiAdvantageLibrary.NetCore\LtiAdvantageLibrary.NetCore.csproj", "{6BED5B93-C749-440D-8D58-45F47812AD2F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C53CA168-7453-4035-8AB3-79781B00A4A4}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantageLibrary.NetCore", "src\LtiAdvantageLibrary.NetCore.csproj", "{73B70E63-5295-4327-8527-30C6F78B9027}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,10 +16,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6BED5B93-C749-440D-8D58-45F47812AD2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6BED5B93-C749-440D-8D58-45F47812AD2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6BED5B93-C749-440D-8D58-45F47812AD2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6BED5B93-C749-440D-8D58-45F47812AD2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73B70E63-5295-4327-8527-30C6F78B9027}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73B70E63-5295-4327-8527-30C6F78B9027}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73B70E63-5295-4327-8527-30C6F78B9027}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73B70E63-5295-4327-8527-30C6F78B9027}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

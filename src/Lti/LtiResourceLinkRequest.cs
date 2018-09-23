@@ -44,8 +44,8 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </summary>
         public string DeploymentId
         {
-            get { return this.GetClaimValue(LtiConstants.DeploymentIdClaim); }
-            set { this.SetClaimValue(LtiConstants.DeploymentIdClaim, value); }
+            get { return this.GetClaimValue(LtiClaimNames.DeploymentId); }
+            set { this.SetClaimValue(LtiClaimNames.DeploymentId, value); }
         }
 
         /// <summary>
@@ -53,8 +53,8 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </summary>
         public string MessageType
         {
-            get { return this.GetClaimValue(LtiConstants.MessageTypeClaim); }
-            set { this.SetClaimValue(LtiConstants.MessageTypeClaim, value); }
+            get { return this.GetClaimValue(LtiClaimNames.MessageType); }
+            set { this.SetClaimValue(LtiClaimNames.MessageType, value); }
         }
 
         /// <summary>
@@ -83,10 +83,10 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </example>
         /// </summary>
         [JsonProperty("ResourceLink")]
-        public ResourceLink ResourceLink
+        public ResourceLinkClaimValue ResourceLinkClaimValue
         {
-            get { return this.GetClaimValue<ResourceLink>(LtiConstants.ResourceLinkClaim); }
-            set { this.SetClaimValue(LtiConstants.ResourceLinkClaim, value); }
+            get { return this.GetClaimValue<ResourceLinkClaimValue>(LtiClaimNames.ResourceLink); }
+            set { this.SetClaimValue(LtiClaimNames.ResourceLink, value); }
         }
 
         /// <summary>
@@ -94,8 +94,8 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </summary>
         public Role[] Roles
         {
-            get { return this.GetClaimValue<Role[]>(LtiConstants.RolesClaim); }
-            set { this.SetClaimValue(LtiConstants.RolesClaim, value); }
+            get { return this.GetClaimValue<Role[]>(LtiClaimNames.Roles); }
+            set { this.SetClaimValue(LtiClaimNames.Roles, value); }
         }
 
         /// <summary>
@@ -114,8 +114,8 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </summary>
         public string Version
         {
-            get { return this.GetClaimValue(LtiConstants.VersionClaim); }
-            set { this.SetClaimValue(LtiConstants.VersionClaim, value); }
+            get { return this.GetClaimValue(LtiClaimNames.Version); }
+            set { this.SetClaimValue(LtiClaimNames.Version, value); }
         }
 
         #endregion
@@ -125,47 +125,47 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// <summary>
         /// Properties of the context from which the launch originated (for example, course id and title).
         /// </summary>
-        public Context Context
+        public ContextClaimValue Context
         {
-            get { return this.GetClaimValue<Context>(LtiConstants.ContextClaim); }
-            set { this.SetClaimValue(LtiConstants.ContextClaim, value); }
+            get { return this.GetClaimValue<ContextClaimValue>(LtiClaimNames.Context); }
+            set { this.SetClaimValue(LtiClaimNames.Context, value); }
         }
 
         /// <summary>
         /// This is a map of key/value custom parameters which are to be included with the launch.
         /// </summary>
-        public Hashtable Custom
+        public CustomClaimValue Custom
         {
-            get { return this.GetClaimValue<Hashtable>(LtiConstants.CustomClaim); }
-            set { this.SetClaimValue(LtiConstants.CustomClaim, value);}
+            get { return this.GetClaimValue<CustomClaimValue>(LtiClaimNames.Custom); }
+            set { this.SetClaimValue(LtiClaimNames.Custom, value);}
         }
 
         /// <summary>
         /// Information to help the Tool present itself appropriately.
         /// </summary>
-        public LaunchPresentation LaunchPresentation
+        public LaunchPresentationClaimValue LaunchPresentation
         {
-            get { return this.GetClaimValue<LaunchPresentation>(LtiConstants.LaunchPresentationClaim); }
-            set { this.SetClaimValue(LtiConstants.LaunchPresentationClaim, value); }
+            get { return this.GetClaimValue<LaunchPresentationClaimValue>(LtiClaimNames.LaunchPresentation); }
+            set { this.SetClaimValue(LtiClaimNames.LaunchPresentation, value); }
         }
 
         /// <summary>
         /// Properties about available Learning Information Services (LIS),
         /// usually originating from the Student Information System.
         /// </summary>
-        public Lis Lis
+        public LisClaimValue Lis
         {
-            get { return this.GetClaimValue<Lis>(LtiConstants.LisClaim); }
-            set { this.SetClaimValue(LtiConstants.LisClaim, value);}
+            get { return this.GetClaimValue<LisClaimValue>(LtiClaimNames.Lis); }
+            set { this.SetClaimValue(LtiClaimNames.Lis, value);}
         }
 
         /// <summary>
         /// Properties associated with the platform initiating the launch.
         /// </summary>
-        public Platform Platform
+        public PlatformClaimValue Platform
         {
-            get { return this.GetClaimValue<Platform>(LtiConstants.PlatformClaim); }
-            set { this.SetClaimValue(LtiConstants.PlatformClaim, value); }
+            get { return this.GetClaimValue<PlatformClaimValue>(LtiClaimNames.Platform); }
+            set { this.SetClaimValue(LtiClaimNames.Platform, value); }
         }
 
         /// <summary>
@@ -173,8 +173,8 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </summary>
         public string[] RoleScopeMentor
         {
-            get { return this.GetClaimValue<string[]>(LtiConstants.RoleScopeMentorClaim); }
-            set { this.SetClaimValue(LtiConstants.RoleScopeMentorClaim, value); }
+            get { return this.GetClaimValue<string[]>(LtiClaimNames.RoleScopeMentor); }
+            set { this.SetClaimValue(LtiClaimNames.RoleScopeMentor, value); }
         }
 
         #endregion
@@ -194,8 +194,8 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </summary>
         public string Email
         {
-            get { return this.GetClaimValue(LtiConstants.EmailClaim); }
-            set { this.SetClaimValue(LtiConstants.EmailClaim, value); }
+            get { return this.GetClaimValue(OpenIdStandardClaimNames.Email); }
+            set { this.SetClaimValue(OpenIdStandardClaimNames.Email, value); }
         }
 
         /// <summary>
@@ -208,8 +208,8 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </summary>
         public string FamilyName
         {
-            get { return this.GetClaimValue(LtiConstants.FamilyNameClaim); }
-            set { this.SetClaimValue(LtiConstants.FamilyNameClaim, value);}
+            get { return this.GetClaimValue(OpenIdStandardClaimNames.FamilyName); }
+            set { this.SetClaimValue(OpenIdStandardClaimNames.FamilyName, value);}
         }
 
         /// <summary>
@@ -221,8 +221,8 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </summary>
         public string GivenName
         {
-            get { return this.GetClaimValue(LtiConstants.GivenNameClaim); }
-            set { this.SetClaimValue(LtiConstants.GivenNameClaim, value);}
+            get { return this.GetClaimValue(OpenIdStandardClaimNames.GivenName); }
+            set { this.SetClaimValue(OpenIdStandardClaimNames.GivenName, value);}
         }
 
         /// <summary>
@@ -237,8 +237,8 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </summary>
         public string Locale
         {
-            get { return this.GetClaimValue(LtiConstants.LocaleClaim); }
-            set { this.SetClaimValue(LtiConstants.LocaleClaim, value); }
+            get { return this.GetClaimValue(OpenIdStandardClaimNames.Locale); }
+            set { this.SetClaimValue(OpenIdStandardClaimNames.Locale, value); }
         }
 
         /// <summary>
@@ -251,8 +251,8 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </summary>
         public string MiddleName
         {
-            get { return this.GetClaimValue(LtiConstants.MiddleNameClaim); }
-            set { this.SetClaimValue(LtiConstants.MiddleNameClaim, value);}
+            get { return this.GetClaimValue(OpenIdStandardClaimNames.MiddleName); }
+            set { this.SetClaimValue(OpenIdStandardClaimNames.MiddleName, value);}
         }
 
         /// <summary>
@@ -264,8 +264,8 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </summary>
         public string Name
         {
-            get { return this.GetClaimValue(LtiConstants.NameClaim); }
-            set { this.SetClaimValue(LtiConstants.NameClaim, value);}
+            get { return this.GetClaimValue(OpenIdStandardClaimNames.Name); }
+            set { this.SetClaimValue(OpenIdStandardClaimNames.Name, value);}
         }
 
         /// <summary>
@@ -279,8 +279,8 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </summary>
         public string Picture
         {
-            get { return this.GetClaimValue(LtiConstants.PictureClaim); }
-            set { this.SetClaimValue(LtiConstants.PictureClaim, value);}
+            get { return this.GetClaimValue(OpenIdStandardClaimNames.Picture); }
+            set { this.SetClaimValue(OpenIdStandardClaimNames.Picture, value);}
         }
 
         #endregion

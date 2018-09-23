@@ -5,7 +5,7 @@ namespace LtiAdvantageLibrary.NetCore.Lti
     /// <summary>
     /// Properties of the context from which the launch originated (for example, course id and title).
     /// </summary>
-    public class Context
+    public class ContextClaimValue
     {
         /// <summary>
         /// An opaque identifier that identifies the context where the launch originated. Must be

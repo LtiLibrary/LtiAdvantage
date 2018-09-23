@@ -6,7 +6,7 @@ namespace LtiAdvantageLibrary.NetCore.Lti
     /// Properties about available Learning Information Services (LIS),
     /// usually originating from the Student Information System.
     /// </summary>
-    public class Lis
+    public class LisClaimValue
     {
         /// <summary>
         /// </summary>

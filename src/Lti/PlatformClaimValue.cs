@@ -5,7 +5,7 @@ namespace LtiAdvantageLibrary.NetCore.Lti
     /// <summary>
     /// Properties associated with the platform initiating the launch.
     /// </summary>
-    public class Platform
+    public class PlatformClaimValue
     {
         /// <summary>
         /// An email contact for the platform.

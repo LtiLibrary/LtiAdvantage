@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using LtiAdvantageLibrary.NetCore.Utilities;
 using Newtonsoft.Json;
 
@@ -32,6 +34,16 @@ namespace LtiAdvantageLibrary.NetCore.Lti
 
         #region Required Message Claims
 
+        /// <summary>
+        /// The deployment identifier, uniquely identifying the tool's deployment on the platform.
+        /// Required.
+        /// </summary>
+        public string DeploymentId
+        {
+            get { return this.GetClaimValue(LtiConstants.DeploymentIdClaim); }
+            set { this.SetClaimValue(LtiConstants.DeploymentIdClaim, value); }
+        }
+
         // https://www.imsglobal.org/spec/lti/v1p3/#required-message-claims
 
         /// <summary>
@@ -44,25 +56,22 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         }
 
         /// <summary>
-        /// The version to which the message conforms. Must be "1.3.0".
+        /// Value used to associate a Client session with an ID Token.
+        /// Should only be used once. Use GenerateCryptoNonce to generate
+        /// a cryptographic nonce value. Required.
+        /// <example>
+        /// LtiResourceLinkRequest request;
+        /// request.Nonce = LtiResourceLinkRequest.GenerateCryptographicNonce();
+        /// </example>
         /// </summary>
-        public string Version
+        public new string Nonce
         {
-            get { return this.GetClaimValue(LtiConstants.VersionClaim); }
-            set { this.SetClaimValue(LtiConstants.VersionClaim, value); }
+            get { return base.Nonce; }
+            set { this.SetClaimValue(JwtRegisteredClaimNames.Nonce, value); }
         }
 
         /// <summary>
-        /// The deployment identifier, uniquely identifying the tool's deployment on the platform..
-        /// </summary>
-        public string DeploymentId
-        {
-            get { return this.GetClaimValue(LtiConstants.DeploymentIdClaim); }
-            set { this.SetClaimValue(LtiConstants.DeploymentIdClaim, value); }
-        }
-
-        /// <summary>
-        /// A link to tool's resource from the tool's platform.
+        /// A link to tool's resource from the platform. Required.
         /// </summary>
         [JsonProperty("ResourceLink")]
         public ResourceLink ResourceLink
@@ -72,13 +81,21 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         }
 
         /// <summary>
-
         /// An array of roles as defined in the Core LTI specification.
         /// </summary>
         public Role[] Roles
         {
             get { return this.GetClaimValue<Role[]>(LtiConstants.RolesClaim); }
             set { this.SetClaimValue(LtiConstants.RolesClaim, value); }
+        }
+
+        /// <summary>
+        /// The version to which the message conforms. Must be "1.3.0".
+        /// </summary>
+        public string Version
+        {
+            get { return this.GetClaimValue(LtiConstants.VersionClaim); }
+            set { this.SetClaimValue(LtiConstants.VersionClaim, value); }
         }
 
         #endregion
@@ -95,21 +112,12 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         }
 
         /// <summary>
-        /// Properties associated with the platform initiating the launch.
+        /// This is a map of key/value custom parameters which are to be included with the launch.
         /// </summary>
-        public Platform Platform
+        public Hashtable Custom
         {
-            get { return this.GetClaimValue<Platform>(LtiConstants.PlatformClaim); }
-            set { this.SetClaimValue(LtiConstants.PlatformClaim, value); }
-        }
-
-        /// <summary>
-        /// An array of the user_id values which the current user can access as a mentor.
-        /// </summary>
-        public string[] RoleScopeMentor
-        {
-            get { return this.GetClaimValue<string[]>(LtiConstants.RoleScopeMentorClaim); }
-            set { this.SetClaimValue(LtiConstants.RoleScopeMentorClaim, value); }
+            get { return this.GetClaimValue<Hashtable>(LtiConstants.CustomClaim); }
+            set { this.SetClaimValue(LtiConstants.CustomClaim, value);}
         }
 
         /// <summary>
@@ -132,17 +140,30 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         }
 
         /// <summary>
-        /// This is a map of key/value custom parameters which are to be included with the launch.
+        /// Properties associated with the platform initiating the launch.
         /// </summary>
-        public Hashtable Custom
+        public Platform Platform
         {
-            get { return this.GetClaimValue<Hashtable>(LtiConstants.CustomClaim); }
-            set { this.SetClaimValue(LtiConstants.CustomClaim, value);}
+            get { return this.GetClaimValue<Platform>(LtiConstants.PlatformClaim); }
+            set { this.SetClaimValue(LtiConstants.PlatformClaim, value); }
+        }
+
+        /// <summary>
+        /// An array of the user_id ('sub' claim) values which the current user can access as a mentor.
+        /// </summary>
+        public string[] RoleScopeMentor
+        {
+            get { return this.GetClaimValue<string[]>(LtiConstants.RoleScopeMentorClaim); }
+            set { this.SetClaimValue(LtiConstants.RoleScopeMentorClaim, value); }
         }
 
         #endregion
 
-        #region https://purl.imsglobal.org/spec/lti/v1p3/schema/json/Token.json
+        #region Optional OpenID claims
+        
+        // See https://www.iana.org/assignments/jwt/jwt.xhtml#claims
+        // See https://openid.net/specs/openid-connect-core-1_0.html#Claims
+        // See https://purl.imsglobal.org/spec/lti/v1p3/schema/json/Token.json
 
         /// <summary>
         /// End-User's preferred e-mail address. Its value MUST conform to the RFC 5322 [RFC5322]
@@ -162,7 +183,7 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// multiple family names or no family name; all can be present, with the names being separated
         /// by space characters.
         /// <example>
-        /// ["Doe"]
+        /// "Doe"
         /// </example>
         /// </summary>
         public string FamilyName
@@ -175,7 +196,7 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// Given name(s) or first name(s) of the End-User. Note that in some cultures, people can have
         /// multiple given names; all can be present, with the names being separated by space characters.
         /// <example>
-        /// ["Jane"]
+        /// "Jane"
         /// </example>
         /// </summary>
         public string GivenName
@@ -205,7 +226,7 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// names; all can be present, with the names being separated by space characters. Also note that
         /// in some cultures, middle names are not used.
         /// <example>
-        /// ["Marie"]
+        /// "Marie"
         /// </example>
         /// </summary>
         public string MiddleName
@@ -218,7 +239,7 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// End-User's full name in displayable form including all name parts, possibly including titles and
         /// suffixes, ordered according to the End-User's locale and preferences.
         /// <example>
-        /// ["Ms Jane Marie Doe"]
+        /// "Ms. Jane Marie Doe"
         /// </example>
         /// </summary>
         public string Name
@@ -243,5 +264,22 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         }
 
         #endregion
+
+        /// <summary>
+        /// Generate a cryptographic nonce.
+        /// </summary>
+        /// <returns>
+        /// A cryptographic nonce as a string value.
+        /// </returns>
+        public static string GenerateCryptographicNonce()
+        {
+            using (var provider = new RNGCryptoServiceProvider())
+            {
+                var byteArray = new byte[4];
+                provider.GetBytes(byteArray);
+                var randomInteger = BitConverter.ToUInt32(byteArray, 0);
+                return randomInteger.ToString();
+            }
+       }
     }
 }

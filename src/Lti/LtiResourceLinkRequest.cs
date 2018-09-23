@@ -34,17 +34,19 @@ namespace LtiAdvantageLibrary.NetCore.Lti
 
         #region Required Message Claims
 
+        // See https://www.imsglobal.org/spec/lti/v1p3/#required-message-claims
+        // See https://openid.net/specs/openid-connect-core-1_0.html#Claims
+        // See https://purl.imsglobal.org/spec/lti/v1p3/schema/json/Token.json
+
         /// <summary>
-        /// The deployment identifier, uniquely identifying the tool's deployment on the platform.
-        /// Required.
+        /// The required https://purl.imsglobal.org/spec/lti/claim/deployment_id claim's value
+        /// contains a string that identifies the platform-tool integration governing the message.
         /// </summary>
         public string DeploymentId
         {
             get { return this.GetClaimValue(LtiConstants.DeploymentIdClaim); }
             set { this.SetClaimValue(LtiConstants.DeploymentIdClaim, value); }
         }
-
-        // https://www.imsglobal.org/spec/lti/v1p3/#required-message-claims
 
         /// <summary>
         /// The type of LTI message. Must be "LtiResourceLinkRequest".
@@ -71,7 +73,14 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         }
 
         /// <summary>
-        /// A link to tool's resource from the platform. Required.
+        /// The required https://purl.imsglobal.org/spec/lti/claim/resource_link claim composes
+        /// properties for the resource link from which the launch message occurs.
+        /// <example>
+        /// {
+        ///   "id": "200d101f-2c14-434a-a0f3-57c2a42369fd",
+        ///   ...
+        /// }
+        /// </example>
         /// </summary>
         [JsonProperty("ResourceLink")]
         public ResourceLink ResourceLink
@@ -87,6 +96,17 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         {
             get { return this.GetClaimValue<Role[]>(LtiConstants.RolesClaim); }
             set { this.SetClaimValue(LtiConstants.RolesClaim, value); }
+        }
+
+        /// <summary>
+        /// The required 'sub' claim's value contains a string acting as an opaque identifier for
+        /// the user that initiated the launch. This value MUST be immutable and MUST be unique
+        /// within the platform instance.
+        /// </summary>
+        public string UserId
+        {
+            get { return this.GetClaimValue(JwtRegisteredClaimNames.Sub); }
+            set { this.SetClaimValue(JwtRegisteredClaimNames.Sub, value); }
         }
 
         /// <summary>

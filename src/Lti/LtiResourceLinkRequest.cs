@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -83,7 +82,7 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </example>
         /// </summary>
         [JsonProperty("ResourceLink")]
-        public ResourceLinkClaimValue ResourceLinkClaimValue
+        public ResourceLinkClaimValue ResourceLink
         {
             get { return this.GetClaimValue<ResourceLinkClaimValue>(LtiClaimNames.ResourceLink); }
             set { this.SetClaimValue(LtiClaimNames.ResourceLink, value); }

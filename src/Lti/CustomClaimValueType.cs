@@ -2,7 +2,7 @@
 
 namespace LtiAdvantageLibrary.NetCore.Lti
 {
-    public class CustomClaimValue : Hashtable
+    public class CustomClaimValueType : Hashtable
     {
     }
 }

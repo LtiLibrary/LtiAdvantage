@@ -5,7 +5,7 @@ namespace LtiAdvantageLibrary.NetCore.Lti
     /// <summary>
     /// Information to help the Tool present itself appropriately.
     /// </summary>
-    public class LaunchPresentationClaimValue
+    public class LaunchPresentationClaimValueType
     {
         /// <summary>
         /// The type of 'browsing context' the launch occurred in. See

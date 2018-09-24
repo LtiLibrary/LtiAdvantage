@@ -5,7 +5,7 @@ namespace LtiAdvantageLibrary.NetCore.Lti
     /// <summary>
     /// A link to tool's resource from the tool's platform.
     /// </summary>
-    public class ResourceLinkClaimValue
+    public class ResourceLinkClaimValueType
     {
         /// <summary>
         /// This is an opaque unique within the tool platform identifier for that resource link.

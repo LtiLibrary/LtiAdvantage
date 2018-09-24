@@ -82,9 +82,9 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// </example>
         /// </summary>
         [JsonProperty("ResourceLink")]
-        public ResourceLinkClaimValue ResourceLink
+        public ResourceLinkClaimValueType ResourceLink
         {
-            get { return this.GetClaimValue<ResourceLinkClaimValue>(LtiClaimNames.ResourceLink); }
+            get { return this.GetClaimValue<ResourceLinkClaimValueType>(LtiClaimNames.ResourceLink); }
             set { this.SetClaimValue(LtiClaimNames.ResourceLink, value); }
         }
 
@@ -124,27 +124,27 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// <summary>
         /// Properties of the context from which the launch originated (for example, course id and title).
         /// </summary>
-        public ContextClaimValue Context
+        public ContextClaimValueType Context
         {
-            get { return this.GetClaimValue<ContextClaimValue>(LtiClaimNames.Context); }
+            get { return this.GetClaimValue<ContextClaimValueType>(LtiClaimNames.Context); }
             set { this.SetClaimValue(LtiClaimNames.Context, value); }
         }
 
         /// <summary>
         /// This is a map of key/value custom parameters which are to be included with the launch.
         /// </summary>
-        public CustomClaimValue Custom
+        public CustomClaimValueType Custom
         {
-            get { return this.GetClaimValue<CustomClaimValue>(LtiClaimNames.Custom); }
+            get { return this.GetClaimValue<CustomClaimValueType>(LtiClaimNames.Custom); }
             set { this.SetClaimValue(LtiClaimNames.Custom, value);}
         }
 
         /// <summary>
         /// Information to help the Tool present itself appropriately.
         /// </summary>
-        public LaunchPresentationClaimValue LaunchPresentation
+        public LaunchPresentationClaimValueType LaunchPresentation
         {
-            get { return this.GetClaimValue<LaunchPresentationClaimValue>(LtiClaimNames.LaunchPresentation); }
+            get { return this.GetClaimValue<LaunchPresentationClaimValueType>(LtiClaimNames.LaunchPresentation); }
             set { this.SetClaimValue(LtiClaimNames.LaunchPresentation, value); }
         }
 
@@ -152,18 +152,18 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// Properties about available Learning Information Services (LIS),
         /// usually originating from the Student Information System.
         /// </summary>
-        public LisClaimValue Lis
+        public LisClaimValueType Lis
         {
-            get { return this.GetClaimValue<LisClaimValue>(LtiClaimNames.Lis); }
+            get { return this.GetClaimValue<LisClaimValueType>(LtiClaimNames.Lis); }
             set { this.SetClaimValue(LtiClaimNames.Lis, value);}
         }
 
         /// <summary>
         /// Properties associated with the platform initiating the launch.
         /// </summary>
-        public PlatformClaimValue Platform
+        public PlatformClaimValueType Platform
         {
-            get { return this.GetClaimValue<PlatformClaimValue>(LtiClaimNames.Platform); }
+            get { return this.GetClaimValue<PlatformClaimValueType>(LtiClaimNames.Platform); }
             set { this.SetClaimValue(LtiClaimNames.Platform, value); }
         }
 

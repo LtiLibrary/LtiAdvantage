@@ -1,8 +1,10 @@
 ﻿using System.IO;
 using System.Security.Cryptography;
 using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Security;
 
 namespace LtiAdvantageLibrary.NetCore.Utilities
 {
@@ -14,6 +16,41 @@ namespace LtiAdvantageLibrary.NetCore.Utilities
     /// </summary>
     public static class RsaHelper
     {
+        public class RsaKeyPair
+        {
+            public string PublicKey { get; set; }
+            public string PrivateKey { get; set; }
+        }
+
+        public static RsaKeyPair GenerateRsaKeyPair()  
+        {  
+            var rsaGenerator = new RsaKeyPairGenerator();  
+            rsaGenerator.Init(new KeyGenerationParameters(new SecureRandom(), 2048));  
+            var keyPair = rsaGenerator.GenerateKeyPair();  
+  
+            var rsaKeyPair = new RsaKeyPair();
+            
+            using (var privateKeyTextWriter = new StringWriter())  
+            {  
+                var pemWriter = new PemWriter(privateKeyTextWriter);  
+                pemWriter.WriteObject(keyPair.Private);  
+                pemWriter.Writer.Flush();
+
+                rsaKeyPair.PrivateKey = privateKeyTextWriter.ToString();
+            }  
+  
+            using (var publicKeyTextWriter = new StringWriter())  
+            {  
+                var pemWriter = new PemWriter(publicKeyTextWriter);  
+                pemWriter.WriteObject(keyPair.Public);  
+                pemWriter.Writer.Flush();  
+  
+                rsaKeyPair.PublicKey = publicKeyTextWriter.ToString();  
+            }
+
+            return rsaKeyPair;
+        } 
+
         public static RSACryptoServiceProvider PrivateKeyFromPemString(string privateKey)  
         {  
             using (var privateKeyTextReader = new StringReader(privateKey))  

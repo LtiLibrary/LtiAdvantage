@@ -95,7 +95,7 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         /// <summary>
         /// </summary>
         [Uri("http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student")]
-        InstituionStudent,
+        InstitutionStudent,
 
         #endregion
 

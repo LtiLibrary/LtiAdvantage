@@ -38,6 +38,19 @@ namespace LtiAdvantageLibrary.NetCore.Lti
         // See https://purl.imsglobal.org/spec/lti/v1p3/schema/json/Token.json
 
         /// <summary>
+        /// REQUIRED. Audience(s) for whom this ID Token is intended i.e. the Tool.
+        /// It MUST contain the OAuth 2.0 client_id of the Tool as an audience value.
+        /// It MAY also contain identifiers for other audiences. In the general case,
+        /// the aud value is an array of case-sensitive strings. In the common special
+        /// case when there is one audience, the aud value MAY be a single case-sensitive string.
+        /// </summary>
+        public string[] Audiences
+        {
+            get { return this.GetClaimValue<string[]>(JwtRegisteredClaimNames.Aud); }
+            set { this.SetClaimValue(JwtRegisteredClaimNames.Aud, value);}
+        }
+
+        /// <summary>
         /// The required https://purl.imsglobal.org/spec/lti/claim/deployment_id claim's value
         /// contains a string that identifies the platform-tool integration governing the message.
         /// </summary>

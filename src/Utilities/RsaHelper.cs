@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Security.Cryptography;
+using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -53,22 +54,22 @@ namespace LtiAdvantageLibrary.NetCore.Utilities
 
         public static RSACryptoServiceProvider PrivateKeyFromPemString(string privateKey)  
         {  
-            using (var privateKeyTextReader = new StringReader(privateKey))  
+            using (var keyTextReader = new StringReader(privateKey))  
             {  
-                var readKeyPair = (AsymmetricCipherKeyPair)new PemReader(privateKeyTextReader).ReadObject();  
+                var cipherKeyPair = (AsymmetricCipherKeyPair)new PemReader(keyTextReader).ReadObject();  
   
-                var privateKeyParams = (RsaPrivateCrtKeyParameters)readKeyPair.Private;  
+                var keyParameters = (RsaPrivateCrtKeyParameters)cipherKeyPair.Private;  
                 var cryptoServiceProvider = new RSACryptoServiceProvider();
                 var parms = new RSAParameters
                 {
-                    Modulus = privateKeyParams.Modulus.ToByteArrayUnsigned(),
-                    P = privateKeyParams.P.ToByteArrayUnsigned(),
-                    Q = privateKeyParams.Q.ToByteArrayUnsigned(),
-                    DP = privateKeyParams.DP.ToByteArrayUnsigned(),
-                    DQ = privateKeyParams.DQ.ToByteArrayUnsigned(),
-                    InverseQ = privateKeyParams.QInv.ToByteArrayUnsigned(),
-                    D = privateKeyParams.Exponent.ToByteArrayUnsigned(),
-                    Exponent = privateKeyParams.PublicExponent.ToByteArrayUnsigned()
+                    Modulus = keyParameters.Modulus.ToByteArrayUnsigned(),
+                    P = keyParameters.P.ToByteArrayUnsigned(),
+                    Q = keyParameters.Q.ToByteArrayUnsigned(),
+                    DP = keyParameters.DP.ToByteArrayUnsigned(),
+                    DQ = keyParameters.DQ.ToByteArrayUnsigned(),
+                    InverseQ = keyParameters.QInv.ToByteArrayUnsigned(),
+                    D = keyParameters.Exponent.ToByteArrayUnsigned(),
+                    Exponent = keyParameters.PublicExponent.ToByteArrayUnsigned()
                 };
                 cryptoServiceProvider.ImportParameters(parms);  
   
@@ -78,19 +79,63 @@ namespace LtiAdvantageLibrary.NetCore.Utilities
 
         public static RSACryptoServiceProvider PublicKeyFromPemString(string publicKey)
         {
-            using (var publicKeyTextReader = new StringReader(publicKey))
+            using (var keyTextReader = new StringReader(publicKey))
             {
-                var publicKeyParam = (RsaKeyParameters)new PemReader(publicKeyTextReader).ReadObject();
+                var keyParameters = (RsaKeyParameters)new PemReader(keyTextReader).ReadObject();
 
                 var cryptoServiceProvider = new RSACryptoServiceProvider();
                 var parms = new RSAParameters
                 {
-                    Modulus = publicKeyParam.Modulus.ToByteArrayUnsigned(),
-                    Exponent = publicKeyParam.Exponent.ToByteArrayUnsigned()
+                    Modulus = keyParameters.Modulus.ToByteArrayUnsigned(),
+                    Exponent = keyParameters.Exponent.ToByteArrayUnsigned()
                 };
                 cryptoServiceProvider.ImportParameters(parms);
 
                 return cryptoServiceProvider;
+            }
+        }
+
+        public static JsonWebKey PrivateJsonWebKeyFromPemString(string privateKey)
+        {
+            using (var keyTextReader = new StringReader(privateKey))
+            {
+                var cipherKeyPair = (AsymmetricCipherKeyPair)new PemReader(keyTextReader).ReadObject();  
+  
+                var keyParameters = (RsaPrivateCrtKeyParameters)cipherKeyPair.Private;  
+
+                var jwk = new JsonWebKey
+                {
+                    Kty = JsonWebAlgorithmsKeyTypes.RSA,
+                    N = Base64UrlEncoder.Encode(keyParameters.Modulus.ToByteArrayUnsigned()),
+                    E = Base64UrlEncoder.Encode(keyParameters.PublicExponent.ToByteArrayUnsigned()),
+                    Alg = "RS256",
+                    Use = JsonWebKeyUseNames.Sig,
+                    P = Base64UrlEncoder.Encode(keyParameters.P.ToByteArrayUnsigned()),
+                    Q = Base64UrlEncoder.Encode(keyParameters.Q.ToByteArrayUnsigned()),
+                    DP = Base64UrlEncoder.Encode(keyParameters.DP.ToByteArrayUnsigned()),
+                    DQ = Base64UrlEncoder.Encode(keyParameters.DQ.ToByteArrayUnsigned()),
+                    QI = Base64UrlEncoder.Encode(keyParameters.QInv.ToByteArrayUnsigned()),
+                    D = Base64UrlEncoder.Encode(keyParameters.Exponent.ToByteArrayUnsigned())
+                };
+                return jwk;
+            }
+        }
+
+        public static JsonWebKey PublicJsonWebKeyFromPemString(string publicKey)
+        {
+            using (var keyTextReader = new StringReader(publicKey))
+            {
+                var keyParameters = (RsaKeyParameters)new PemReader(keyTextReader).ReadObject();
+
+                var jwk = new JsonWebKey
+                {
+                    Kty = JsonWebAlgorithmsKeyTypes.RSA,
+                    N = Base64UrlEncoder.Encode(keyParameters.Modulus.ToByteArrayUnsigned()),
+                    E = Base64UrlEncoder.Encode(keyParameters.Exponent.ToByteArrayUnsigned()),
+                    Alg = "RS256",
+                    Use = JsonWebKeyUseNames.Sig
+                };
+                return jwk;
             }
         }
     }

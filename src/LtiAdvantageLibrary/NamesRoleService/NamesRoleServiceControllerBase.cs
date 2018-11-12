@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LtiAdvantageLibrary.Membership
+namespace LtiAdvantageLibrary.NamesRoleService
 {
     /// <inheritdoc />
     /// <summary>
@@ -19,13 +19,13 @@ namespace LtiAdvantageLibrary.Membership
     /// </remarks>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("context/{contextid}/[controller]", Name = Constants.LtiClaims.NamesRoleService)]
-    public abstract class MembershipControllerBase : ControllerBase
+    public abstract class NamesRoleServiceControllerBase : ControllerBase
     {
         /// <summary>
-        /// Populate the <see cref="GetMembershipResponse"/> with the membership and set the StatusCode
+        /// Populate the <see cref="GetNamesRolesResponse"/> with the membership and set the StatusCode
         /// to signify success or failure.
         /// </summary>
-        protected abstract Task<GetMembershipResponse> OnGetMembershipAsync(GetMembershipRequest request);
+        protected abstract Task<GetNamesRolesResponse> OnGetMembershipAsync(GetNamesRolesRequest request);
 
         /// <summary>
         /// To get the membership for a particular context, the client submits an HTTP GET 
@@ -49,7 +49,7 @@ namespace LtiAdvantageLibrary.Membership
                 }
 
                 // Invoke OnGetMembershipAsync in the application's controller to fill in the membership
-                var request = new GetMembershipRequest(contextId, limit, rlid, role);
+                var request = new GetNamesRolesRequest(contextId, limit, rlid, role);
                 var response = await OnGetMembershipAsync(request).ConfigureAwait(false);
 
                 // Return the result

@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace LtiAdvantageLibrary.Membership
+namespace LtiAdvantageLibrary.NamesRoleService
 {
     /// <inheritdoc />
     /// <summary>
-    /// A <see cref="T:LtiAdvantageLibrary.Membership.GetMembershipResponse" />
+    /// A <see cref="T:LtiAdvantageLibrary.NamesRoleService.GetMembershipResponse" />
     /// that when executed will produce a Not Found (404) response.
     /// </summary>
-    public class NotFoundResponse : GetMembershipResponse
+    public class NotFoundResponse : GetNamesRolesResponse
     {
         /// <summary>
         /// Creates a new <see cref="NotFoundResponse"/> instance.

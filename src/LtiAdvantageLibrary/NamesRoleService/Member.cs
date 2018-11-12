@@ -3,7 +3,7 @@ using System.ComponentModel;
 using LtiAdvantageLibrary.Lti;
 using Newtonsoft.Json;
 
-namespace LtiAdvantageLibrary.Membership
+namespace LtiAdvantageLibrary.NamesRoleService
 {
     /// <summary>
     /// Represents a member in the Membership container of the Membership service.

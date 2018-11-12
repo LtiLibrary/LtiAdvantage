@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace LtiAdvantageLibrary.Membership
+namespace LtiAdvantageLibrary.NamesRoleService
 {
     /// <summary>
     /// Represents a GetMembership response.
     /// </summary>
-    public class GetMembershipResponse
+    public class GetNamesRolesResponse
     {
         /// <summary>
         /// Create an empty response
         /// </summary>
-        public GetMembershipResponse()
+        public GetNamesRolesResponse()
         {
             StatusCode = StatusCodes.Status200OK;
         }

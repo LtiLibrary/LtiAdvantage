@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LtiAdvantageLibrary.Membership
+namespace LtiAdvantageLibrary.NamesRoleService
 {
     /// <inheritdoc />
     /// <summary>
-    /// <see cref="T:Microsoft.AspNetCore.Mvc.JsonResult" /> wrapper for <see cref="T:LtiAdvantageLibrary.Membership.MembershipContainer" /> assigns the correct
+    /// <see cref="T:Microsoft.AspNetCore.Mvc.JsonResult" /> wrapper for <see cref="T:LtiAdvantageLibrary.NamesRoleService.MembershipContainer" /> assigns the correct
     /// <see cref="P:Microsoft.AspNetCore.Mvc.JsonResult.ContentType" /> for the Content-Type header.
     /// </summary>
     public class MembershipContainerResult : JsonResult

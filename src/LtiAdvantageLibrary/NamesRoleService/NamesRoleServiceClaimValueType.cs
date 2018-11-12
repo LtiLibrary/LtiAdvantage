@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace LtiAdvantageLibrary.Membership
+namespace LtiAdvantageLibrary.NamesRoleService
 {
     public class NamesRoleServiceClaimValueType
     {

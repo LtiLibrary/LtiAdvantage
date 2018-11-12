@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace LtiAdvantageLibrary.Membership
+namespace LtiAdvantageLibrary.NamesRoleService
 {
     /// <inheritdoc />
     /// <summary>
-    /// A <see cref="T:LtiAdvantageLibrary.Membership.GetMembershipResponse" />
+    /// A <see cref="T:LtiAdvantageLibrary.NamesRoleService.GetMembershipResponse" />
     /// that when executed will produce a Bad Request (400) response.
     /// </summary>
-    public class BadRequestResponse : GetMembershipResponse
+    public class BadRequestResponse : GetNamesRolesResponse
     {
         /// <summary>
         /// Creates a new <see cref="BadRequestResponse"/> instance.

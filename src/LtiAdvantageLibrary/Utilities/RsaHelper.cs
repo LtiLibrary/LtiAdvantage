@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Security.Cryptography;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
@@ -34,6 +36,21 @@ namespace LtiAdvantageLibrary.Utilities
         }
 
         /// <summary>
+        /// Create a signed jwt.
+        /// </summary>
+        /// <param name="payload">The payload to include in the jwt.</param>
+        /// <param name="privateKey">The private signing key in PEM format.</param>
+        /// <returns>The signed jwt.</returns>
+        public static string CreateSignedJwt(JwtPayload payload, string privateKey)
+        {
+            var key = RsaHelper.PrivateKeyFromPemString(privateKey);
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
+            var handler = new JsonWebTokenHandler();
+            var jwt = handler.CreateToken(payload.SerializeToJson(), credentials);
+            return jwt;
+        }
+
+        /// <summary>
         /// Create a new private/public key pair as PEM formatted strings.
         /// </summary>
         /// <returns>An <see cref="RsaKeyPair"/>.</returns>
@@ -64,14 +81,14 @@ namespace LtiAdvantageLibrary.Utilities
             }
 
             return rsaKeyPair;
-        } 
+        }
 
         /// <summary>
         /// Converts a private key in PEM format into an <see cref="RsaSecurityKey"/>.
         /// </summary>
         /// <param name="privateKey">The private key.</param>
         /// <returns>The private key as an <see cref="RsaSecurityKey"/>.</returns>
-        public static RsaSecurityKey PrivateKeyFromPemString(string privateKey)  
+        private static RsaSecurityKey PrivateKeyFromPemString(string privateKey)  
         {  
             using (var keyTextReader = new StringReader(privateKey))  
             {  

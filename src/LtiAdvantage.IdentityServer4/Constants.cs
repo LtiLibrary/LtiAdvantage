@@ -4,8 +4,8 @@
     {
         public static class SecretTypes
         {
-            public const string PrivateKey = "PrivateKey";
-            public const string PublicKey = "PublicKey";
+            public const string PublicPemKey = "PublicPemKey";
+            public const string PublicJsonWebKey = "PublicJsonWebKey";
         }
     }
 }

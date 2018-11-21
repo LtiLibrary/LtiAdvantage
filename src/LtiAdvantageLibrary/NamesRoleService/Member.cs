@@ -102,8 +102,8 @@ namespace LtiAdvantageLibrary.NamesRoleService
         /// A unique identifier for the person as provisioned by an external system such as an SIS.
         /// Corresponds to <code>PersonSourcedId</code> in <see cref="LtiResourceLinkRequest.Lis"/>.
         /// </summary>
-        [JsonProperty("sourced_id")]
-        public string SourcedId { get; set; }
+        [JsonProperty("lis_person_sourced_id")]
+        public string LisPersonSourcedId { get; set; }
 
         /// <summary>
         /// Membership status is either Active or Inactive. Defaults to Active if not specified.

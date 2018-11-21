@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using IdentityServer4;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Validation;
-using LtiAdvantageLibrary.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.OpenSsl;
+using JsonWebKey = IdentityServer4.Models.JsonWebKey;
 
 namespace LtiAdvantage.IdentityServer4
 {
@@ -58,10 +63,10 @@ namespace LtiAdvantage.IdentityServer4
                 return fail;
             }
 
-            var publicKeys = secrets
-                .Where(s => s.Type == Constants.SecretTypes.PublicKey)
-                .Select(s => RsaHelper.PublicKeyFromPemString(s.Value))
-                .ToList();
+            // Collect the potential public keys from the client secrets
+            var secretArray = secrets as Secret[] ?? secrets.ToArray();
+            var publicKeys = GetPemKeys(secretArray);
+            publicKeys.AddRange(GetJsonWebKeys(secretArray));
 
             if (!publicKeys.Any())
             {
@@ -105,6 +110,76 @@ namespace LtiAdvantage.IdentityServer4
                 _logger.LogError(e, "JWT token validation error");
                 return fail;
             }
+        }
+
+        /// <summary>
+        /// Get the PEM format secrets.
+        /// </summary>
+        /// <param name="secrets">The secrets to examine.</param>
+        /// <returns>The PEM secrets converted into <see cref="RsaSecurityKey"/>'s.</returns>
+        private static List<RsaSecurityKey> GetPemKeys(IEnumerable<Secret> secrets)
+        {
+            var pemKeys = secrets
+                .Where(s => s.Type == Constants.SecretTypes.PublicPemKey)
+                .Select(s => s.Value)
+                .ToList();
+
+            var rsaSecurityKeys = new List<RsaSecurityKey>();
+
+            foreach (var pemKey in pemKeys)
+            {
+                using (var keyTextReader = new StringReader(pemKey))
+                {
+                    // PemReader can read any PEM file. Only interested in RsaKeyParameters.
+                    if (new PemReader(keyTextReader).ReadObject() is RsaKeyParameters bouncyKeyParameters)
+                    {
+                        var rsaParameters = new RSAParameters
+                        {
+                            Modulus = bouncyKeyParameters.Modulus.ToByteArrayUnsigned(),
+                            Exponent = bouncyKeyParameters.Exponent.ToByteArrayUnsigned()
+                        };
+
+                        var rsaSecurityKey = new RsaSecurityKey(rsaParameters);
+
+                        rsaSecurityKeys.Add(rsaSecurityKey);
+                    }
+                }
+            }
+
+            return rsaSecurityKeys;
+        }
+
+        /// <summary>
+        /// Get the <see cref="JsonWebKey"/> secrets.
+        /// </summary>
+        /// <param name="secrets">The secrets to examine.</param>
+        /// <returns>The <see cref="JsonWebKey"/>'s converted into <see cref="RsaSecurityKey"/>'s.</returns>
+        private static IEnumerable<RsaSecurityKey> GetJsonWebKeys(IEnumerable<Secret> secrets)
+        {
+            var jsonWebKeys = secrets
+                .Where(s => s.Type == Constants.SecretTypes.PublicJsonWebKey)
+                .Select(s => JsonConvert.DeserializeObject<JsonWebKey>(s.Value))
+                .ToList();
+
+            var rsaSecurityKeys = new List<RsaSecurityKey>();
+
+            foreach (var jsonWebKey in jsonWebKeys)
+            {
+                if (jsonWebKey.kty == JsonWebAlgorithmsKeyTypes.RSA)
+                {
+                    var rsaParameters = new RSAParameters
+                    {
+                        Modulus = Base64UrlEncoder.DecodeBytes(jsonWebKey.n),
+                        Exponent = Base64UrlEncoder.DecodeBytes(jsonWebKey.e)
+                    };
+
+                    var rsaSecurityKey = new RsaSecurityKey(rsaParameters);
+
+                    rsaSecurityKeys.Add(rsaSecurityKey);
+                }
+            }
+
+            return rsaSecurityKeys;
         }
     }
 }

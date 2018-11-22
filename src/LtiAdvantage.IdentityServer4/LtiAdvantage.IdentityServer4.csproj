@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="1.8.3" />
-    <PackageReference Include="IdentityServer4" Version="2.1.1" />
+    <PackageReference Include="IdentityServer4" Version="2.3.0" />
   </ItemGroup>
 
 </Project>

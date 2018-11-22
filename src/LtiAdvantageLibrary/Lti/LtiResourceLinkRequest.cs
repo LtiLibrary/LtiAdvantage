@@ -12,7 +12,7 @@ namespace LtiAdvantageLibrary.Lti
     /// <summary>
     /// https://purl.imsglobal.org/spec/lti/v1p3/schema/json/LtiResourceLinkRequest.json
     /// </summary>
-    public partial class LtiResourceLinkRequest : JwtPayload
+    public class LtiResourceLinkRequest : JwtPayload
     {
 
         #region Constructors
@@ -151,6 +151,15 @@ namespace LtiAdvantageLibrary.Lti
         {
             get { return this.GetClaimValue<ContextClaimValueType>(Constants.LtiClaims.Context); }
             set { this.SetClaimValue(Constants.LtiClaims.Context, value); }
+        }
+
+        /// <summary>
+        /// This is a map of key/value custom parameters which are to be included with the launch.
+        /// </summary>
+        public Dictionary<string, string> Custom
+        {
+            get { return this.GetClaimValue<Dictionary<string, string>>(Constants.LtiClaims.Custom); }
+            set { this.SetClaimValue(Constants.LtiClaims.Custom, value); }
         }
 
         /// <summary>

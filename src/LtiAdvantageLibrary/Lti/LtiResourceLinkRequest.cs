@@ -155,9 +155,9 @@ namespace LtiAdvantageLibrary.Lti
         /// <summary>
         /// This is a map of key/value custom parameters which are to be included with the launch.
         /// </summary>
-        public CustomClaimValueType Custom
+        public Dictionary<string, string> Custom
         {
-            get { return this.GetClaimValue<CustomClaimValueType>(Constants.LtiClaims.Custom); }
+            get { return this.GetClaimValue<Dictionary<string, string>>(Constants.LtiClaims.Custom); }
             set { this.SetClaimValue(Constants.LtiClaims.Custom, value);}
         }
 

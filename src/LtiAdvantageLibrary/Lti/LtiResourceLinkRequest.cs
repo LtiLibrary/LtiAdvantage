@@ -8,10 +8,11 @@ using LtiAdvantageLibrary.Utilities;
 
 namespace LtiAdvantageLibrary.Lti
 {
+    /// <inheritdoc />
     /// <summary>
     /// https://purl.imsglobal.org/spec/lti/v1p3/schema/json/LtiResourceLinkRequest.json
     /// </summary>
-    public class LtiResourceLinkRequest : JwtPayload
+    public partial class LtiResourceLinkRequest : JwtPayload
     {
 
         #region Constructors
@@ -153,15 +154,6 @@ namespace LtiAdvantageLibrary.Lti
         }
 
         /// <summary>
-        /// This is a map of key/value custom parameters which are to be included with the launch.
-        /// </summary>
-        public Dictionary<string, string> Custom
-        {
-            get { return this.GetClaimValue<Dictionary<string, string>>(Constants.LtiClaims.Custom); }
-            set { this.SetClaimValue(Constants.LtiClaims.Custom, value);}
-        }
-
-        /// <summary>
         /// Information to help the Tool present itself appropriately.
         /// </summary>
         public LaunchPresentationClaimValueType LaunchPresentation
@@ -244,22 +236,6 @@ namespace LtiAdvantageLibrary.Lti
         {
             get { return this.GetClaimValue(JwtRegisteredClaimNames.GivenName); }
             set { this.SetClaimValue(JwtRegisteredClaimNames.GivenName, value);}
-        }
-
-        /// <summary>
-        /// End-User's locale, represented as a BCP47 [RFC5646] language tag. This is typically an
-        /// ISO 639-1 Alpha-2 [ISO639‑1] language code in lowercase and an ISO 3166-1 Alpha-2 [ISO3166‑1]
-        /// country code in uppercase, separated by a dash. For example, en-US or fr-CA. As a compatibility
-        /// note, some implementations have used an underscore as the separator rather than a dash, for
-        /// example, en_US; Tools MAY choose to accept this locale syntax as well.
-        /// <example>
-        /// en-US
-        /// </example>
-        /// </summary>
-        public string Locale
-        {
-            get { return this.GetClaimValue(Constants.OidcClaims.Locale); }
-            set { this.SetClaimValue(Constants.OidcClaims.Locale, value); }
         }
 
         /// <summary>

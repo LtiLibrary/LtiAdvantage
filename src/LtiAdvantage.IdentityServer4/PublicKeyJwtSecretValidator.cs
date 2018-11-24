@@ -87,10 +87,18 @@ namespace LtiAdvantage.IdentityServer4
                 return fail;
             }
 
+            var handler = new JwtSecurityTokenHandler();
+            if (!handler.CanReadToken(token))
+            {
+                _logger.LogError("ParsedSecret.Credential is not a well formed JWT.");
+                return fail;
+            }
+
             // Collect the potential public keys from the client secrets
             var secretArray = secrets as Secret[] ?? secrets.ToArray();
             var publicKeys = GetPemKeys(secretArray);
-            publicKeys.AddRange(GetJsonWebKeys(secretArray));
+            var securityToken = handler.ReadJwtToken(token);
+            publicKeys.AddRange(GetJsonWebKeys(secretArray, securityToken.Header.Kid));
 
             if (!publicKeys.Any())
             {
@@ -124,7 +132,6 @@ namespace LtiAdvantage.IdentityServer4
 
             try
             {
-                var handler = new JwtSecurityTokenHandler();
                 handler.ValidateToken(token, tokenValidationParameters, out _);
 
                 return success;
@@ -177,8 +184,9 @@ namespace LtiAdvantage.IdentityServer4
         /// Get the <see cref="JsonWebKey"/> secrets.
         /// </summary>
         /// <param name="secrets">The secrets to examine.</param>
+        /// <param name="keyId">The keyId to match.</param>
         /// <returns>The <see cref="JsonWebKey"/>'s converted into <see cref="RsaSecurityKey"/>'s.</returns>
-        private static IEnumerable<RsaSecurityKey> GetJsonWebKeys(IEnumerable<Secret> secrets)
+        private static IEnumerable<RsaSecurityKey> GetJsonWebKeys(IEnumerable<Secret> secrets, string keyId)
         {
             var jsonWebKeys = secrets
                 .Where(s => s.Type == Constants.SecretTypes.PublicJsonWebKey)
@@ -189,7 +197,8 @@ namespace LtiAdvantage.IdentityServer4
 
             foreach (var jsonWebKey in jsonWebKeys)
             {
-                if (jsonWebKey.kty == JsonWebAlgorithmsKeyTypes.RSA)
+                if (jsonWebKey.kty == JsonWebAlgorithmsKeyTypes.RSA
+                    && jsonWebKey.kid == keyId)
                 {
                     var rsaParameters = new RSAParameters
                     {

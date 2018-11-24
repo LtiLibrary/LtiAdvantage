@@ -17,7 +17,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 using JsonWebKey = IdentityServer4.Models.JsonWebKey;
 
-namespace LtiAdvantage.IdentityServer4
+namespace LtiAdvantage.IdentityServer4.Validation
 {
     /// <inheritdoc />
     /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace LtiAdvantage.IdentityServer4
+﻿namespace LtiAdvantage.IdentityServer4.Validation
 {
     /// <summary>
     /// Identity Server contants used by <see cref="PublicKeyJwtSecretValidator"/>.

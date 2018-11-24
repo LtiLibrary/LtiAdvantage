@@ -21,34 +21,41 @@ namespace LtiAdvantage.IdentityServer4
 {
     /// <inheritdoc />
     /// <summary>
-    /// Validates a secret based on RS256 signed JWT token
+    /// Authenticates a client using public key JWT client secrets.
     /// </summary>
-    public class SignedJwtSecretValidator : ISecretValidator
+    /// <remarks>
+    /// See https://tools.ietf.org/html/rfc7523 and the IMS application profile
+    /// https://www.imsglobal.org/spec/security/v1p0#using-json-web-tokens-with-oauth-2-0-client-credentials-grant).
+    /// This similar to <see cref="PrivateKeyJwtSecretValidator"/> with these differences:
+    /// <list type="bullet">
+    /// <item>
+    /// <description>
+    /// Does not require that iss=sub. The IMS application profile does not require this.
+    /// </description>        
+    /// </item>
+    /// <item>
+    /// <description>
+    /// Accepts either the token endpoint or that base url of the authentication server per
+    /// the IMS application profile.
+    /// </description>
+    /// </item>
+    /// <item>
+    /// <description>
+    /// Uses serialized JSON Web Keys or PEM format keys instead of the full (leaf)
+    /// certificate as base64.
+    /// </description>
+    /// </item>
+    /// </list>
+    /// </remarks>
+    public class PublicKeyJwtSecretValidator : ISecretValidator
     {
-        private readonly ILogger<SignedJwtSecretValidator> _logger;
+        private readonly ILogger<PublicKeyJwtSecretValidator> _logger;
         private readonly string _audienceUri;
 
         /// <summary>
         /// Instantiates an instance of Signed JWT secret validator.
         /// </summary>
-        /// <remarks>
-        /// Validates an IMS JWT client credentials that was signed by a private key as described here:
-        /// https://www.imsglobal.org/spec/security/v1p0#using-json-web-tokens-with-oauth-2-0-client-credentials-grant.
-        /// This similar to <see cref="PrivateKeyJwtSecretValidator"/> with these differences:
-        /// <list type="bullet">
-        /// <item>
-        /// <description>
-        /// Does not require that iss=aud.
-        /// </description>        
-        /// </item>
-        /// <item>
-        /// <description>
-        /// Uses serialized JSON Web Keys or PEM format keys.
-        /// </description>
-        /// </item>
-        /// </list>
-        /// </remarks>
-        public SignedJwtSecretValidator(IHttpContextAccessor contextAccessor, ILogger<SignedJwtSecretValidator> logger)
+        public PublicKeyJwtSecretValidator(IHttpContextAccessor contextAccessor, ILogger<PublicKeyJwtSecretValidator> logger)
         {
             _audienceUri = contextAccessor.HttpContext.GetIdentityServerIssuerUri();
             _logger = logger;
@@ -74,7 +81,7 @@ namespace LtiAdvantage.IdentityServer4
                 return fail;
             }
 
-            if (!(parsedSecret.Credential is string jwt))
+            if (!(parsedSecret.Credential is string token))
             {
                 _logger.LogError("ParsedSecret.Credential is not a string.");
                 return fail;
@@ -100,7 +107,7 @@ namespace LtiAdvantage.IdentityServer4
                 IssuerSigningKeys = publicKeys,
                 ValidateIssuerSigningKey = true,
 
-                // IMS recommendation is to send any unique name as Issuer. IMS reference 
+                // IMS recommendation is to send any unique name as Issuer. The IMS reference 
                 // implementation sends the tool name. The tool's own name for this client
                 // is not known by the platform and cannot be validated.
                 ValidateIssuer = false,
@@ -118,7 +125,7 @@ namespace LtiAdvantage.IdentityServer4
             try
             {
                 var handler = new JwtSecurityTokenHandler();
-                handler.ValidateToken(jwt, tokenValidationParameters, out _);
+                handler.ValidateToken(token, tokenValidationParameters, out _);
 
                 return success;
             }
@@ -190,7 +197,7 @@ namespace LtiAdvantage.IdentityServer4
                         Exponent = Base64UrlEncoder.DecodeBytes(jsonWebKey.e)
                     };
 
-                    var rsaSecurityKey = new RsaSecurityKey(rsaParameters);
+                    var rsaSecurityKey = new RsaSecurityKey(rsaParameters) {KeyId = jsonWebKey.kid};
 
                     rsaSecurityKeys.Add(rsaSecurityKey);
                 }

@@ -1,12 +1,12 @@
 ﻿namespace LtiAdvantage.IdentityServer4
 {
     /// <summary>
-    /// Identity Server contants used by <see cref="SignedJwtSecretValidator"/>.
+    /// Identity Server contants used by <see cref="PublicKeyJwtSecretValidator"/>.
     /// </summary>
     public static class Constants
     {
         /// <summary>
-        /// Types of ClientSecret used by <see cref="SignedJwtSecretValidator"/>.
+        /// Types of ClientSecret used by <see cref="PublicKeyJwtSecretValidator"/>.
         /// </summary>
         public static class SecretTypes
         {

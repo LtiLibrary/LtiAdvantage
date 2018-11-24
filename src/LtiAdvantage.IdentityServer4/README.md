@@ -11,7 +11,7 @@ for compatibility with the [IMS LTI Reference Implementation](https://github.com
 
 ## Getting Started
 
-Add the `PublicKeyJwtSecretValidator` to Startup.cs on the identity server (may be your platform):
+Add the `PublicKeyJwtSecretValidator` to Startup.cs:
 ```
 // Add JWT client credentials validation
 .AddSecretParser<JwtBearerClientAssertionSecretParser>()

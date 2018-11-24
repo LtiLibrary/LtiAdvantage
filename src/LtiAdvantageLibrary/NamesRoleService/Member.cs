@@ -118,7 +118,7 @@ namespace LtiAdvantageLibrary.NamesRoleService
 
         /// <summary>
         /// A unique identifier for the person.
-        /// Corresponds to <see cref="LtiResourceLinkRequest.Sub"/>.
+        /// Corresponds to the "sub" claim.
         /// </summary>
         [JsonProperty("user_id")]
         public string UserId { get; set; }

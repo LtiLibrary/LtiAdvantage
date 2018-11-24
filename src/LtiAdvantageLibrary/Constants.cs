@@ -1,7 +1,13 @@
 ﻿namespace LtiAdvantageLibrary
 {
+    /// <summary>
+    /// LTI Advantage Library constants.
+    /// </summary>
     public static class Constants
     {
+        /// <summary>
+        /// LTI claims.
+        /// </summary>
         public static class LtiClaims
         {
             /// <summary>
@@ -67,6 +73,9 @@
             public const string Version = "https://purl.imsglobal.org/spec/lti/claim/version";
         }
 
+        /// <summary>
+        /// LTI Advantage constants.
+        /// </summary>
         public static class Lti
         {
             /// <summary>
@@ -85,9 +94,20 @@
         /// </summary>
         public static class LtiScopes
         {
+            /// <summary>
+            /// Assignment and Grade Service lineitem read/write scope.
+            /// </summary>
             public const string AssignmentGradesLineItem = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem";
+
+            /// <summary>
+            /// Assignment and Grade Service result readonly scope.
+            /// </summary>
             public const string AssignmentGradesResultReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly";
-            public const string MembershipReadonly = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly";
+
+            /// <summary>
+            /// Names and Role Service readonly scope.
+            /// </summary>
+            public const string NamesRoleReadonly = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly";
         }
 
         /// <summary>

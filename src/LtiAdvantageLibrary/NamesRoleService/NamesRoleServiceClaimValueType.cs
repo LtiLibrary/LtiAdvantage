@@ -2,8 +2,16 @@
 
 namespace LtiAdvantageLibrary.NamesRoleService
 {
+    /// <summary>
+    /// LTI claim to include in the LtiResourceLinkRequest if the platform
+    /// supports the Names and Role Service.
+    /// </summary>
     public class NamesRoleServiceClaimValueType
     {
+        /// <summary>
+        /// Create an instance of the <see cref="NamesRoleServiceClaimValueType"/> with
+        /// the default value for <see cref="ServiceVersion"/>.
+        /// </summary>
         public NamesRoleServiceClaimValueType()
         {
             ServiceVersion = "2.0";

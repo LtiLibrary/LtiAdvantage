@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>LtiAdvantage.IdentityServer4</name>
+    </assembly>
+    <members>
+        <member name="T:LtiAdvantage.IdentityServer4.Constants">
+            <summary>
+            Identity Server contants used by <see cref="T:LtiAdvantage.IdentityServer4.SignedJwtSecretValidator"/>.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.IdentityServer4.Constants.SecretTypes">
+            <summary>
+            Types of ClientSecret used by <see cref="T:LtiAdvantage.IdentityServer4.SignedJwtSecretValidator"/>.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.IdentityServer4.Constants.SecretTypes.PublicPemKey">
+            <summary>
+            The ClientSecret is a public key in PEM format.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.IdentityServer4.Constants.SecretTypes.PublicJsonWebKey">
+            <summary>
+            The ClientSecret is a public key in JSON format.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.IdentityServer4.SignedJwtSecretValidator">
+            <inheritdoc />
+            <summary>
+            Validates a secret based on RS256 signed JWT token
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.IdentityServer4.SignedJwtSecretValidator.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.IdentityServer4.SignedJwtSecretValidator})">
+            <summary>
+            Instantiates an instance of Signed JWT secret validator.
+            </summary>
+            <remarks>
+            Validates an IMS JWT client credentials that was signed by a private key as described here:
+            https://www.imsglobal.org/spec/security/v1p0#using-json-web-tokens-with-oauth-2-0-client-credentials-grant.
+            This similar to <see cref="T:IdentityServer4.Validation.PrivateKeyJwtSecretValidator"/> with these differences:
+            <list type="bullet">
+            <item>
+            <description>
+            Does not require that iss=aud.
+            </description>        
+            </item>
+            <item>
+            <description>
+            Uses serialized JSON Web Keys or PEM format keys.
+            </description>
+            </item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.IdentityServer4.SignedJwtSecretValidator.ValidateAsync(System.Collections.Generic.IEnumerable{IdentityServer4.Models.Secret},IdentityServer4.Models.ParsedSecret)">
+            <inheritdoc />
+            <summary>
+            Validates the signed
+            </summary>
+            <param name="secrets">The stored secrets.</param>
+            <param name="parsedSecret">The received secret.</param>
+            <returns>
+            A validation result
+            </returns>
+            <exception cref="T:System.ArgumentException">ParsedSecret.Credential is not a JWT token</exception>
+        </member>
+        <member name="M:LtiAdvantage.IdentityServer4.SignedJwtSecretValidator.GetPemKeys(System.Collections.Generic.IEnumerable{IdentityServer4.Models.Secret})">
+            <summary>
+            Get the PEM format secrets.
+            </summary>
+            <param name="secrets">The secrets to examine.</param>
+            <returns>The PEM secrets converted into <see cref="T:Microsoft.IdentityModel.Tokens.RsaSecurityKey"/>'s.</returns>
+        </member>
+        <member name="M:LtiAdvantage.IdentityServer4.SignedJwtSecretValidator.GetJsonWebKeys(System.Collections.Generic.IEnumerable{IdentityServer4.Models.Secret})">
+            <summary>
+            Get the <see cref="T:IdentityServer4.Models.JsonWebKey"/> secrets.
+            </summary>
+            <param name="secrets">The secrets to examine.</param>
+            <returns>The <see cref="T:IdentityServer4.Models.JsonWebKey"/>'s converted into <see cref="T:Microsoft.IdentityModel.Tokens.RsaSecurityKey"/>'s.</returns>
+        </member>
+        <member name="T:LtiAdvantage.IdentityServer4.StringExtensions">
+            <summary>
+            Local version of Identity Server 4 internal static class StringExtensions
+            https://github.com/IdentityServer/IdentityServer4/blob/master/src/Extensions/StringsExtensions.cs
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.IdentityServer4.StringExtensions.EnsureTrailingSlash(System.String)">
+            <summary>
+            Ensure the string has a trailing slash.
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:LtiAdvantage.IdentityServer4.StringExtensions.IsMissing(System.String)">
+            <summary>
+            True if the value is null, empty, or whitespace.
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:LtiAdvantage.IdentityServer4.StringExtensions.IsPresent(System.String)">
+            <summary>
+            True if the value is not null, empty, or whitespace.
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

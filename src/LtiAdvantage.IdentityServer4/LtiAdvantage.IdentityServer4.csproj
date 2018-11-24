@@ -4,6 +4,10 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Users\aamil\Documents\Visual Studio 2017\Projects\LTI\LtiAdvantage\src\LtiAdvantage.IdentityServer4\LtiAdvantage.IdentityServer4.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="1.8.3" />
     <PackageReference Include="IdentityServer4" Version="2.3.0" />

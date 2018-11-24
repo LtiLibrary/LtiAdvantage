@@ -29,8 +29,25 @@ namespace LtiAdvantage.IdentityServer4
         private readonly string _audienceUri;
 
         /// <summary>
-        /// Instantiates an instance of Signed JWT secret validator
+        /// Instantiates an instance of Signed JWT secret validator.
         /// </summary>
+        /// <remarks>
+        /// Validates an IMS JWT client credentials that was signed by a private key as described here:
+        /// https://www.imsglobal.org/spec/security/v1p0#using-json-web-tokens-with-oauth-2-0-client-credentials-grant.
+        /// This similar to <see cref="PrivateKeyJwtSecretValidator"/> with these differences:
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// Does not require that iss=aud.
+        /// </description>        
+        /// </item>
+        /// <item>
+        /// <description>
+        /// Uses serialized JSON Web Keys or PEM format keys.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </remarks>
         public SignedJwtSecretValidator(IHttpContextAccessor contextAccessor, ILogger<SignedJwtSecretValidator> logger)
         {
             _audienceUri = contextAccessor.HttpContext.GetIdentityServerIssuerUri();
@@ -39,7 +56,7 @@ namespace LtiAdvantage.IdentityServer4
 
         /// <inheritdoc />
         /// <summary>
-        /// Validates a secret
+        /// Validates the signed
         /// </summary>
         /// <param name="secrets">The stored secrets.</param>
         /// <param name="parsedSecret">The received secret.</param>

@@ -169,5 +169,32 @@ namespace LtiAdvantage.AssignmentGradeServices
                 return StatusCode(StatusCodes.Status500InternalServerError, ex);
             }
         }
+
+        /// <summary>
+        /// Creates an <see cref="LineItemResult"/> object that produces an <see cref="StatusCodes.Status200OK"/> response.
+        /// </summary>
+        /// <param name="value">The LineItem to format in the entity body.</param>
+        /// <returns>The created <see cref="LineItemResult"/> for the response.</returns>
+        public LineItemResult Ok(LineItem value)
+            => new LineItemResult(value);
+
+        /// <summary>
+        /// Creates an <see cref="LineItemContainerResult"/> object that produces an <see cref="StatusCodes.Status200OK"/> response.
+        /// </summary>
+        /// <param name="value">The LineItem to format in the entity body.</param>
+        /// <returns>The created <see cref="LineItemContainerResult"/> for the response.</returns>
+        public LineItemContainerResult Ok(LineItemContainer value)
+            => new LineItemContainerResult(value);
+
+        /// <summary>
+        /// Creates an <see cref="LineItemResult"/> object that produces an <see cref="StatusCodes.Status201Created"/> response.
+        /// </summary>
+        /// <param name="value">The LineItem to format in the entity body.</param>
+        /// <returns>The created <see cref="LineItemResult"/> for the response.</returns>
+        public LineItemResult Created(LineItem value)
+        => new LineItemResult(StatusCodes.Status201Created)
+        {
+            Value = value
+        };
     }
 }

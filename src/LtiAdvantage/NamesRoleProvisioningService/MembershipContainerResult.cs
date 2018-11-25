@@ -32,5 +32,11 @@ namespace LtiAdvantage.NamesRoleProvisioningService
             ContentType = Constants.MediaTypes.MembershipContainer;
             StatusCode = statusCode;
         }
+
+        public MembershipContainer MembershipContainer
+        {
+            get { return Value as MembershipContainer; }
+            set { Value = value; }
+        }
     }
 }

@@ -5,16 +5,28 @@ namespace LtiAdvantage.AssignmentGradeServices
 {
     /// <inheritdoc />
     /// <summary>
-    /// Represents the <see cref="T:Microsoft.AspNetCore.Mvc.JsonResult" /> returned by the LineItemsController to the <see cref="T:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase" />
+    /// A LineItem JsonResult.
     /// </summary>
     public class LineItemResult : JsonResult
     {
+        /// <inheritdoc />
         /// <summary>
-        /// Initialize a new instance of the LineItemResult.
+        /// Initialize a new instance of the LineItemResult with a line item.
         /// </summary>
-        /// <param name="value">The object returned by the controller."/></param>
+        /// <param name="value">The line item."/&gt;</param>
+        public LineItemResult(LineItem value) : base(value)
+        {
+            ContentType = Constants.MediaTypes.LineItem;
+            StatusCode = StatusCodes.Status200OK;
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Initialize a new instance of the LineItemResult without a line item.
+        /// </summary>
+        /// <param name="value">The object returned by the controller."/&gt;</param>
         /// <param name="statusCode">The HTTP status code returned by the controller.</param>
-        public LineItemResult(object value, int statusCode = StatusCodes.Status200OK) : base(value)
+        public LineItemResult(int statusCode) : base(null)
         {
             ContentType = Constants.MediaTypes.LineItem;
             StatusCode = statusCode;

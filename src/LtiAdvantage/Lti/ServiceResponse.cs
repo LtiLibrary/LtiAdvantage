@@ -1,24 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace LtiAdvantage.NamesRoleService
+namespace LtiAdvantage.Lti
 {
     /// <summary>
-    /// Represents a GetMembership response.
+    /// Represents an LTI service response.
     /// </summary>
-    public class GetNamesRolesResponse
+    public class ServiceResponse
     {
         /// <summary>
         /// Create an empty response
         /// </summary>
-        public GetNamesRolesResponse()
+        public ServiceResponse()
         {
             StatusCode = StatusCodes.Status200OK;
         }
-
-        /// <summary>
-        /// Get or set the MembershipContainer.
-        /// </summary>
-        public MembershipContainer MembershipContainer { get; set; }
 
         /// <summary>
         /// Get or set the HTTP status code representing the success or failure of the membership

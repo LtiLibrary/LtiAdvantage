@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using LtiAdvantage.NamesRoleService;
+using LtiAdvantage.AssignmentGradeServices;
+using LtiAdvantage.NamesRoleProvisioningService;
 using LtiAdvantage.Utilities;
 
 namespace LtiAdvantage.Lti
@@ -51,6 +52,15 @@ namespace LtiAdvantage.Lti
         // See https://www.imsglobal.org/spec/lti/v1p3/#required-message-claims
         // See https://openid.net/specs/openid-connect-core-1_0.html#Claims
         // See https://purl.imsglobal.org/spec/lti/v1p3/schema/json/Token.json
+
+        /// <summary>
+        /// The Assignment and Grade Services claim.
+        /// </summary>
+        public AssignmentGradeServicesClaimValueType AssignmentGradeServices
+        {
+            get { return this.GetClaimValue<AssignmentGradeServicesClaimValueType>(Constants.LtiClaims.AssignmentGradeServices); }
+            set { this.SetClaimValue(Constants.LtiClaims.AssignmentGradeServices, value);}
+        }
 
         /// <summary>
         /// REQUIRED. Audience(s) for whom this ID Token is intended i.e. the Tool.

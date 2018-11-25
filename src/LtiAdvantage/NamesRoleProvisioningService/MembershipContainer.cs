@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace LtiAdvantage.NamesRoleService
+namespace LtiAdvantage.NamesRoleProvisioningService
 {
     /// <summary>
     /// Represents the results returned by the Membership service.

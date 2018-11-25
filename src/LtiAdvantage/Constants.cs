@@ -11,6 +11,11 @@
         public static class LtiClaims
         {
             /// <summary>
+            /// The claim to include Names and Role Provisioning Service parameter in LTI 1.3 messages.
+            /// </summary>
+            public const string AssignmentGradeServices = "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint";
+
+            /// <summary>
             /// Properties of the context from which the launch originated (for example, course id and title).
             /// </summary>
             public const string Context = "https://purl.imsglobal.org/spec/lti/claim/context";
@@ -105,6 +110,11 @@
             public const string AssignmentGradesResultReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly";
 
             /// <summary>
+            /// Assignment and Grade Service result readonly scope.
+            /// </summary>
+            public const string AssignmentGradesScoreWriteonly = "https://purl.imsglobal.org/spec/lti-ags/scope/score";
+
+            /// <summary>
             /// Names and Role Service readonly scope.
             /// </summary>
             public const string NamesRoleReadonly = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly";
@@ -116,9 +126,26 @@
         public static class MediaTypes
         {
             /// <summary>
+            /// https://www.imsglobal.org/spec/lti-ags/v2p0/#media-types-and-schemas
+            /// </summary>
+            public const string LineItem = "application/vnd.ims.lis.v2.lineitem+json";
+
+            /// <summary>
+            /// https://www.imsglobal.org/spec/lti-ags/v2p0/#media-types-and-schemas
+            /// </summary>
+            public const string LineItemContainer = "application/vnd.ims.lis.v2.lineitemcontainer+json";
+
+            /// <summary>
             /// https://www.imsglobal.org/spec/lti-nrps/v2p0#membership-container-media-type
             /// </summary>
             public const string MembershipContainer = "application/vnd.ims.lis.v2.membershipcontainer+json";
+        }
+
+        public static class ServiceEndpoints
+        {
+            public const string LineItemsService = "lineitems";
+            public const string MembershipService = "membership";
+            public const string ResultsService = "results";
         }
 
         /// <summary>

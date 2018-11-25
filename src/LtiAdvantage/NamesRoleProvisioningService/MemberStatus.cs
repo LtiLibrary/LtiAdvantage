@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace LtiAdvantage.NamesRoleService
+namespace LtiAdvantage.NamesRoleProvisioningService
 {
     /// <summary>
     /// Names and Role Service member status values.

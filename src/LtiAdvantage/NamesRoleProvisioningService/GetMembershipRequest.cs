@@ -1,7 +1,7 @@
 ﻿using System;
 using LtiAdvantage.Lti;
 
-namespace LtiAdvantage.NamesRoleService
+namespace LtiAdvantage.NamesRoleProvisioningService
 {
     /// <summary>
     /// Represents a GetMembership request.
@@ -10,7 +10,7 @@ namespace LtiAdvantage.NamesRoleService
     /// Does not support membership differences.
     /// See https://www.imsglobal.org/spec/lti-nrps/v2p0#membership-differences.
     /// </remarks>
-    public class GetNamesRolesRequest
+    public class GetMembershipRequest
     {
         /// <summary>
         /// Initialize a new instance of the class.
@@ -19,7 +19,7 @@ namespace LtiAdvantage.NamesRoleService
         /// <param name="limit">Optional limit to the number of members to return.</param>
         /// <param name="rlid">Optional resource link filter for members with access to resource link.</param>
         /// <param name="role">Optional role filter for members that have the specified role.</param>
-        public GetNamesRolesRequest(string contextId, int? limit = null, string rlid = null, Role? role = null)
+        public GetMembershipRequest(string contextId, int? limit = null, string rlid = null, Role? role = null)
         {
             ContextId = contextId ?? throw new ArgumentNullException(nameof(contextId));
             Limit = limit;

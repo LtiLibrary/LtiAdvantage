@@ -18,7 +18,7 @@ namespace LtiAdvantage.NamesRoleProvisioningService
     /// Unless it is overridden, the route for this controller will be
     /// "/context/{contextid}/[controller]" named "MembershipApi".
     /// </remarks>
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "membership")]
     [Route("context/{contextid}/[controller]", Name = Constants.ServiceEndpoints.MembershipService)]
     public abstract class MembershipControllerBase : ControllerBase
     {

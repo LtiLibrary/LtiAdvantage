@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using LtiAdvantage.Lti;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,15 +14,15 @@ namespace LtiAdvantage.AssignmentGradeServices
     /// "A REST API for LineItem Resources in multiple formats, Internal Draft 2.1"
     /// https://www.imsglobal.org/lti/model/uml/purl.imsglobal.org/vocab/lis/v2/outcomes/LineItem/service.html
     /// </summary>
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "lineitems")]
     [Route("context/{contextid}/[controller]/{id?}", Name = Constants.ServiceEndpoints.LineItemsService)]
     public abstract class LineItemsControllerBase : Controller
     {
-        private readonly ILogger<LineItemsControllerBase> _logger;
+        protected readonly ILogger<LineItemsControllerBase> Logger;
 
         protected LineItemsControllerBase(ILogger<LineItemsControllerBase> logger)
         {
-            _logger = logger;
+            Logger = logger;
         }
 
         /// <summary>
@@ -67,11 +66,11 @@ namespace LtiAdvantage.AssignmentGradeServices
         [HttpDelete]
         public async Task<IActionResult> DeleteAsync(string contextId, string id)
         {
-            _logger.LogInformation("Processing delete lineitem request.");
+            Logger.LogInformation("Processing delete lineitem request.");
 
             if (string.IsNullOrWhiteSpace(id))
             {
-                _logger.LogError($"{nameof(id)} is missing.");
+                Logger.LogError($"{nameof(id)} is missing.");
                 return BadRequest();
             }
 
@@ -94,7 +93,7 @@ namespace LtiAdvantage.AssignmentGradeServices
             [FromQuery(Name = "lti_link_id")] string ltiLinkId = null, [FromQuery(Name = "resource_id")] string resourceId = null, 
             [FromQuery] string tag = null, [FromQuery] int? limit = null)
         {
-            _logger.LogInformation(string.IsNullOrWhiteSpace(id)
+            Logger.LogInformation(string.IsNullOrWhiteSpace(id)
                 ? "Processing get lineitems request."
                 : "Processing get lineitem request.");
 
@@ -113,7 +112,7 @@ namespace LtiAdvantage.AssignmentGradeServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, string.IsNullOrWhiteSpace(id) 
+                Logger.LogError(ex, string.IsNullOrWhiteSpace(id) 
                     ? "Error processing get lineitems request." 
                     : "Error processing get lineitem request.");
                 return StatusCode(StatusCodes.Status500InternalServerError, ex);
@@ -126,11 +125,11 @@ namespace LtiAdvantage.AssignmentGradeServices
         [HttpPost]
         public async Task<IActionResult> PostAsync(string contextId, LineItem lineItem)
         {
-            _logger.LogInformation("Processing post lineitem request.");
+            Logger.LogInformation("Processing post lineitem request.");
 
             if (!ModelState.IsValid)
             {
-                _logger.LogError($"{nameof(lineItem)} model binding failed.");
+                Logger.LogError($"{nameof(lineItem)} model binding failed.");
                 return BadRequest();
             }
 
@@ -151,11 +150,11 @@ namespace LtiAdvantage.AssignmentGradeServices
         [HttpPut]
         public async Task<IActionResult> PutAsync(LineItem lineItem)
         {
-            _logger.LogInformation("Processing put lineitem request.");
+            Logger.LogInformation("Processing put lineitem request.");
 
             if (!ModelState.IsValid)
             {
-                _logger.LogError($"{nameof(lineItem)} model binding failed.");
+                Logger.LogError($"{nameof(lineItem)} model binding failed.");
                 return BadRequest();
             }
 
@@ -185,6 +184,9 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <returns>The created <see cref="LineItemContainerResult"/> for the response.</returns>
         public LineItemContainerResult Ok(LineItemContainer value)
             => new LineItemContainerResult(value);
+
+        public new LineItemContainerResult NotFound()
+            => new LineItemContainerResult(StatusCodes.Status404NotFound);
 
         /// <summary>
         /// Creates an <see cref="LineItemResult"/> object that produces an <see cref="StatusCodes.Status201Created"/> response.

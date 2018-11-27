@@ -14,8 +14,8 @@ namespace LtiAdvantage.AssignmentGradeServices
     /// "A REST API for LineItem Resources in multiple formats, Internal Draft 2.1"
     /// https://www.imsglobal.org/lti/model/uml/purl.imsglobal.org/vocab/lis/v2/outcomes/LineItem/service.html
     /// </summary>
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "lineitems")]
-    [Route("context/{contextid}/[controller]/{id?}", Name = Constants.ServiceEndpoints.LineItemsService)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
+    [Route("context/{contextid}/[controller]/{id?}", Name = Constants.ServiceEndpoints.AgsLineItemService)]
     public abstract class LineItemsControllerBase : Controller
     {
         protected readonly ILogger<LineItemsControllerBase> Logger;

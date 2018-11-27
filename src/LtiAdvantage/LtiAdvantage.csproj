@@ -22,6 +22,8 @@
     <Compile Remove="AssignmentGradeServices\ResultContainerPageResult.cs" />
     <Compile Remove="AssignmentGradeServices\ResultResult.cs" />
     <Compile Remove="AssignmentGradeServices\ResultsControllerBase.cs" />
+    <Compile Remove="Utilities\HasScopeHandler.cs" />
+    <Compile Remove="Utilities\HasScopeRequirement.cs" />
   </ItemGroup>
 
   <ItemGroup>

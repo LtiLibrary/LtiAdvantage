@@ -6,6 +6,22 @@
     public static class Constants
     {
         /// <summary>
+        /// LTI Advantage constants.
+        /// </summary>
+        public static class Lti
+        {
+            /// <summary>
+            /// The message type of an LtiResourceLinkRequest.
+            /// </summary>
+            public const string LtiResourceLinkRequestMessageType = "LtiResourceLinkRequest";
+
+            /// <summary>
+            /// LTI version.
+            /// </summary>
+            public const string Version = "1.3.0";
+        }
+
+        /// <summary>
         /// LTI claims.
         /// </summary>
         public static class LtiClaims
@@ -79,22 +95,6 @@
         }
 
         /// <summary>
-        /// LTI Advantage constants.
-        /// </summary>
-        public static class Lti
-        {
-            /// <summary>
-            /// The message type of an LtiResourceLinkRequest.
-            /// </summary>
-            public const string LtiResourceLinkRequestMessageType = "LtiResourceLinkRequest";
-
-            /// <summary>
-            /// LTI version.
-            /// </summary>
-            public const string Version = "1.3.0";
-        }
-
-        /// <summary>
         /// LTI Advantage API scopes.
         /// </summary>
         public static class LtiScopes
@@ -102,22 +102,22 @@
             /// <summary>
             /// Assignment and Grade Service lineitem read/write scope.
             /// </summary>
-            public const string AssignmentGradesLineItem = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem";
+            public const string AgsLineItem = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem";
 
             /// <summary>
             /// Assignment and Grade Service result readonly scope.
             /// </summary>
-            public const string AssignmentGradesResultReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly";
+            public const string AgsResultReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly";
 
             /// <summary>
             /// Assignment and Grade Service result readonly scope.
             /// </summary>
-            public const string AssignmentGradesScoreWriteonly = "https://purl.imsglobal.org/spec/lti-ags/scope/score";
+            public const string AgsScoreWriteonly = "https://purl.imsglobal.org/spec/lti-ags/scope/score";
 
             /// <summary>
             /// Names and Role Service readonly scope.
             /// </summary>
-            public const string NamesRoleReadonly = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly";
+            public const string NrpsMembershipReadonly = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly";
         }
 
         /// <summary>
@@ -141,15 +141,9 @@
             public const string MembershipContainer = "application/vnd.ims.lis.v2.membershipcontainer+json";
         }
 
-        public static class ServiceEndpoints
-        {
-            public const string LineItemsService = "lineitems";
-            public const string MembershipService = "membership";
-            public const string ResultsService = "results";
-        }
-
         /// <summary>
-        /// Subset of OpenID standard claims used by LTI Advantage. See https://openid.net/specs/openid-connect-core-1_0.html#Claims.
+        /// Subset of OpenID standard claims used by LTI Advantage.
+        /// See https://openid.net/specs/openid-connect-core-1_0.html#Claims.
         /// </summary>
         public static class OidcClaims
         {
@@ -212,6 +206,14 @@
             /// </example>
             /// </summary>
             public const string Picture = "picture";
+        }
+
+        public static class ServiceEndpoints
+        {
+            public const string AgsLineItemService = "lineitems";
+            public const string AgsResultService = "results";
+            public const string AgsScoreService = "scores";
+            public const string NrpsMembershipService = "membership";
         }
     }
 }

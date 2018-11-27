@@ -185,7 +185,10 @@ namespace LtiAdvantage.AssignmentGradeServices
         public LineItemContainerResult Ok(LineItemContainer value)
             => new LineItemContainerResult(value);
 
-        public new LineItemContainerResult NotFound()
+        public LineItemResult NotFound(LineItem lineItem)
+            => new LineItemResult(StatusCodes.Status404NotFound);
+
+        public LineItemContainerResult NotFound(LineItemContainer lineItem)
             => new LineItemContainerResult(StatusCodes.Status404NotFound);
 
         /// <summary>

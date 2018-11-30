@@ -21,7 +21,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// The resource link id.
         /// </summary>
         [JsonProperty("ltiLinkId")]
-        public string LtiLinkId { get; set; }
+        public string ResourceLinkId { get; set; }
 
         /// <summary>
         /// The non-link resource id.
@@ -33,7 +33,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// The maximum score allowed.
         /// </summary>
         [JsonProperty("scoreMaximum")]
-        public float? ScoreMaximum { get; set; }
+        public double? ScoreMaximum { get; set; }
 
         /// <summary>
         /// Optional tag.

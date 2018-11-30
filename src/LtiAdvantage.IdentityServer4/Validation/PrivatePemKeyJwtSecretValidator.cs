@@ -12,10 +12,9 @@ using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
+using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
-using JsonWebKey = IdentityServer4.Models.JsonWebKey;
 
 namespace LtiAdvantage.IdentityServer4.Validation
 {
@@ -47,15 +46,15 @@ namespace LtiAdvantage.IdentityServer4.Validation
     /// </item>
     /// </list>
     /// </remarks>
-    public class PublicKeyJwtSecretValidator : ISecretValidator
+    public class PrivatePemKeyJwtSecretValidator : ISecretValidator
     {
-        private readonly ILogger<PublicKeyJwtSecretValidator> _logger;
+        private readonly ILogger<PrivatePemKeyJwtSecretValidator> _logger;
         private readonly string _audienceUri;
 
         /// <summary>
         /// Instantiates an instance of Signed JWT secret validator.
         /// </summary>
-        public PublicKeyJwtSecretValidator(IHttpContextAccessor contextAccessor, ILogger<PublicKeyJwtSecretValidator> logger)
+        public PrivatePemKeyJwtSecretValidator(IHttpContextAccessor contextAccessor, ILogger<PrivatePemKeyJwtSecretValidator> logger)
         {
             _audienceUri = contextAccessor.HttpContext.GetIdentityServerIssuerUri();
             _logger = logger;
@@ -63,7 +62,7 @@ namespace LtiAdvantage.IdentityServer4.Validation
 
         /// <inheritdoc />
         /// <summary>
-        /// Validates the signed
+        /// Validates the signed JWT.
         /// </summary>
         /// <param name="secrets">The stored secrets.</param>
         /// <param name="parsedSecret">The received secret.</param>
@@ -96,13 +95,11 @@ namespace LtiAdvantage.IdentityServer4.Validation
 
             // Collect the potential public keys from the client secrets
             var secretArray = secrets as Secret[] ?? secrets.ToArray();
-            var publicKeys = GetPemKeys(secretArray);
-            var securityToken = handler.ReadJwtToken(token);
-            publicKeys.AddRange(GetJsonWebKeys(secretArray, securityToken.Header.Kid));
+            var pemKeys = GetPemKeys(secretArray);
 
-            if (!publicKeys.Any())
+            if (!pemKeys.Any())
             {
-                _logger.LogError("There are no public keys available to validate the client assertion.");
+                _logger.LogError("There are no keys available to validate the client assertion.");
                 return fail;
             }
 
@@ -112,7 +109,7 @@ namespace LtiAdvantage.IdentityServer4.Validation
                 RequireSignedTokens = true,
                 RequireExpirationTime = true,
 
-                IssuerSigningKeys = publicKeys,
+                IssuerSigningKeys = pemKeys,
                 ValidateIssuerSigningKey = true,
 
                 // IMS recommendation is to send any unique name as Issuer. The IMS reference 
@@ -151,7 +148,7 @@ namespace LtiAdvantage.IdentityServer4.Validation
         private static List<RsaSecurityKey> GetPemKeys(IEnumerable<Secret> secrets)
         {
             var pemKeys = secrets
-                .Where(s => s.Type == Constants.SecretTypes.PublicPemKey)
+                .Where(s => s.Type == Constants.SecretTypes.PrivatePemKey)
                 .Select(s => s.Value)
                 .ToList();
 
@@ -162,8 +159,9 @@ namespace LtiAdvantage.IdentityServer4.Validation
                 using (var keyTextReader = new StringReader(pemKey))
                 {
                     // PemReader can read any PEM file. Only interested in RsaKeyParameters.
-                    if (new PemReader(keyTextReader).ReadObject() is RsaKeyParameters bouncyKeyParameters)
+                    if (new PemReader(keyTextReader).ReadObject() is AsymmetricCipherKeyPair bouncyKeyPair)
                     {
+                        var bouncyKeyParameters = (RsaKeyParameters) bouncyKeyPair.Public;
                         var rsaParameters = new RSAParameters
                         {
                             Modulus = bouncyKeyParameters.Modulus.ToByteArrayUnsigned(),
@@ -174,41 +172,6 @@ namespace LtiAdvantage.IdentityServer4.Validation
 
                         rsaSecurityKeys.Add(rsaSecurityKey);
                     }
-                }
-            }
-
-            return rsaSecurityKeys;
-        }
-
-        /// <summary>
-        /// Get the <see cref="JsonWebKey"/> secrets.
-        /// </summary>
-        /// <param name="secrets">The secrets to examine.</param>
-        /// <param name="keyId">The keyId to match.</param>
-        /// <returns>The <see cref="JsonWebKey"/>'s converted into <see cref="RsaSecurityKey"/>'s.</returns>
-        private static IEnumerable<RsaSecurityKey> GetJsonWebKeys(IEnumerable<Secret> secrets, string keyId)
-        {
-            var jsonWebKeys = secrets
-                .Where(s => s.Type == Constants.SecretTypes.PublicJsonWebKey)
-                .Select(s => JsonConvert.DeserializeObject<JsonWebKey>(s.Value))
-                .ToList();
-
-            var rsaSecurityKeys = new List<RsaSecurityKey>();
-
-            foreach (var jsonWebKey in jsonWebKeys)
-            {
-                if (jsonWebKey.kty == JsonWebAlgorithmsKeyTypes.RSA
-                    && jsonWebKey.kid == keyId)
-                {
-                    var rsaParameters = new RSAParameters
-                    {
-                        Modulus = Base64UrlEncoder.DecodeBytes(jsonWebKey.n),
-                        Exponent = Base64UrlEncoder.DecodeBytes(jsonWebKey.e)
-                    };
-
-                    var rsaSecurityKey = new RsaSecurityKey(rsaParameters) {KeyId = jsonWebKey.kid};
-
-                    rsaSecurityKeys.Add(rsaSecurityKey);
                 }
             }
 

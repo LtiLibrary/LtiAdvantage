@@ -58,6 +58,11 @@
             public const string Lis = "https://purl.imsglobal.org/spec/lti/claim/lis";
 
             /// <summary>
+            /// User ID as defined in LTI 1.1.
+            /// </summary>
+            public const string Lti11LegacyUserId = "https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id";
+
+            /// <summary>
             /// The type of message.
             /// </summary>
             public const string MessageType = "https://purl.imsglobal.org/spec/lti/claim/message_type";
@@ -85,8 +90,12 @@
             /// <summary>
             /// An array of the user_id values which the current user can access as a mentor.
             /// </summary>
-            public const string RoleScopeMentor =
-                "https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor";
+            public const string RoleScopeMentor = "https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor";
+
+            /// <summary>
+            /// The launch url.
+            /// </summary>
+            public const string TargetLinkUri = "https://purl.imsglobal.org/spec/lti/claim/target_link_uri";
 
             /// <summary>
             /// The minimum LTI version required.

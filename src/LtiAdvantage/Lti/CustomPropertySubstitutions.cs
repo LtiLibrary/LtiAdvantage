@@ -89,10 +89,13 @@ namespace LtiAdvantage.Lti
         {
             var dest = new Dictionary<string, string>();
 
-            foreach (var pair in source)
+            if (source != null)
             {
-                // Substitute
-                dest.Add(pair.Key, SubstituteCustomVariable(pair.Value));
+                foreach (var pair in source)
+                {
+                    // Substitute
+                    dest.Add(pair.Key, SubstituteCustomVariable(pair.Value));
+                }
             }
 
             return dest;

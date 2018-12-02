@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
@@ -15,6 +14,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// Initializes a new instance of the LineItemContainerResult class.
         /// </summary>
         /// <param name="value">The LineItemContainer to return.</param>
+        // ReSharper disable once SuggestBaseTypeForParameter
         public LineItemContainerResult(LineItemContainer value) : base(value)
         {
             ContentType = Constants.MediaTypes.LineItemContainer;

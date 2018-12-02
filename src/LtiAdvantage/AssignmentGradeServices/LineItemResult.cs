@@ -24,7 +24,6 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <summary>
         /// Initialize a new instance of the LineItemResult without a line item.
         /// </summary>
-        /// <param name="value">The object returned by the controller."/&gt;</param>
         /// <param name="statusCode">The HTTP status code returned by the controller.</param>
         public LineItemResult(int statusCode) : base(null)
         {

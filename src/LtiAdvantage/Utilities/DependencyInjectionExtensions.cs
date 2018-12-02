@@ -8,7 +8,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// Extensions methods to configure an <see cref="IServiceCollection"/> for <see cref="AuthorizationPolicyProvider"/>.
     /// </summary>
-    public static class ServiceCollectionExtensions
+    public static class DependencyInjectionExtensions
     {
         /// <summary>
         /// Adds the <see cref="AuthorizationPolicyProvider"/> and related services to the <see cref="IServiceCollection"/>.

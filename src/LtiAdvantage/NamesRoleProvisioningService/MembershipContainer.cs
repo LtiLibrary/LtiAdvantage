@@ -16,6 +16,12 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         public string Id { get; set; }
 
         /// <summary>
+        /// Context information for the list of members.
+        /// </summary>
+        [JsonProperty("context")]
+        public Context Context { get; set; }
+
+        /// <summary>
         /// The list of members in the specified context.
         /// </summary>
         [JsonProperty("members")]

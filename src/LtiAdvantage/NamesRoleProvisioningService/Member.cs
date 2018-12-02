@@ -17,28 +17,6 @@ namespace LtiAdvantage.NamesRoleProvisioningService
     public class Member
     {
         /// <summary>
-        /// The context ID. Repeated for each member.
-        /// Corresponds to <code>Id</code> in <see cref="LtiResourceLinkRequest.Context"/>.
-        /// </summary>
-        [JsonProperty("context_id")]
-        public string ContextId { get; set; }
-
-        /// <summary>
-        /// The context label. Repeated for each member.
-        /// Corresponds to <code>Label</code> in <see cref="LtiResourceLinkRequest.Context"/>.
-        /// </summary>
-        [JsonProperty("context_label")]
-        public string ContextLabel { get; set; }
-
-
-        /// <summary>
-        /// The context title. Repeated for each member.
-        /// Corresponds to <code>Title</code> in <see cref="LtiResourceLinkRequest.Context"/>.
-        /// </summary>
-        [JsonProperty("context_title")]
-        public string ContextTitle { get; set; }
-
-        /// <summary>
         /// The primary email address for the person.
         /// Not specified if not included in a basic launch from same context.
         /// Corresponds to <see cref="LtiResourceLinkRequest.Email"/>.
@@ -102,7 +80,7 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// A unique identifier for the person as provisioned by an external system such as an SIS.
         /// Corresponds to <code>PersonSourcedId</code> in <see cref="LtiResourceLinkRequest.Lis"/>.
         /// </summary>
-        [JsonProperty("lis_person_sourced_id")]
+        [JsonProperty("lis_person_sourcedid")]
         public string LisPersonSourcedId { get; set; }
 
         /// <summary>

@@ -1,11 +1,18 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
     public class LineItem
     {
         /// <summary>
-        /// The id.
+        /// The end date and time.
+        /// </summary>
+        [JsonProperty("end_date_time")]
+        public DateTime? EndDateTime { get; set; }
+
+        /// <summary>
+        /// The lineitems endpoint url for this item.
         /// </summary>
         [JsonProperty("id")]
         public string Id { get; set; }
@@ -20,20 +27,26 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <summary>
         /// The resource link id.
         /// </summary>
-        [JsonProperty("ltiLinkId")]
+        [JsonProperty("lti_link_id")]
         public string ResourceLinkId { get; set; }
 
         /// <summary>
         /// The non-link resource id.
         /// </summary>
-        [JsonProperty("resourceId")]
+        [JsonProperty("resource_id")]
         public string ResourceId { get; set; }
 
         /// <summary>
         /// The maximum score allowed.
         /// </summary>
-        [JsonProperty("scoreMaximum")]
+        [JsonProperty("score_maximum")]
         public double? ScoreMaximum { get; set; }
+
+        /// <summary>
+        /// The start date and time.
+        /// </summary>
+        [JsonProperty("start_date_time")]
+        public DateTime? StartDateTime { get; set; }
 
         /// <summary>
         /// Optional tag.

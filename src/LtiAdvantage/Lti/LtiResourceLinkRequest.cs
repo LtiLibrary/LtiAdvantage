@@ -86,6 +86,15 @@ namespace LtiAdvantage.Lti
         }
 
         /// <summary>
+        /// User ID as defined in LTI 1.1.
+        /// </summary>
+        public string Lti11LegacyUserId
+        {
+            get { return this.GetClaimValue(Constants.LtiClaims.Lti11LegacyUserId); }
+            set { this.SetClaimValue(Constants.LtiClaims.Lti11LegacyUserId, value); }
+        }
+
+        /// <summary>
         /// The type of LTI message. Must be "LtiResourceLinkRequest".
         /// </summary>
         public string MessageType
@@ -141,6 +150,12 @@ namespace LtiAdvantage.Lti
         {
             get { return this.GetClaimValue<Role[]>(Constants.LtiClaims.Roles); }
             set { this.SetClaimValue(Constants.LtiClaims.Roles, value); }
+        }
+
+        public string TargetLinkUri
+        {
+            get { return this.GetClaimValue(Constants.LtiClaims.TargetLinkUri); }
+            set { this.SetClaimValue(Constants.LtiClaims.TargetLinkUri, value);}
         }
 
         /// <summary>

@@ -22,11 +22,11 @@ namespace LtiAdvantage.NamesRoleProvisioningService
     [Route("context/{contextid}/[controller]", Name = Constants.ServiceEndpoints.NrpsMembershipService)]
     public abstract class MembershipControllerBase : ControllerBase
     {
-        private readonly ILogger<MembershipControllerBase> _logger;
+        protected readonly ILogger<MembershipControllerBase> Logger;
 
         protected MembershipControllerBase(ILogger<MembershipControllerBase> logger)
         {
-            _logger = logger;
+            Logger = logger;
         }
 
         /// <summary>
@@ -48,17 +48,24 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         [HttpGet]
         public virtual async Task<IActionResult> GetAsync(string contextId, int? limit = null, string rlid = null, Role? role = null)
         {
-            _logger.LogInformation("Processing GET request.");
-
             try
             {
-                var request = new GetMembershipRequest(contextId, limit, rlid, role);
-                return await OnGetMembershipAsync(request).ConfigureAwait(false);
+                Logger.LogInformation($"Entering {nameof(GetAsync)}.");
+
+                try
+                {
+                    var request = new GetMembershipRequest(contextId, limit, rlid, role);
+                    return await OnGetMembershipAsync(request).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "Cannot get membership.");
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                }
             }
-            catch (Exception ex)
+            finally
             {
-                _logger.LogError(ex, "Cannot get membership.");
-                return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                Logger.LogInformation($"Exiting {nameof(GetAsync)}.");
             }
         }
     }

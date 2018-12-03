@@ -23,22 +23,22 @@
         public string ContextId { get; set; }
 
         /// <summary>
-        /// Get or set the limit.
+        /// Get or set the limit filter.
         /// </summary>
         public int? Limit { get; }
 
         /// <summary>
-        /// Get or set the lti_link_id.
+        /// Get or set the lti_link_id filter.
         /// </summary>
         public string LtiLinkId { get; set; }
 
         /// <summary>
-        /// Get or set the resource_id.
+        /// Get or set the resource_id filter.
         /// </summary>
         public string ResourceId { get; set; }
 
         /// <summary>
-        /// Get or set the tag.
+        /// Get or set the tag filter.
         /// </summary>
         public string Tag { get; set; }
     }

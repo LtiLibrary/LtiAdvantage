@@ -57,22 +57,29 @@ namespace LtiAdvantage.AssignmentGradeServices
         [HttpDelete]
         public async Task<IActionResult> DeleteAsync(string contextId, string id)
         {
-            Logger.LogInformation("Processing delete lineitem request.");
-
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                Logger.LogError($"{nameof(id)} is missing.");
-                return BadRequest();
-            }
-
             try
             {
-                var request = new DeleteLineItemRequest(contextId, id);
-                return await OnDeleteLineItemAsync(request).ConfigureAwait(false);
+                Logger.LogInformation($"Entering {nameof(DeleteAsync)}.");
+
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    Logger.LogError($"{nameof(id)} is missing.");
+                    return BadRequest();
+                }
+
+                try
+                {
+                    var request = new DeleteLineItemRequest(contextId, id);
+                    return await OnDeleteLineItemAsync(request).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                }
             }
-            catch (Exception ex)
+            finally 
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                Logger.LogInformation($"Entering {nameof(DeleteAsync)}.");
             }
         }
 
@@ -80,19 +87,32 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// Get the lineitem.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetAsync(string contextId, string id = null)
+        public async Task<IActionResult> GetAsync(string contextId, string id)
         {
-            Logger.LogInformation("Processing get lineitem request.");
-
             try
             {
-                var request = new GetLineItemRequest(contextId, id);
-                return await OnGetLineItemAsync(request).ConfigureAwait(false);
+                Logger.LogInformation($"Entering {nameof(GetAsync)}.");
+            
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    Logger.LogError($"{nameof(id)} is missing.");
+                    return BadRequest();
+                }
+
+                try
+                {
+                    var request = new GetLineItemRequest(contextId, id);
+                    return await OnGetLineItemAsync(request).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "Error processing get lineitem request.");
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                }
             }
-            catch (Exception ex)
+            finally
             {
-                Logger.LogError(ex, "Error processing get lineitem request.");
-                return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                Logger.LogInformation($"Exiting {nameof(GetAsync)}.");
             }
         }
 
@@ -102,22 +122,29 @@ namespace LtiAdvantage.AssignmentGradeServices
         [HttpPost]
         public async Task<IActionResult> PostAsync(string contextId, LineItem lineItem)
         {
-            Logger.LogInformation("Processing post lineitem request.");
-
-            if (!ModelState.IsValid)
-            {
-                Logger.LogError($"{nameof(lineItem)} model binding failed.");
-                return BadRequest();
-            }
-
             try
             {
-                var request = new PostLineItemRequest(contextId, lineItem);
-                return await OnCreateLineItemAsync(request).ConfigureAwait(false);
+                Logger.LogInformation($"Entering {nameof(PostAsync)}.");
+
+                if (!ModelState.IsValid)
+                {
+                    Logger.LogError($"{nameof(lineItem)} model binding failed.");
+                    return BadRequest();
+                }
+
+                try
+                {
+                    var request = new PostLineItemRequest(contextId, lineItem);
+                    return await OnCreateLineItemAsync(request).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                }
             }
-            catch (Exception ex)
+            finally
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                Logger.LogInformation($"Exiting {nameof(PostAsync)}.");
             }
         }
 
@@ -127,22 +154,29 @@ namespace LtiAdvantage.AssignmentGradeServices
         [HttpPut]
         public async Task<IActionResult> PutAsync(LineItem lineItem)
         {
-            Logger.LogInformation("Processing put lineitem request.");
-
-            if (!ModelState.IsValid)
-            {
-                Logger.LogError($"{nameof(lineItem)} model binding failed.");
-                return BadRequest();
-            }
-
             try
             {
-                var request = new PutLineItemRequest(lineItem);
-                return await OnUpdateLineItemAsync(request).ConfigureAwait(false);
+                Logger.LogInformation($"Entering {nameof(PutAsync)}.");
+
+                if (!ModelState.IsValid)
+                {
+                    Logger.LogError($"{nameof(lineItem)} model binding failed.");
+                    return BadRequest();
+                }
+
+                try
+                {
+                    var request = new PutLineItemRequest(lineItem);
+                    return await OnUpdateLineItemAsync(request).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                }
             }
-            catch (Exception ex)
+            finally
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                Logger.LogInformation($"Exiting {nameof(PutAsync)}.");
             }
         }
 

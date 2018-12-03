@@ -34,19 +34,34 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// Get the results for a line item.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetAsync(string contextId, string id = null, [FromQuery(Name = "user_id")] string userId = null)
+        public async Task<IActionResult> GetAsync(string contextId, string id, 
+            [FromQuery(Name = "user_id")] string userId = null, 
+            [FromQuery] int? limit = null)
         {
-            Logger.LogInformation("Processing get results request.");
-
             try
             {
-                var request = new GetResultsRequest(contextId, id, userId);
-                return await OnGetResultsAsync(request).ConfigureAwait(false);
+                Logger.LogInformation($"Entering {nameof(GetAsync)}.");
+            
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    Logger.LogError($"{nameof(id)} is missing.");
+                    return BadRequest();
+                }
+
+                try
+                {
+                    var request = new GetResultsRequest(contextId, id, userId, limit);
+                    return await OnGetResultsAsync(request).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "Error processing get results request.");
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                }
             }
-            catch (Exception ex)
+            finally
             {
-                Logger.LogError(ex, "Error processing get results request.");
-                return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                Logger.LogInformation($"Exiting {nameof(GetAsync)}.");
             }
         }
     }

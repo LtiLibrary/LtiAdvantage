@@ -40,17 +40,24 @@ namespace LtiAdvantage.AssignmentGradeServices
             [FromQuery] string tag = null, 
             [FromQuery] int? limit = null)
         {
-            Logger.LogInformation("Processing get lineitems request.");
-
             try
             {
-                var request = new GetLineItemsRequest(contextId, ltiLinkId, resourceId, tag, limit);
-                return await OnGetLineItemsAsync(request).ConfigureAwait(false);
+                Logger.LogInformation($"Entering {nameof(GetAsync)}.");
+
+                try
+                {
+                    var request = new GetLineItemsRequest(contextId, ltiLinkId, resourceId, tag, limit);
+                    return await OnGetLineItemsAsync(request).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "Error processing get lineitems request.");
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                }
             }
-            catch (Exception ex)
+            finally
             {
-                Logger.LogError(ex, "Error processing get lineitems request.");
-                return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                Logger.LogInformation($"Exiting {nameof(GetAsync)}.");
             }
         }
 

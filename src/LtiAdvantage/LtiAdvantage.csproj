@@ -19,9 +19,7 @@
     <Compile Remove="AssignmentGradeServices\PostLineItemResponse.cs" />
     <Compile Remove="AssignmentGradeServices\PostResultDto.cs" />
     <Compile Remove="AssignmentGradeServices\PutResultDto.cs" />
-    <Compile Remove="AssignmentGradeServices\ResultContainerPageResult.cs" />
     <Compile Remove="AssignmentGradeServices\ResultResult.cs" />
-    <Compile Remove="AssignmentGradeServices\ResultsControllerBase.cs" />
     <Compile Remove="Utilities\HasScopeHandler.cs" />
     <Compile Remove="Utilities\HasScopeRequirement.cs" />
   </ItemGroup>

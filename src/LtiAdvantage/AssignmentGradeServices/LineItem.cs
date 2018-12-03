@@ -12,7 +12,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         public DateTime? EndDateTime { get; set; }
 
         /// <summary>
-        /// The lineitems endpoint url for this item.
+        /// The endpoint url for this item.
         /// </summary>
         [JsonProperty("id")]
         public string Id { get; set; }

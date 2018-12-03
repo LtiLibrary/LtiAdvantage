@@ -10,9 +10,7 @@ namespace LtiAdvantage.AssignmentGradeServices
 {
     /// <inheritdoc />
     /// <summary>
-    /// An <see cref="T:Microsoft.AspNetCore.Mvc.Controller" /> that implements 
-    /// "A REST API for LineItem Resources in multiple formats, Internal Draft 2.1"
-    /// https://www.imsglobal.org/lti/model/uml/purl.imsglobal.org/vocab/lis/v2/outcomes/LineItem/service.html
+    /// Implements the Assignment and Grade Services line items endpoint.
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
     [Route("context/{contextid}/lineitems", Name = Constants.ServiceEndpoints.AgsLineItemsService)]
@@ -33,7 +31,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         protected abstract Task<LineItemContainerResult> OnGetLineItemsAsync(GetLineItemsRequest request);
 
         /// <summary>
-        /// Get the lineitems or a single lineitem for a context.
+        /// Get the lineitems from a context.
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAsync(string contextId, 

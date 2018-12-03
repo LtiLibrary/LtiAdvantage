@@ -219,7 +219,8 @@
 
         public static class ServiceEndpoints
         {
-            public const string AgsLineItemService = "lineitems";
+            public const string AgsLineItemService = "lineitem";
+            public const string AgsLineItemsService = "lineitems";
             public const string AgsResultService = "results";
             public const string AgsScoreService = "scores";
             public const string NrpsMembershipService = "membership";

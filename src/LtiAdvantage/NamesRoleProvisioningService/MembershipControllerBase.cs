@@ -11,15 +11,11 @@ namespace LtiAdvantage.NamesRoleProvisioningService
 {
     /// <inheritdoc />
     /// <summary>
-    /// A <see cref="T:Microsoft.AspNetCore.Mvc.Controller" /> that implements a REST API for the Membership service.
-    /// See https://www.imsglobal.org/spec/lti-nrps/v2p0.
+    /// Implements the Names and Role Provisioning Service membership endpoint.
     /// </summary>
-    /// <remarks>
-    /// Unless it is overridden, the route for this controller will be
-    /// "/context/{contextid}/[controller]" named "MembershipApi".
-    /// </remarks>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.NrpsMembershipReadonly)]
-    [Route("context/{contextid}/[controller]", Name = Constants.ServiceEndpoints.NrpsMembershipService)]
+    [Route("context/{contextid}/membership", Name = Constants.ServiceEndpoints.NrpsMembershipService)]
+    [Route("context/{contextid}/membership.{format}")]
     public abstract class MembershipControllerBase : ControllerBase
     {
         protected readonly ILogger<MembershipControllerBase> Logger;
@@ -50,7 +46,7 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         {
             try
             {
-                Logger.LogInformation($"Entering {nameof(GetAsync)}.");
+                Logger.LogDebug($"Entering {nameof(GetAsync)}.");
 
                 try
                 {
@@ -65,7 +61,7 @@ namespace LtiAdvantage.NamesRoleProvisioningService
             }
             finally
             {
-                Logger.LogInformation($"Exiting {nameof(GetAsync)}.");
+                Logger.LogDebug($"Exiting {nameof(GetAsync)}.");
             }
         }
     }

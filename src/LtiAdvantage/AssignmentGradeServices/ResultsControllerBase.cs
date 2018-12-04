@@ -14,6 +14,7 @@ namespace LtiAdvantage.AssignmentGradeServices
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsResultReadonly)]
     [Route("context/{contextid}/lineitems/{id}/results", Name = Constants.ServiceEndpoints.AgsResultService)]
+    [Route("context/{contextid}/lineitems/{id}/results.{format}")]
     public abstract class ResultsControllerBase : Controller
     {
         protected readonly ILogger<ResultsControllerBase> Logger;
@@ -40,7 +41,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         {
             try
             {
-                Logger.LogInformation($"Entering {nameof(GetAsync)}.");
+                Logger.LogDebug($"Entering {nameof(GetAsync)}.");
             
                 if (string.IsNullOrWhiteSpace(id))
                 {
@@ -61,7 +62,7 @@ namespace LtiAdvantage.AssignmentGradeServices
             }
             finally
             {
-                Logger.LogInformation($"Exiting {nameof(GetAsync)}.");
+                Logger.LogDebug($"Exiting {nameof(GetAsync)}.");
             }
         }
     }

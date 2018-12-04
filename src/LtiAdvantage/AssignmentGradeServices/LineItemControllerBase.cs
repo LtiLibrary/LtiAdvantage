@@ -14,6 +14,7 @@ namespace LtiAdvantage.AssignmentGradeServices
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
     [Route("context/{contextid}/lineitems/{id}", Name = Constants.ServiceEndpoints.AgsLineItemService)]
+    [Route("context/{contextid}/lineitems/{id}.{format}")]
     public abstract class LineItemControllerBase : Controller
     {
         protected readonly ILogger<LineItemsControllerBase> Logger;
@@ -59,7 +60,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         {
             try
             {
-                Logger.LogInformation($"Entering {nameof(DeleteAsync)}.");
+                Logger.LogDebug($"Entering {nameof(DeleteAsync)}.");
 
                 if (string.IsNullOrWhiteSpace(id))
                 {
@@ -79,7 +80,7 @@ namespace LtiAdvantage.AssignmentGradeServices
             }
             finally 
             {
-                Logger.LogInformation($"Entering {nameof(DeleteAsync)}.");
+                Logger.LogDebug($"Entering {nameof(DeleteAsync)}.");
             }
         }
 
@@ -91,7 +92,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         {
             try
             {
-                Logger.LogInformation($"Entering {nameof(GetAsync)}.");
+                Logger.LogDebug($"Entering {nameof(GetAsync)}.");
             
                 if (string.IsNullOrWhiteSpace(id))
                 {
@@ -112,7 +113,7 @@ namespace LtiAdvantage.AssignmentGradeServices
             }
             finally
             {
-                Logger.LogInformation($"Exiting {nameof(GetAsync)}.");
+                Logger.LogDebug($"Exiting {nameof(GetAsync)}.");
             }
         }
 
@@ -124,7 +125,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         {
             try
             {
-                Logger.LogInformation($"Entering {nameof(PostAsync)}.");
+                Logger.LogDebug($"Entering {nameof(PostAsync)}.");
 
                 if (!ModelState.IsValid)
                 {
@@ -144,7 +145,7 @@ namespace LtiAdvantage.AssignmentGradeServices
             }
             finally
             {
-                Logger.LogInformation($"Exiting {nameof(PostAsync)}.");
+                Logger.LogDebug($"Exiting {nameof(PostAsync)}.");
             }
         }
 
@@ -156,7 +157,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         {
             try
             {
-                Logger.LogInformation($"Entering {nameof(PutAsync)}.");
+                Logger.LogDebug($"Entering {nameof(PutAsync)}.");
 
                 if (!ModelState.IsValid)
                 {
@@ -176,7 +177,7 @@ namespace LtiAdvantage.AssignmentGradeServices
             }
             finally
             {
-                Logger.LogInformation($"Exiting {nameof(PutAsync)}.");
+                Logger.LogDebug($"Exiting {nameof(PutAsync)}.");
             }
         }
 

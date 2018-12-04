@@ -14,6 +14,7 @@ namespace LtiAdvantage.AssignmentGradeServices
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
     [Route("context/{contextid}/lineitems", Name = Constants.ServiceEndpoints.AgsLineItemsService)]
+    [Route("context/{contextid}/lineitems.{format}")]
     public abstract class LineItemsControllerBase : Controller
     {
         protected readonly ILogger<LineItemsControllerBase> Logger;
@@ -42,7 +43,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         {
             try
             {
-                Logger.LogInformation($"Entering {nameof(GetAsync)}.");
+                Logger.LogDebug($"Entering {nameof(GetAsync)}.");
 
                 try
                 {
@@ -57,7 +58,7 @@ namespace LtiAdvantage.AssignmentGradeServices
             }
             finally
             {
-                Logger.LogInformation($"Exiting {nameof(GetAsync)}.");
+                Logger.LogDebug($"Exiting {nameof(GetAsync)}.");
             }
         }
 

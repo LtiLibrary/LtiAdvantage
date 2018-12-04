@@ -39,7 +39,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         {
             try
             {
-                Logger.LogInformation($"Entering {nameof(PostAsync)}.");
+                Logger.LogDebug($"Entering {nameof(PostAsync)}.");
             
                 if (string.IsNullOrWhiteSpace(id))
                 {
@@ -60,7 +60,7 @@ namespace LtiAdvantage.AssignmentGradeServices
             }
             finally
             {
-                Logger.LogInformation($"Exiting {nameof(PostAsync)}.");
+                Logger.LogDebug($"Exiting {nameof(PostAsync)}.");
             }
         }
     }

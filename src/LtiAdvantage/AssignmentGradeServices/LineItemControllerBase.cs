@@ -182,7 +182,6 @@ namespace LtiAdvantage.AssignmentGradeServices
         }
 
         #region Convenience methods to return a properly formatted  IActionResult
-
         
         /// <summary>
         /// Creates a LineItemResult with 200 status code.

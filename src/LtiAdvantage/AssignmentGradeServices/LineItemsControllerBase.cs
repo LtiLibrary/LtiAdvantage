@@ -61,16 +61,24 @@ namespace LtiAdvantage.AssignmentGradeServices
                 Logger.LogDebug($"Exiting {nameof(GetAsync)}.");
             }
         }
+        
+        #region Convenience methods to return a properly formatted  IActionResult
+        
+        /// <summary>
+        /// Creates a LineItemContainerResult with 200 status code.
+        /// </summary>
+        /// <param name="lineItemContainer">The LineItemContainer.</param>
+        /// <returns>The created <see cref="LineItemContainerResult"/> for the response.</returns>
+        public LineItemContainerResult LineItemsOk(LineItemContainer lineItemContainer)
+            => new LineItemContainerResult(lineItemContainer);
 
         /// <summary>
-        /// Creates an <see cref="LineItemContainerResult"/> object that produces an <see cref="StatusCodes.Status200OK"/> response.
+        /// Creates an empty LineItemContainerResult with 404 status code.
         /// </summary>
-        /// <param name="value">The LineItem to format in the entity body.</param>
         /// <returns>The created <see cref="LineItemContainerResult"/> for the response.</returns>
-        public LineItemContainerResult Ok(LineItemContainer value)
-            => new LineItemContainerResult(value);
-
-        public LineItemContainerResult NotFound(LineItemContainer lineItem)
+        public LineItemContainerResult LineItemsNotFound()
             => new LineItemContainerResult(StatusCodes.Status404NotFound);
+
+        #endregion
     }
 }

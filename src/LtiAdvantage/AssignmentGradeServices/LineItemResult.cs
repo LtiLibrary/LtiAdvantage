@@ -15,10 +15,10 @@ namespace LtiAdvantage.AssignmentGradeServices
 
         /// <inheritdoc />
         /// <summary>
-        /// Empty LineItem <see cref="JsonResult"/> with specified status code.
+        /// An empty LineItem <see cref="JsonResult"/> with specified status code.
         /// </summary>
         /// <param name="statusCode">The HTTP status code returned by the controller.</param>
-        public LineItemResult(int statusCode) : base(null, Settings)
+        public LineItemResult(int statusCode) : base(null)
         {
             ContentType = Constants.MediaTypes.LineItem;
             StatusCode = statusCode;
@@ -26,7 +26,7 @@ namespace LtiAdvantage.AssignmentGradeServices
 
         /// <inheritdoc />
         /// <summary>
-        /// LineItem <see cref="JsonResult"/> with 200 status code.
+        /// A LineItem <see cref="JsonResult"/> with 200 status code.
         /// </summary>
         /// <param name="lineItem">The line item."</param>
         public LineItemResult(LineItem lineItem) : base(lineItem, Settings)

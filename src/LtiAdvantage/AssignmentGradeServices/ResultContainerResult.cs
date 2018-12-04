@@ -15,18 +15,18 @@ namespace LtiAdvantage.AssignmentGradeServices
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the ResultContainerResult class
-        /// with a status code. Typically used for non-success status codes.
+        /// An empty ResultContainer <see cref="JsonResult"/> with specified status code.
         /// </summary>
-        /// <param name="statusCode">The HTTP StatusCode to return.</param>
+        /// <param name="statusCode">The HTTP status code returned by the controller.</param>
         public ResultContainerResult(int statusCode) : base(null)
         {
             ContentType = Constants.MediaTypes.ResultContainer;
             StatusCode = statusCode;
         }
+
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the ResultContainerResult class.
+        /// A ResultContainer <see cref="JsonResult"/> with 200 status code.
         /// </summary>
         /// <param name="resultContainer">The ResultContainer to return.</param>
         // ReSharper disable once SuggestBaseTypeForParameter

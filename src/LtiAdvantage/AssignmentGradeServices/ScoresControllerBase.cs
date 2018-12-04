@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using LtiAdvantage.NamesRoleProvisioningService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -29,7 +30,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// </summary>
         /// <param name="request">The request parameters.</param>
         /// <returns></returns>
-        protected abstract Task<IActionResult> OnPostScoreAsync(PostScoreRequest request);
+        protected abstract Task<ScoreResult> OnPostScoreAsync(PostScoreRequest request);
 
         /// <summary>
         /// Post a score for a line item.
@@ -63,6 +64,25 @@ namespace LtiAdvantage.AssignmentGradeServices
                 Logger.LogDebug($"Exiting {nameof(PostAsync)}.");
             }
         }
+
+        #region Convenience methods to return a properly formatted  IActionResult
+        
+        /// <summary>
+        /// Creates a ScoreResult with 201 Created status code.
+        /// </summary>
+        /// <param name="score">The LineItemContainer.</param>
+        /// <returns>The created <see cref="ScoreResult"/> for the response.</returns>
+        public ScoreResult ScoreCreated(Score score)
+            => new ScoreResult(score);
+
+        /// <summary>
+        /// Creates an empty ScoreResult with 404 status code.
+        /// </summary>
+        /// <returns>The created <see cref="ScoreResult"/> for the response.</returns>
+        public ScoreResult ScoreNotFound()
+            => new ScoreResult(StatusCodes.Status404NotFound);
+
+        #endregion
     }
 }
 

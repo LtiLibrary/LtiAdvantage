@@ -36,7 +36,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// </summary>
         /// <param name="request">The request parameters.</param>
         /// <returns>The result.</returns>
-        protected abstract Task<IActionResult> OnDeleteLineItemAsync(DeleteLineItemRequest request);
+        protected abstract Task<LineItemResult> OnDeleteLineItemAsync(DeleteLineItemRequest request);
 
         /// <summary>
         /// Get a line item.
@@ -50,7 +50,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// </summary>
         /// <param name="request">The request parameters.</param>
         /// <returns>The result.</returns>
-        protected abstract Task<IActionResult> OnUpdateLineItemAsync(PutLineItemRequest request);
+        protected abstract Task<LineItemResult> OnUpdateLineItemAsync(PutLineItemRequest request);
 
         /// <summary>
         /// Delete a particular LineItem instance.
@@ -181,26 +181,32 @@ namespace LtiAdvantage.AssignmentGradeServices
             }
         }
 
-        /// <summary>
-        /// Creates an <see cref="LineItemResult"/> object that produces an <see cref="StatusCodes.Status200OK"/> response.
-        /// </summary>
-        /// <param name="value">The LineItem to format in the entity body.</param>
-        /// <returns>The created <see cref="LineItemResult"/> for the response.</returns>
-        public LineItemResult Ok(LineItem value)
-            => new LineItemResult(value);
+        #region Convenience methods to return a properly formatted  IActionResult
 
-        public LineItemResult NotFound(LineItem lineItem)
+        
+        /// <summary>
+        /// Creates a LineItemResult with 200 status code.
+        /// </summary>
+        /// <param name="lineItem">The LineItem.</param>
+        /// <returns>The created <see cref="LineItemResult"/> for the response.</returns>
+        public LineItemResult LineItemOk(LineItem lineItem = null)
+            => new LineItemResult(lineItem);
+
+        /// <summary>
+        /// Creates an empty LineItemResult with 404 status code.
+        /// </summary>
+        /// <returns>The created <see cref="LineItemResult"/> for the response.</returns>
+        public LineItemResult LineItemNotFound()
             => new LineItemResult(StatusCodes.Status404NotFound);
 
         /// <summary>
-        /// Creates an <see cref="LineItemResult"/> object that produces an <see cref="StatusCodes.Status201Created"/> response.
+        /// Creates a LineItemResult with 201 status code.
         /// </summary>
-        /// <param name="value">The LineItem to format in the entity body.</param>
+        /// <param name="lineItem">The LineItem to format in the entity body.</param>
         /// <returns>The created <see cref="LineItemResult"/> for the response.</returns>
-        public LineItemResult Created(LineItem value)
-            => new LineItemResult(StatusCodes.Status201Created)
-            {
-                Value = value
-            };
+        public LineItemResult LineItemCreated(LineItem lineItem)
+            => new LineItemResult(lineItem, StatusCodes.Status201Created);
+
+        #endregion
     }
 }

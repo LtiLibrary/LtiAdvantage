@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
@@ -9,17 +10,8 @@ namespace LtiAdvantage.AssignmentGradeServices
     /// </summary>
     public class ResultContainerResult : JsonResult
     {
-        /// <inheritdoc />
-        /// <summary>
-        /// Initializes a new instance of the ResultContainerResult class.
-        /// </summary>
-        /// <param name="value">The ResultContainer to return.</param>
-        // ReSharper disable once SuggestBaseTypeForParameter
-        public ResultContainerResult(ResultContainer value) : base(value)
-        {
-            ContentType = Constants.MediaTypes.ResultContainer;
-            StatusCode = StatusCodes.Status200OK;
-        }
+        private static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
+            {NullValueHandling = NullValueHandling.Ignore};
 
         /// <inheritdoc />
         /// <summary>
@@ -31,6 +23,17 @@ namespace LtiAdvantage.AssignmentGradeServices
         {
             ContentType = Constants.MediaTypes.ResultContainer;
             StatusCode = statusCode;
+        }
+        /// <inheritdoc />
+        /// <summary>
+        /// Initializes a new instance of the ResultContainerResult class.
+        /// </summary>
+        /// <param name="resultContainer">The ResultContainer to return.</param>
+        // ReSharper disable once SuggestBaseTypeForParameter
+        public ResultContainerResult(ResultContainer resultContainer) : base(resultContainer, Settings)
+        {
+            ContentType = Constants.MediaTypes.ResultContainer;
+            StatusCode = StatusCodes.Status200OK;
         }
     }
 }

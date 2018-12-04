@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using LtiAdvantage.NamesRoleProvisioningService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -65,6 +66,25 @@ namespace LtiAdvantage.AssignmentGradeServices
                 Logger.LogDebug($"Exiting {nameof(GetAsync)}.");
             }
         }
+
+        #region Convenience methods to return a properly formatted  IActionResult
+        
+        /// <summary>
+        /// Creates a ResultContainerResult with 200 status code.
+        /// </summary>
+        /// <param name="resultContainer">The LineItemContainer.</param>
+        /// <returns>The created <see cref="MembershipContainerResult"/> for the response.</returns>
+        public ResultContainerResult ResultsOk(ResultContainer resultContainer)
+            => new ResultContainerResult(resultContainer);
+
+        /// <summary>
+        /// Creates an empty ResultContainerResult with 404 status code.
+        /// </summary>
+        /// <returns>The created <see cref="ResultContainerResult"/> for the response.</returns>
+        public ResultContainerResult ResultsNotFound()
+            => new ResultContainerResult(StatusCodes.Status404NotFound);
+
+        #endregion
     }
 }
 

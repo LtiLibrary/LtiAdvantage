@@ -13,7 +13,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <summary>
         /// Initialize a new instance of the LineItemResult with a line item.
         /// </summary>
-        /// <param name="value">The line item."/&gt;</param>
+        /// <param name="value">The line item."</param>
         public LineItemResult(LineItem value) : base(value)
         {
             ContentType = Constants.MediaTypes.LineItem;

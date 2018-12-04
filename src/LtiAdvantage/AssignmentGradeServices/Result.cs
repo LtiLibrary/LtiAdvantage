@@ -6,7 +6,7 @@ namespace LtiAdvantage.AssignmentGradeServices
     public class Result
     {
         /// <summary>
-        /// The endpoint url for this item.
+        /// The endpoint url for this result.
         /// </summary>
         [JsonProperty("id")]
         public string Id { get; set; }

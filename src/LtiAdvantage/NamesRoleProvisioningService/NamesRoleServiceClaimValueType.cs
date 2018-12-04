@@ -9,6 +9,11 @@ namespace LtiAdvantage.NamesRoleProvisioningService
     /// </summary>
     public class NamesRoleServiceClaimValueType
     {
+        public NamesRoleServiceClaimValueType()
+        {
+            ServiceVersions = new[] {Version};
+        }
+
         /// <summary>
         /// The version of this implementation.
         /// </summary>
@@ -24,7 +29,6 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// Service version. Default is <see cref="Version"/>.
         /// </summary>
         [JsonProperty("service_versions")]
-        [DefaultValue(new [] {Version})]
         public string[] ServiceVersions { get; set; }
     }
 }

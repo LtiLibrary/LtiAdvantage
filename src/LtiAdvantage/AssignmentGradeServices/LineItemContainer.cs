@@ -2,7 +2,9 @@
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
-    public class LineItemContainer : List<LineItem>
-    {
-    }
+    /// <inheritdoc />
+    /// <summary>
+    /// A list of LineItems.
+    /// </summary>
+    public class LineItemContainer : List<LineItem> {}
 }

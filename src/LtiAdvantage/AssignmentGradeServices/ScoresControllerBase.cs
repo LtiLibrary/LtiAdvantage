@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using LtiAdvantage.NamesRoleProvisioningService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

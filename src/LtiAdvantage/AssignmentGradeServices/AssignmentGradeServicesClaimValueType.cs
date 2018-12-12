@@ -19,12 +19,12 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// The fully resolved URL to the line item endpoint associated with the resource link.
         /// </summary>
         [JsonProperty("lineitem")]
-        public string LineItem { get; set; }
+        public string LineItemUrl { get; set; }
 
         /// <summary>
         /// The fully resolved URL to the line items endpoint associated with the context.
         /// </summary>
         [JsonProperty("lineitems")]
-        public string LineItems { get; set; }
+        public string LineItemsUrl { get; set; }
     }
 }

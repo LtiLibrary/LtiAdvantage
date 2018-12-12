@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
@@ -20,7 +19,6 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <summary>
         /// Maximum result score.
         /// </summary>
-        [DefaultValue(1)]
         [JsonProperty("resultMaximum")]
         public double ResultMaximum { get; set; }
 

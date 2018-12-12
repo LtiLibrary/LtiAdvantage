@@ -8,7 +8,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <summary>
         /// The end date and time.
         /// </summary>
-        [JsonProperty("end_date_time")]
+        [JsonProperty("endDateTime")]
         public DateTime? EndDateTime { get; set; }
 
         /// <summary>
@@ -27,25 +27,25 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <summary>
         /// The resource link id.
         /// </summary>
-        [JsonProperty("lti_link_id")]
+        [JsonProperty("resourceLinkId")]
         public string ResourceLinkId { get; set; }
 
         /// <summary>
         /// The non-link resource id.
         /// </summary>
-        [JsonProperty("resource_id")]
+        [JsonProperty("resourceId")]
         public string ResourceId { get; set; }
 
         /// <summary>
         /// The maximum score allowed.
         /// </summary>
-        [JsonProperty("score_maximum")]
+        [JsonProperty("scoreMaximum")]
         public double? ScoreMaximum { get; set; }
 
         /// <summary>
         /// The start date and time.
         /// </summary>
-        [JsonProperty("start_date_time")]
+        [JsonProperty("startDateTime")]
         public DateTime? StartDateTime { get; set; }
 
         /// <summary>

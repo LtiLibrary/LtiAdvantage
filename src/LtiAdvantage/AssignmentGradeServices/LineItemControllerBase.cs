@@ -25,13 +25,6 @@ namespace LtiAdvantage.AssignmentGradeServices
         }
 
         /// <summary>
-        /// Create a line item.
-        /// </summary>
-        /// <param name="request">The request parameters.</param>
-        /// <returns>The line item created.</returns>
-        protected abstract Task<LineItemResult> OnCreateLineItemAsync(PostLineItemRequest request);
-
-        /// <summary>
         /// Delete a line item.
         /// </summary>
         /// <param name="request">The request parameters.</param>
@@ -118,38 +111,6 @@ namespace LtiAdvantage.AssignmentGradeServices
         }
 
         /// <summary>
-        /// Create a new LineItem instance.
-        /// </summary>
-        [HttpPost]
-        public async Task<IActionResult> PostAsync(string contextId, LineItem lineItem)
-        {
-            try
-            {
-                Logger.LogDebug($"Entering {nameof(PostAsync)}.");
-
-                if (!ModelState.IsValid)
-                {
-                    Logger.LogError($"{nameof(lineItem)} model binding failed.");
-                    return BadRequest();
-                }
-
-                try
-                {
-                    var request = new PostLineItemRequest(contextId, lineItem);
-                    return await OnCreateLineItemAsync(request).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, ex);
-                }
-            }
-            finally
-            {
-                Logger.LogDebug($"Exiting {nameof(PostAsync)}.");
-            }
-        }
-
-        /// <summary>
         /// Update a particular LineItem instance.
         /// </summary>
         [HttpPut]
@@ -197,14 +158,6 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <returns>The created <see cref="LineItemResult"/> for the response.</returns>
         public LineItemResult LineItemNotFound()
             => new LineItemResult(StatusCodes.Status404NotFound);
-
-        /// <summary>
-        /// Creates a LineItemResult with 201 status code.
-        /// </summary>
-        /// <param name="lineItem">The LineItem to format in the entity body.</param>
-        /// <returns>The created <see cref="LineItemResult"/> for the response.</returns>
-        public LineItemResult LineItemCreated(LineItem lineItem)
-            => new LineItemResult(lineItem, StatusCodes.Status201Created);
 
         #endregion
     }

@@ -114,6 +114,11 @@
             public const string AgsLineItem = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem";
 
             /// <summary>
+            /// Assignment and Grade Service lineitem read/write scope.
+            /// </summary>
+            public const string AgsLineItemReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly";
+
+            /// <summary>
             /// Assignment and Grade Service result readonly scope.
             /// </summary>
             public const string AgsResultReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly";

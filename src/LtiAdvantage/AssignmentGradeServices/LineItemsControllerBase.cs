@@ -15,7 +15,9 @@ namespace LtiAdvantage.AssignmentGradeServices
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
     [Route("context/{contextid}/lineitems", Name = Constants.ServiceEndpoints.AgsLineItemsService)]
     [Route("context/{contextid}/lineitems.{format}")]
-    public abstract class LineItemsControllerBase : Controller
+    [ApiController]
+    [ApiConventionType(typeof(DefaultApiConventions))]
+    public abstract class LineItemsControllerBase : ControllerBase
     {
         protected readonly ILogger<LineItemsControllerBase> Logger;
 
@@ -29,20 +31,21 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// </summary>
         /// <param name="request">The request parameters.</param>
         /// <returns>The line item created.</returns>
-        protected abstract Task<LineItemResult> OnCreateLineItemAsync(PostLineItemRequest request);
+        protected abstract Task<ActionResult<LineItem>> OnCreateLineItemAsync(CreateLineItemRequest request);
 
         /// <summary>
         /// Get the line items for a context.
         /// </summary>
         /// <param name="request">The request parameters.</param>
         /// <returns>The line items.</returns>
-        protected abstract Task<LineItemContainerResult> OnGetLineItemsAsync(GetLineItemsRequest request);
+        protected abstract Task<ActionResult<LineItemContainer>> OnGetLineItemsAsync(GetLineItemsRequest request);
 
         /// <summary>
         /// Get the lineitems from a context.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetAsync(string contextId, 
+        [Produces(Constants.MediaTypes.LineItemContainer)]
+        public async Task<ActionResult<LineItemContainer>> GetAsync(string contextId, 
             [FromQuery(Name = "lti_link_id")] string ltiLinkId = null, 
             [FromQuery(Name = "resource_id")] string resourceId = null, 
             [FromQuery] string tag = null, 
@@ -73,7 +76,9 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// Create a new LineItem instance.
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> PostAsync(string contextId, [FromBody] LineItem lineItem)
+        [Consumes(Constants.MediaTypes.LineItem)]
+        [Produces(Constants.MediaTypes.LineItem)]
+        public async Task<ActionResult<LineItem>> PostAsync(string contextId, [FromBody] LineItem lineItem)
         {
             try
             {
@@ -87,7 +92,7 @@ namespace LtiAdvantage.AssignmentGradeServices
 
                 try
                 {
-                    var request = new PostLineItemRequest(contextId, lineItem);
+                    var request = new CreateLineItemRequest(contextId, lineItem);
                     return await OnCreateLineItemAsync(request).ConfigureAwait(false);
                 }
                 catch (Exception ex)
@@ -100,32 +105,5 @@ namespace LtiAdvantage.AssignmentGradeServices
                 Logger.LogDebug($"Exiting {nameof(PostAsync)}.");
             }
         }
-
-        #region Convenience methods to return a properly formatted  IActionResult
-        
-        /// <summary>
-        /// Creates a LineItemResult with 201 status code.
-        /// </summary>
-        /// <param name="lineItem">The LineItem to format in the entity body.</param>
-        /// <returns>The created <see cref="LineItemResult"/> for the response.</returns>
-        public LineItemResult LineItemCreated(LineItem lineItem)
-            => new LineItemResult(lineItem, StatusCodes.Status201Created);
-
-        /// <summary>
-        /// Creates an empty LineItemContainerResult with 404 status code.
-        /// </summary>
-        /// <returns>The created <see cref="LineItemContainerResult"/> for the response.</returns>
-        public LineItemContainerResult LineItemsNotFound()
-            => new LineItemContainerResult(StatusCodes.Status404NotFound);
-
-        /// <summary>
-        /// Creates a LineItemContainerResult with 200 status code.
-        /// </summary>
-        /// <param name="lineItemContainer">The LineItemContainer.</param>
-        /// <returns>The created <see cref="LineItemContainerResult"/> for the response.</returns>
-        public LineItemContainerResult LineItemsOk(LineItemContainer lineItemContainer)
-            => new LineItemContainerResult(lineItemContainer);
-
-        #endregion
     }
 }

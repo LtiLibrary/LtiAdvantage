@@ -14,9 +14,11 @@ namespace LtiAdvantage.AssignmentGradeServices
     /// Implements the Assignment and Grade Services results endpoint.
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsResultReadonly)]
-    [Route("context/{contextid}/lineitems/{id}/results", Name = Constants.ServiceEndpoints.AgsResultService)]
+    [Route("context/{contextid}/lineitems/{id}/results", Name = Constants.ServiceEndpoints.AgsResultsService)]
     [Route("context/{contextid}/lineitems/{id}/results.{format}")]
-    public abstract class ResultsControllerBase : Controller
+    [ApiController]
+    [ApiConventionType(typeof(DefaultApiConventions))]
+    public abstract class ResultsControllerBase : ControllerBase
     {
         protected readonly ILogger<ResultsControllerBase> Logger;
 
@@ -30,13 +32,14 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// </summary>
         /// <param name="request">The request parameters.</param>
         /// <returns>The results.</returns>
-        protected abstract Task<ResultContainerResult> OnGetResultsAsync(GetResultsRequest request);
+        protected abstract Task<ActionResult<ResultContainer>> OnGetResultsAsync(GetResultsRequest request);
 
         /// <summary>
         /// Get the results for a line item.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetAsync(string contextId, string id, 
+        [Produces(Constants.MediaTypes.ResultContainer)]
+        public async Task<ActionResult<ResultContainer>> GetAsync(string contextId, string id, 
             [FromQuery(Name = "user_id")] string userId = null, 
             [FromQuery] int? limit = null)
         {
@@ -66,25 +69,6 @@ namespace LtiAdvantage.AssignmentGradeServices
                 Logger.LogDebug($"Exiting {nameof(GetAsync)}.");
             }
         }
-
-        #region Convenience methods to return a properly formatted  IActionResult
-        
-        /// <summary>
-        /// Creates a ResultContainerResult with 200 status code.
-        /// </summary>
-        /// <param name="resultContainer">The LineItemContainer.</param>
-        /// <returns>The created <see cref="MembershipContainerResult"/> for the response.</returns>
-        public ResultContainerResult ResultsOk(ResultContainer resultContainer)
-            => new ResultContainerResult(resultContainer);
-
-        /// <summary>
-        /// Creates an empty ResultContainerResult with 404 status code.
-        /// </summary>
-        /// <returns>The created <see cref="ResultContainerResult"/> for the response.</returns>
-        public ResultContainerResult ResultsNotFound()
-            => new ResultContainerResult(StatusCodes.Status404NotFound);
-
-        #endregion
     }
 }
 

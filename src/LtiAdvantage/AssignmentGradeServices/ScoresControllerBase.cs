@@ -13,9 +13,9 @@ namespace LtiAdvantage.AssignmentGradeServices
     /// Implements the Assignment and Grade Services score publish service endpoint.
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsScoreWriteonly)]
-    [Route("context/{contextid}/lineitems/{id}/scores", Name = Constants.ServiceEndpoints.AgsScoreService)]
-    [Route("context/{contextid}/lineitems/{id}/scores.{format}")]
-    public abstract class ScoresControllerBase : Controller
+    [ApiController]
+    [ApiConventionType(typeof(DefaultApiConventions))]
+    public abstract class ScoresControllerBase : ControllerBase
     {
         protected readonly ILogger<ScoresControllerBase> Logger;
 
@@ -29,13 +29,35 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// </summary>
         /// <param name="request">The request parameters.</param>
         /// <returns></returns>
-        protected abstract Task<ScoreResult> OnPostScoreAsync(PostScoreRequest request);
+        protected abstract Task<ActionResult<Score>> OnCreateScoreAsync(CreateScoreRequest request);
+
+        /// <summary>
+        /// Return a score.
+        /// </summary>
+        /// <param name="contextId">The context (course) id.</param>
+        /// <param name="lineItemId">The line item id.</param>
+        /// <param name="id">The score id.</param>
+        /// <returns>The score.</returns>
+        [HttpGet]
+        [Route("context/{contextid}/lineitems/{lineItemId}/scores/{id}", Name = Constants.ServiceEndpoints.AgsScoreService)]
+        [Route("context/{contextid}/lineitems/{lineItemId}/scores/{id}.{format}")]
+        [Produces(Constants.MediaTypes.Score)]
+        public ActionResult<Score> Get(string contextId, string lineItemId, string id)
+        {
+            // Not implemented.
+            return null;
+        }
+
 
         /// <summary>
         /// Post a score for a line item.
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> PostAsync(string contextId, string id, [FromBody] Score score)
+        [Route("context/{contextid}/lineitems/{id}/scores", Name = Constants.ServiceEndpoints.AgsScoresService)]
+        [Route("context/{contextid}/lineitems/{id}/scores.{format}")]
+        [Consumes(Constants.MediaTypes.Score)]
+        [Produces(Constants.MediaTypes.Score)]
+        public async Task<ActionResult<Score>> PostAsync(string contextId, string id, [FromBody] Score score)
         {
             try
             {
@@ -49,8 +71,8 @@ namespace LtiAdvantage.AssignmentGradeServices
 
                 try
                 {
-                    var request = new PostScoreRequest(contextId, id, score);
-                    return await OnPostScoreAsync(request).ConfigureAwait(false);
+                    var request = new CreateScoreRequest(contextId, id, score);
+                    return await OnCreateScoreAsync(request).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -63,25 +85,6 @@ namespace LtiAdvantage.AssignmentGradeServices
                 Logger.LogDebug($"Exiting {nameof(PostAsync)}.");
             }
         }
-
-        #region Convenience methods to return a properly formatted  IActionResult
-        
-        /// <summary>
-        /// Creates a ScoreResult with 201 Created status code.
-        /// </summary>
-        /// <param name="score">The LineItemContainer.</param>
-        /// <returns>The created <see cref="ScoreResult"/> for the response.</returns>
-        public ScoreResult ScoreCreated(Score score)
-            => new ScoreResult(score);
-
-        /// <summary>
-        /// Creates an empty ScoreResult with 404 status code.
-        /// </summary>
-        /// <returns>The created <see cref="ScoreResult"/> for the response.</returns>
-        public ScoreResult ScoreNotFound()
-            => new ScoreResult(StatusCodes.Status404NotFound);
-
-        #endregion
     }
 }
 

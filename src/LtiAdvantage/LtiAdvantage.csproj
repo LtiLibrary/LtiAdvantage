@@ -9,27 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="AssignmentGradeServices\DeleteResultDto.cs" />
-    <Compile Remove="AssignmentGradeServices\GetLineItemResponse.cs" />
-    <Compile Remove="AssignmentGradeServices\GetLineItemsResponse.cs" />
-    <Compile Remove="AssignmentGradeServices\GetResultDto.cs" />
-    <Compile Remove="AssignmentGradeServices\GetResultsDto.cs" />
-    <Compile Remove="AssignmentGradeServices\LineItemResultsResult.cs" />
-    <Compile Remove="AssignmentGradeServices\LisResultModelBinder.cs" />
-    <Compile Remove="AssignmentGradeServices\PostLineItemResponse.cs" />
-    <Compile Remove="AssignmentGradeServices\PostResultDto.cs" />
-    <Compile Remove="AssignmentGradeServices\PutResultDto.cs" />
-    <Compile Remove="AssignmentGradeServices\ResultResult.cs" />
-    <Compile Remove="Utilities\HasScopeHandler.cs" />
-    <Compile Remove="Utilities\HasScopeRequirement.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="1.8.3" />
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.1.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Api.Analyzers" Version="2.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.3.0" />
   </ItemGroup>
 

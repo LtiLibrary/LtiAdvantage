@@ -236,8 +236,9 @@
         {
             public const string AgsLineItemService = "lineitem";
             public const string AgsLineItemsService = "lineitems";
-            public const string AgsResultService = "results";
-            public const string AgsScoreService = "scores";
+            public const string AgsResultsService = "results";
+            public const string AgsScoreService = "score";
+            public const string AgsScoresService = "scores";
             public const string NrpsMembershipService = "membership";
         }
     }

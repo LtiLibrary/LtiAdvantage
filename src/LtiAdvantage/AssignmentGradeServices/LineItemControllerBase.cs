@@ -15,7 +15,9 @@ namespace LtiAdvantage.AssignmentGradeServices
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
     [Route("context/{contextid}/lineitems/{id}", Name = Constants.ServiceEndpoints.AgsLineItemService)]
     [Route("context/{contextid}/lineitems/{id}.{format}")]
-    public abstract class LineItemControllerBase : Controller
+    [ApiController]
+    [ApiConventionType(typeof(DefaultApiConventions))]
+    public abstract class LineItemControllerBase : ControllerBase
     {
         protected readonly ILogger<LineItemsControllerBase> Logger;
 
@@ -29,27 +31,30 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// </summary>
         /// <param name="request">The request parameters.</param>
         /// <returns>The result.</returns>
-        protected abstract Task<LineItemResult> OnDeleteLineItemAsync(DeleteLineItemRequest request);
+        protected abstract Task<ActionResult> OnDeleteLineItemAsync(DeleteLineItemRequest request);
 
         /// <summary>
         /// Get a line item.
         /// </summary>
         /// <param name="request">The request parameters.</param>
         /// <returns>The line item.</returns>
-        protected abstract Task<LineItemResult> OnGetLineItemAsync(GetLineItemRequest request);
+        protected abstract Task<ActionResult<LineItem>> OnGetLineItemAsync(GetLineItemRequest request);
 
         /// <summary>
         /// Update a line item.
         /// </summary>
         /// <param name="request">The request parameters.</param>
         /// <returns>The result.</returns>
-        protected abstract Task<LineItemResult> OnUpdateLineItemAsync(PutLineItemRequest request);
+        protected abstract Task<ActionResult> OnUpdateLineItemAsync(UpdateLineItemRequest request);
 
         /// <summary>
-        /// Delete a particular LineItem instance.
+        /// Delete a line item.
         /// </summary>
+        /// <param name="contextId">The context (course) id.</param>
+        /// <param name="id">The line item id.</param>
+        /// <returns>The result.</returns>
         [HttpDelete]
-        public async Task<IActionResult> DeleteAsync(string contextId, string id)
+        public async Task<ActionResult> DeleteAsync(string contextId, string id)
         {
             try
             {
@@ -78,10 +83,14 @@ namespace LtiAdvantage.AssignmentGradeServices
         }
 
         /// <summary>
-        /// Get the lineitem.
+        /// Get a line item.
         /// </summary>
+        /// <param name="contextId">The context (course) id.</param>
+        /// <param name="id">The line item id.</param>
+        /// <returns>The line item.</returns>
         [HttpGet]
-        public async Task<IActionResult> GetAsync(string contextId, string id)
+        [Produces(Constants.MediaTypes.LineItem)]
+        public async Task<ActionResult<LineItem>> GetAsync(string contextId, string id)
         {
             try
             {
@@ -111,10 +120,13 @@ namespace LtiAdvantage.AssignmentGradeServices
         }
 
         /// <summary>
-        /// Update a particular LineItem instance.
+        /// Update a line item.
         /// </summary>
+        /// <param name="lineItem">The updated line item.</param>
+        /// <returns>The result.</returns>
         [HttpPut]
-        public async Task<IActionResult> PutAsync(LineItem lineItem)
+        [Consumes(Constants.MediaTypes.LineItem)]
+        public async Task<ActionResult> PutAsync(LineItem lineItem)
         {
             try
             {
@@ -128,7 +140,7 @@ namespace LtiAdvantage.AssignmentGradeServices
 
                 try
                 {
-                    var request = new PutLineItemRequest(lineItem);
+                    var request = new UpdateLineItemRequest(lineItem);
                     return await OnUpdateLineItemAsync(request).ConfigureAwait(false);
                 }
                 catch (Exception ex)
@@ -141,24 +153,5 @@ namespace LtiAdvantage.AssignmentGradeServices
                 Logger.LogDebug($"Exiting {nameof(PutAsync)}.");
             }
         }
-
-        #region Convenience methods to return a properly formatted  IActionResult
-        
-        /// <summary>
-        /// Creates a LineItemResult with 200 status code.
-        /// </summary>
-        /// <param name="lineItem">The LineItem.</param>
-        /// <returns>The created <see cref="LineItemResult"/> for the response.</returns>
-        public LineItemResult LineItemOk(LineItem lineItem = null)
-            => new LineItemResult(lineItem);
-
-        /// <summary>
-        /// Creates an empty LineItemResult with 404 status code.
-        /// </summary>
-        /// <returns>The created <see cref="LineItemResult"/> for the response.</returns>
-        public LineItemResult LineItemNotFound()
-            => new LineItemResult(StatusCodes.Status404NotFound);
-
-        #endregion
     }
 }

@@ -1,14 +1,14 @@
 ﻿namespace LtiAdvantage.AssignmentGradeServices
 {
     /// <summary>
-    /// Represents a PutLineItem DTO.
+    /// Represents an update line item request.
     /// </summary>
-    public class PutLineItemRequest
+    public class UpdateLineItemRequest
     {
         /// <summary>
         /// Initialize a new instance of the class.
         /// </summary>
-        public PutLineItemRequest(LineItem lineItem)
+        public UpdateLineItemRequest(LineItem lineItem)
         {
             LineItem = lineItem;
         }

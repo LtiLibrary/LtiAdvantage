@@ -1,14 +1,14 @@
 ﻿namespace LtiAdvantage.AssignmentGradeServices
 {
     /// <summary>
-    /// Represents a PostScoreRequest.
+    /// Represents a create score request.
     /// </summary>
-    public class PostScoreRequest
+    public class CreateScoreRequest
     {
         /// <summary>
         /// Initialize a new instance of the class.
         /// </summary>
-        public PostScoreRequest(string contextId, string id, Score score)
+        public CreateScoreRequest(string contextId, string id, Score score)
         {
             ContextId = contextId;
             Id = id;

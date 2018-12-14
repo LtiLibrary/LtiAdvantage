@@ -1,14 +1,14 @@
 ﻿namespace LtiAdvantage.AssignmentGradeServices
 {
     /// <summary>
-    /// Represents a PostLineItem request.
+    /// Represents a create item request request.
     /// </summary>
-    public class PostLineItemRequest
+    public class CreateLineItemRequest
     {
         /// <summary>
         /// Initialize a new instance of the class.
         /// </summary>
-        public PostLineItemRequest(string contextId, LineItem lineItem)
+        public CreateLineItemRequest(string contextId, LineItem lineItem)
         {
             ContextId = contextId;
             LineItem = lineItem;

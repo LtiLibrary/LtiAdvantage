@@ -14,20 +14,24 @@ namespace LtiAdvantage.Utilities
     /// 
     /// [Authorize("https://purl.imsglobal.org/spec/lti-ags/scope/lineitem")]
     /// </example>
-    /// <example>
-    /// To add AuthorizationPolicyProvider to ConfigureServices
-    ///
-    /// 
-    /// </example>
     public class AuthorizationPolicyProvider : DefaultAuthorizationPolicyProvider
     {
         private readonly IOptions<AuthorizationOptions> _options;
 
+        /// <inheritdoc />
+        /// <summary>
+        /// </summary>
         public AuthorizationPolicyProvider(IOptions<AuthorizationOptions> options) : base(options)
         {
             _options = options;
         }
 
+        /// <inheritdoc />
+        /// <summary>
+        /// Returns a policy that requires a scope claim = policyName.
+        /// </summary>
+        /// <param name="policyName"></param>
+        /// <returns></returns>
         public override async Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
         {
             // Check static policies first
@@ -36,7 +40,7 @@ namespace LtiAdvantage.Utilities
             if (policy == null)
             {
                 policy = new AuthorizationPolicyBuilder().AddRequirements()
-                    .RequireClaim("scope", policyName)
+                    .RequireClaim("scope", policyName.Split(' '))
                     .Build();
 
                 // Add policy to the AuthorizationOptions, so we don't have to re-create it each time

@@ -8,17 +8,17 @@
         /// <summary>
         /// Initialize a new instance of the class.
         /// </summary>
-        public GetLineItemsRequest(string contextId, string ltiLinkId, string resourceId, string tag, int? limit)
+        public GetLineItemsRequest(string contextId, string resourceLinkId, string resourceId, string tag, int? limit)
         {
             ContextId = contextId;
             Limit = limit;
-            LtiLinkId = ltiLinkId;
+            ResourceLinkId = resourceLinkId;
             ResourceId = resourceId;
             Tag = tag;
         }
 
         /// <summary>
-        /// Get or set the context_id.
+        /// Get or set the context id.
         /// </summary>
         public string ContextId { get; set; }
 
@@ -28,12 +28,12 @@
         public int? Limit { get; }
 
         /// <summary>
-        /// Get or set the lti_link_id filter.
+        /// Get or set the resource link id filter.
         /// </summary>
-        public string LtiLinkId { get; set; }
+        public string ResourceLinkId { get; set; }
 
         /// <summary>
-        /// Get or set the resource_id filter.
+        /// Get or set the resource id filter.
         /// </summary>
         public string ResourceId { get; set; }
 

@@ -2,6 +2,14 @@
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
+    /// <summary>
+    /// The score result for a single line item and user.
+    /// </summary>
+    /// <remarks>
+    /// There may be multiple scores for a given line item and user,
+    /// but only one result. It is up to the platform to decide how
+    /// to calculate the result.
+    /// </remarks>
     public class Result
     {
         /// <summary>

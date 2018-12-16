@@ -3,6 +3,9 @@ using Newtonsoft.Json;
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
+    /// <summary>
+    /// Represents a gradebook column (e.g. an assignment).
+    /// </summary>
     public class LineItem
     {
         /// <summary>

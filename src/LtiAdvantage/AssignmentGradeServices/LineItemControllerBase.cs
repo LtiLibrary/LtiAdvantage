@@ -13,14 +13,19 @@ namespace LtiAdvantage.AssignmentGradeServices
     /// Implements the Assignment and Grade Services line items endpoint.
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
-    [Route("context/{contextid}/lineitems/{id}", Name = Constants.ServiceEndpoints.AgsLineItemService)]
-    [Route("context/{contextid}/lineitems/{id}.{format}")]
+    [Route("context/{contextId}/lineitems/{id}", Name = Constants.ServiceEndpoints.AgsLineItemService)]
+    [Route("context/{contextId}/lineitems/{id}.{format}")]
     [ApiController]
     [ApiConventionType(typeof(DefaultApiConventions))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public abstract class LineItemControllerBase : ControllerBase
     {
+        /// <summary>
+        /// </summary>
         protected readonly ILogger<LineItemsControllerBase> Logger;
 
+        /// <summary>
+        /// </summary>
         protected LineItemControllerBase(ILogger<LineItemsControllerBase> logger)
         {
             Logger = logger;
@@ -50,7 +55,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <summary>
         /// Delete a line item.
         /// </summary>
-        /// <param name="contextId">The context (course) id.</param>
+        /// <param name="contextId">The context id.</param>
         /// <param name="id">The line item id.</param>
         /// <returns>The result.</returns>
         [HttpDelete]
@@ -85,7 +90,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <summary>
         /// Get a line item.
         /// </summary>
-        /// <param name="contextId">The context (course) id.</param>
+        /// <param name="contextId">The context id.</param>
         /// <param name="id">The line item id.</param>
         /// <returns>The line item.</returns>
         [HttpGet]

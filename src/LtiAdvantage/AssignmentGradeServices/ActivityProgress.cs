@@ -3,9 +3,15 @@ using Newtonsoft.Json.Converters;
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
+    /// <summary>
+    /// The activity progress or status.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ActivityProgress
     {
+        /// <summary>
+        /// Unknown activity progress.
+        /// </summary>
         None = 0,
 
         /// <summary>

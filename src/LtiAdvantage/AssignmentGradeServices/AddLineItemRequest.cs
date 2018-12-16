@@ -3,12 +3,12 @@
     /// <summary>
     /// Represents a create item request request.
     /// </summary>
-    public class CreateLineItemRequest
+    public class AddLineItemRequest
     {
         /// <summary>
         /// Initialize a new instance of the class.
         /// </summary>
-        public CreateLineItemRequest(string contextId, LineItem lineItem)
+        public AddLineItemRequest(string contextId, LineItem lineItem)
         {
             ContextId = contextId;
             LineItem = lineItem;

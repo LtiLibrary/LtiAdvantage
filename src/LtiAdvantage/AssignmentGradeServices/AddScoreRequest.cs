@@ -3,15 +3,15 @@
     /// <summary>
     /// Represents a create score request.
     /// </summary>
-    public class CreateScoreRequest
+    public class AddScoreRequest
     {
         /// <summary>
         /// Initialize a new instance of the class.
         /// </summary>
-        public CreateScoreRequest(string contextId, string id, Score score)
+        public AddScoreRequest(string contextId, string lineItemId, Score score)
         {
             ContextId = contextId;
-            Id = id;
+            LineItemId = lineItemId;
             Score = score;
         }
 
@@ -23,7 +23,7 @@
         /// <summary>
         /// Get or set the line item Id.
         /// </summary>
-        public string Id { get; }
+        public string LineItemId { get; }
 
         /// <summary>
         /// The score.

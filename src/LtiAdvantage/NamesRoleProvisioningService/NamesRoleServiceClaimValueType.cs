@@ -8,6 +8,8 @@ namespace LtiAdvantage.NamesRoleProvisioningService
     /// </summary>
     public class NamesRoleServiceClaimValueType
     {
+        /// <summary>
+        /// </summary>
         public NamesRoleServiceClaimValueType()
         {
             ServiceVersions = new[] {Version};

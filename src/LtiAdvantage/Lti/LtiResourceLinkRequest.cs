@@ -152,6 +152,9 @@ namespace LtiAdvantage.Lti
             set { this.SetClaimValue(Constants.LtiClaims.Roles, value); }
         }
 
+        /// <summary>
+        /// The tool's url.
+        /// </summary>
         public string TargetLinkUri
         {
             get { return this.GetClaimValue(Constants.LtiClaims.TargetLinkUri); }

@@ -14,7 +14,6 @@ namespace LtiAdvantage.AssignmentGradeServices
     /// <summary>
     /// Implements the Assignment and Grade Services line items endpoint.
     /// </summary>
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
     [Route("context/{contextId}/lineitems", Name = Constants.ServiceEndpoints.AgsLineItemsService)]
     [Route("context/{contextId}/lineitems.{format}")]
     [ApiController]
@@ -64,6 +63,8 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, 
+            Policy = Constants.LtiScopes.AgsLineItem + " " + Constants.LtiScopes.AgsLineItemReadonly)]
         public async Task<ActionResult<LineItemContainer>> GetAsync([Required] string contextId,
             [FromQuery(Name = "resourceLinkId")] string resourceLinkId = null,
             [FromQuery(Name = "resourceId")] string resourceId = null,
@@ -111,6 +112,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
         public async Task<ActionResult<LineItem>> PostAsync([Required] string contextId, [Required] [FromBody] LineItem lineItem)
         {
             try

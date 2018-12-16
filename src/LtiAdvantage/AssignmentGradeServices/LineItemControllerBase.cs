@@ -32,28 +32,21 @@ namespace LtiAdvantage.AssignmentGradeServices
         }
 
         /// <summary>
-        /// Delete a line item.
+        /// Deletes a line item.
         /// </summary>
         /// <param name="request">The request parameters.</param>
         /// <returns>The result.</returns>
         protected abstract Task<ActionResult> OnDeleteLineItemAsync(DeleteLineItemRequest request);
 
         /// <summary>
-        /// Get a line item.
-        /// </summary>
-        /// <param name="request">The request parameters.</param>
-        /// <returns>The line item.</returns>
-        protected abstract Task<ActionResult<LineItem>> OnGetLineItemAsync(GetLineItemRequest request);
-
-        /// <summary>
-        /// Update a line item.
+        /// Updates a line item.
         /// </summary>
         /// <param name="request">The request parameters.</param>
         /// <returns>The result.</returns>
         protected abstract Task<ActionResult> OnUpdateLineItemAsync(UpdateLineItemRequest request);
 
         /// <summary>
-        /// Delete a line item.
+        /// Deletes a line item.
         /// </summary>
         /// <param name="contextId">The context id.</param>
         /// <param name="id">The line item id.</param>
@@ -88,44 +81,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         }
 
         /// <summary>
-        /// Get a line item.
-        /// </summary>
-        /// <param name="contextId">The context id.</param>
-        /// <param name="id">The line item id.</param>
-        /// <returns>The line item.</returns>
-        [HttpGet]
-        [Produces(Constants.MediaTypes.LineItem)]
-        public async Task<ActionResult<LineItem>> GetAsync(string contextId, string id)
-        {
-            try
-            {
-                Logger.LogDebug($"Entering {nameof(GetAsync)}.");
-            
-                if (string.IsNullOrWhiteSpace(id))
-                {
-                    Logger.LogError($"{nameof(id)} is missing.");
-                    return BadRequest();
-                }
-
-                try
-                {
-                    var request = new GetLineItemRequest(contextId, id);
-                    return await OnGetLineItemAsync(request).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError(ex, "Error processing get lineitem request.");
-                    return StatusCode(StatusCodes.Status500InternalServerError, ex);
-                }
-            }
-            finally
-            {
-                Logger.LogDebug($"Exiting {nameof(GetAsync)}.");
-            }
-        }
-
-        /// <summary>
-        /// Update a line item.
+        /// Updates a line item.
         /// </summary>
         /// <param name="lineItem">The updated line item.</param>
         /// <returns>The result.</returns>

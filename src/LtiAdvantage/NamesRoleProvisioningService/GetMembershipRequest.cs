@@ -15,7 +15,7 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// <summary>
         /// Initialize a new instance of the class.
         /// </summary>
-        /// <param name="contextId">The context ID (e.g. course). Required.</param>
+        /// <param name="contextId">Required context id.</param>
         /// <param name="limit">Optional limit to the number of members to return.</param>
         /// <param name="rlid">Optional resource link filter for members with access to resource link.</param>
         /// <param name="role">Optional role filter for members that have the specified role.</param>

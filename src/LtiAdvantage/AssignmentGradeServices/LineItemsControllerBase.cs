@@ -40,6 +40,13 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <param name="request">The request parameters.</param>
         /// <returns>The line item.</returns>
         protected abstract Task<ActionResult<LineItem>> OnAddLineItemAsync(AddLineItemRequest request);
+        
+        /// <summary>
+        /// Get a line item.
+        /// </summary>
+        /// <param name="request">The request parameters.</param>
+        /// <returns>The line item.</returns>
+        protected abstract Task<ActionResult<LineItem>> OnGetLineItemAsync(GetLineItemRequest request);
 
         /// <summary>
         /// Get the line items for a context.
@@ -47,9 +54,54 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <param name="request">The request parameters.</param>
         /// <returns>The line items.</returns>
         protected abstract Task<ActionResult<LineItemContainer>> OnGetLineItemsAsync(GetLineItemsRequest request);
+        
+        /// <summary>
+        /// Returns a line item.
+        /// </summary>
+        /// <param name="contextId">The context id.</param>
+        /// <param name="lineItemId">The line item id.</param>
+        /// <returns>The line item.</returns>
+        [HttpGet("{lineItemId}")]
+        [HttpGet("{lineItemId}.{format2}")]
+        [Produces(Constants.MediaTypes.LineItem)]
+        [ProducesResponseType(typeof(LineItem), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, 
+            Policy = Constants.LtiScopes.AgsLineItem + " " + Constants.LtiScopes.AgsLineItemReadonly)]
+        public async Task<ActionResult<LineItem>> GetLineItemAsync([Required] string contextId, [Required] string lineItemId)
+        {
+            try
+            {
+                _logger.LogDebug($"Entering {nameof(GetLineItemAsync)}.");
+
+                try
+                {
+                    var request = new GetLineItemRequest(contextId, lineItemId);
+                    return await OnGetLineItemAsync(request).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(GetLineItemAsync)}.");
+                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                    {
+                        Title = "An unexpected error occurred",
+                        Status = StatusCodes.Status500InternalServerError,
+                        Detail = _env.IsDevelopment()
+                            ? ex.Message + ex.StackTrace
+                            : ex.Message
+                    });
+                }
+            }
+            finally
+            {
+                _logger.LogDebug($"Exiting {nameof(GetLineItemAsync)}.");
+            }
+        }
 
         /// <summary>
-        /// Returns the line items in a context (course).
+        /// Returns the line items in a context.
         /// </summary>
         /// <param name="contextId">The context id.</param>
         /// <param name="resourceLinkId">Optional resource link id filter.</param>
@@ -65,7 +117,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, 
             Policy = Constants.LtiScopes.AgsLineItem + " " + Constants.LtiScopes.AgsLineItemReadonly)]
-        public async Task<ActionResult<LineItemContainer>> GetAsync([Required] string contextId,
+        public async Task<ActionResult<LineItemContainer>> GetLineItemsAsync([Required] string contextId,
             [FromQuery(Name = "resourceLinkId")] string resourceLinkId = null,
             [FromQuery(Name = "resourceId")] string resourceId = null,
             [FromQuery] string tag = null,
@@ -73,7 +125,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         {
             try
             {
-                _logger.LogDebug($"Entering {nameof(GetAsync)}.");
+                _logger.LogDebug($"Entering {nameof(GetLineItemsAsync)}.");
 
                 try
                 {
@@ -95,7 +147,7 @@ namespace LtiAdvantage.AssignmentGradeServices
             }
             finally
             {
-                _logger.LogDebug($"Exiting {nameof(GetAsync)}.");
+                _logger.LogDebug($"Exiting {nameof(GetLineItemsAsync)}.");
             }
         }
 

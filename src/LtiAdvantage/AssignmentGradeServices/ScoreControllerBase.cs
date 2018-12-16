@@ -43,7 +43,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         protected abstract Task<ActionResult<Score>> OnGetScoreAsync(GetScoreRequest request);
 
         /// <summary>
-        /// Return a score.
+        /// Returns a score.
         /// </summary>
         /// <param name="contextId">The context id.</param>
         /// <param name="lineItemId">The line item id.</param>

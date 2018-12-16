@@ -15,12 +15,12 @@
         }
 
         /// <summary>
-        /// The ContextId (course) for this <see cref="LineItem"/>.
+        /// The context id.
         /// </summary>
         public string ContextId { get; set; }
 
         /// <summary>
-        /// The <see cref="LineItem"/>.
+        /// The line item.
         /// </summary>
         public LineItem LineItem { get; set; }
     }

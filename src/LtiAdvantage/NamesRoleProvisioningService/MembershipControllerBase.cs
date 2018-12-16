@@ -38,7 +38,7 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         protected abstract Task<ActionResult<MembershipContainer>> OnGetMembershipAsync(GetMembershipRequest request);
 
         /// <summary>
-        /// Returns the membership of a context (e.g. course).
+        /// Returns the membership of a context.
         /// </summary>
         /// <param name="contextId">The context id.</param>
         /// <param name="limit">Optional limit to the number of members to return.</param>

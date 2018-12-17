@@ -19,10 +19,8 @@ namespace LtiAdvantage.AssignmentGradeServices
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public abstract class LineItemsControllerBase : ControllerBase, ILineItemsController
     {
-        /// <summary>
-        /// </summary>
-        private readonly ILogger<ILineItemsController> _logger;
         private readonly IHostingEnvironment _env;
+        private readonly ILogger<ILineItemsController> _logger;
 
         /// <summary>
         /// </summary>

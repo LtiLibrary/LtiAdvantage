@@ -1,35 +1,34 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using LtiAdvantage.Lti;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace LtiAdvantage.NamesRoleProvisioningService
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="ControllerBase" />
     /// <summary>
     /// Implements the Names and Role Provisioning Service membership endpoint.
     /// </summary>
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.NrpsMembershipReadonly)]
-    [Route("context/{contextId}/membership", Name = Constants.ServiceEndpoints.NrpsMembershipService)]
-    [Route("context/{contextId}/membership.{format}")]
     [ApiController]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public abstract class MembershipControllerBase : ControllerBase
+    public abstract class MembershipControllerBase : ControllerBase, IMembershipController
     {
-        /// <summary>
-        /// </summary>
-        protected readonly ILogger<MembershipControllerBase> Logger;
+        private readonly IHostingEnvironment _env;
+        private readonly ILogger<IMembershipController> _logger;
 
         /// <summary>
         /// </summary>
-        protected MembershipControllerBase(ILogger<MembershipControllerBase> logger)
+        protected MembershipControllerBase(IHostingEnvironment env, ILogger<IMembershipController> logger)
         {
-            Logger = logger;
+            _env = env;
+            _logger = logger;
         }
 
         /// <summary>
@@ -51,17 +50,15 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public virtual async Task<ActionResult<MembershipContainer>> GetAsync(string contextId, int? limit = null, string rlid = null, Role? role = null)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.NrpsMembershipReadonly)]
+        [Route("context/{contextId}/membership", Name = Constants.ServiceEndpoints.NrpsMembershipService)]
+        [Route("context/{contextId}/membership.{format}")]
+        public virtual async Task<ActionResult<MembershipContainer>> GetMembershipAsync([Required] string contextId, 
+            int? limit = null, string rlid = null, Role? role = null)
         {
             try
             {
-                Logger.LogDebug($"Entering {nameof(GetAsync)}.");
-
-                if (string.IsNullOrWhiteSpace(contextId))
-                {
-                    Logger.LogError($"{nameof(contextId)} is missing.");
-                    return BadRequest(new ProblemDetails { Title = $"{nameof(contextId)} is required." });
-                }
+                _logger.LogDebug($"Entering {nameof(GetMembershipAsync)}.");
 
                 try
                 {
@@ -70,17 +67,20 @@ namespace LtiAdvantage.NamesRoleProvisioningService
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "Cannot get membership.");
+                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(GetMembershipAsync)}.");
                     return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
                     {
-                        Title = ex.Message,
-                        Detail = ex.StackTrace
+                        Title = "An unexpected error occurred",
+                        Status = StatusCodes.Status500InternalServerError,
+                        Detail = _env.IsDevelopment()
+                            ? ex.Message + ex.StackTrace
+                            : ex.Message
                     });
                 }
             }
             finally
             {
-                Logger.LogDebug($"Exiting {nameof(GetAsync)}.");
+                _logger.LogDebug($"Exiting {nameof(GetMembershipAsync)}.");
             }
         }
     }

@@ -1,34 +1,33 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="ControllerBase" />
     /// <summary>
     /// Implements the Assignment and Grade Services results endpoint.
     /// </summary>
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsResultReadonly)]
-    [Route("context/{contextId}/lineitems/{lineItemId}/results", Name = Constants.ServiceEndpoints.AgsResultsService)]
-    [Route("context/{contextId}/lineitems/{lineItemId}/results.{format}")]
     [ApiController]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public abstract class ResultsControllerBase : ControllerBase
+    public abstract class ResultsControllerBase : ControllerBase, IResultsController
     {
-        /// <summary>
-        /// </summary>
-        protected readonly ILogger<ResultsControllerBase> Logger;
+        private readonly IHostingEnvironment _env;
+        private readonly ILogger<IResultsController> _logger;
 
         /// <summary>
         /// </summary>
-        protected ResultsControllerBase(ILogger<ResultsControllerBase> logger)
+        protected ResultsControllerBase(IHostingEnvironment env, ILogger<IResultsController> logger)
         {
-            Logger = logger;
+            _env = env;
+            _logger = logger;
         }
                 
         /// <summary>
@@ -52,25 +51,16 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ResultContainer>> GetAsync(string contextId, string lineItemId, 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsResultReadonly)]
+        [Route("context/{contextId}/lineitems/{lineItemId}/results", Name = Constants.ServiceEndpoints.AgsResultsService)]
+        [Route("context/{contextId}/lineitems/{lineItemId}/results.{format}")]
+        public async Task<ActionResult<ResultContainer>> GetResultsAsync([Required] string contextId, [Required] string lineItemId, 
             [FromQuery(Name = "userId")] string userId = null, 
             [FromQuery] int? limit = null)
         {
             try
             {
-                Logger.LogDebug($"Entering {nameof(GetAsync)}.");
-                
-                if (string.IsNullOrWhiteSpace(contextId))
-                {
-                    Logger.LogError($"{nameof(contextId)} is missing.");
-                    return BadRequest(new ProblemDetails { Title = $"{nameof(contextId)} is required." });
-                }
-            
-                if (string.IsNullOrWhiteSpace(lineItemId))
-                {
-                    Logger.LogError($"{nameof(lineItemId)} is missing.");
-                    return BadRequest(new ProblemDetails { Title = $"{nameof(lineItemId)} is required." });
-                }
+                _logger.LogDebug($"Entering {nameof(GetResultsAsync)}.");
 
                 try
                 {
@@ -79,17 +69,20 @@ namespace LtiAdvantage.AssignmentGradeServices
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "Error processing get results request.");
+                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(GetResultsAsync)}.");
                     return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
                     {
-                        Title = ex.Message,
-                        Detail = ex.StackTrace
+                        Title = "An unexpected error occurred",
+                        Status = StatusCodes.Status500InternalServerError,
+                        Detail = _env.IsDevelopment()
+                            ? ex.Message + ex.StackTrace
+                            : ex.Message
                     });
                 }
             }
             finally
             {
-                Logger.LogDebug($"Exiting {nameof(GetAsync)}.");
+                _logger.LogDebug($"Exiting {nameof(GetResultsAsync)}.");
             }
         }
     }

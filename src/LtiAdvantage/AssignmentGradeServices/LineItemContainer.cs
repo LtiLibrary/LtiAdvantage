@@ -21,7 +21,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// Create a LineItemContainer that contains the line items.
         /// </summary>
         /// <param name="lineItems"></param>
-        public LineItemContainer(List<LineItem> lineItems) : base(lineItems)
+        public LineItemContainer(IEnumerable<LineItem> lineItems) : base(lineItems)
         {
         }
     }

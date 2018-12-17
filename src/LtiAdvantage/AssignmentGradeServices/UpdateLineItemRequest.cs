@@ -8,14 +8,26 @@
         /// <summary>
         /// Initialize a new instance of the class.
         /// </summary>
-        public UpdateLineItemRequest(LineItem lineItem)
+        public UpdateLineItemRequest(string contextId, string lineItemId, LineItem lineItem)
         {
+            ContextId = contextId;
+            LineItemId = lineItemId;
             LineItem = lineItem;
         }
 
         /// <summary>
-        /// Get or set the LineItem.
+        /// Get or set the context id.
+        /// </summary>
+        public string ContextId { get; set; }
+
+        /// <summary>
+        /// Get or set the line item.
         /// </summary>
         public LineItem LineItem { get; }
+
+        /// <summary>
+        /// Get or set the line item id.
+        /// </summary>
+        public string LineItemId { get; set; }
     }
 }

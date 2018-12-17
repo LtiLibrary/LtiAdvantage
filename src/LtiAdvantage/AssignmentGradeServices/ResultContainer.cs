@@ -8,5 +8,21 @@ namespace LtiAdvantage.AssignmentGradeServices
     /// </summary>
     public class ResultContainer : List<Result>
     {
+        /// <inheritdoc />
+        /// <summary>
+        /// Create an empty ResultContainer
+        /// </summary>
+        public ResultContainer()
+        {
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Create a ResultContainer that contains the results.
+        /// </summary>
+        /// <param name="results"></param>
+        public ResultContainer(IEnumerable<Result> results) : base(results)
+        {
+        }
     }
 }

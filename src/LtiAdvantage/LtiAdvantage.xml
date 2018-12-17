@@ -120,7 +120,7 @@
             Get or set the ContextId.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.AssignmentGradeServices.DeleteLineItemRequest.Id">
+        <member name="P:LtiAdvantage.AssignmentGradeServices.DeleteLineItemRequest.LineItemId">
             <summary>
             Get or set the Id.
             </summary>
@@ -336,55 +336,12 @@
             Create an empty LineItemContainer
             </summary>
         </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemContainer.#ctor(System.Collections.Generic.List{LtiAdvantage.AssignmentGradeServices.LineItem})">
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemContainer.#ctor(System.Collections.Generic.IEnumerable{LtiAdvantage.AssignmentGradeServices.LineItem})">
             <inheritdoc />
             <summary>
             Create a LineItemContainer that contains the line items.
             </summary>
             <param name="lineItems"></param>
-        </member>
-        <member name="T:LtiAdvantage.AssignmentGradeServices.LineItemControllerBase">
-            <inheritdoc />
-            <summary>
-            Implements the Assignment and Grade Services line items endpoint.
-            </summary>
-        </member>
-        <member name="F:LtiAdvantage.AssignmentGradeServices.LineItemControllerBase.Logger">
-            <summary>
-            </summary>
-        </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemControllerBase.#ctor(Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase})">
-            <summary>
-            </summary>
-        </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemControllerBase.OnDeleteLineItemAsync(LtiAdvantage.AssignmentGradeServices.DeleteLineItemRequest)">
-            <summary>
-            Deletes a line item.
-            </summary>
-            <param name="request">The request parameters.</param>
-            <returns>The result.</returns>
-        </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemControllerBase.OnUpdateLineItemAsync(LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest)">
-            <summary>
-            Updates a line item.
-            </summary>
-            <param name="request">The request parameters.</param>
-            <returns>The result.</returns>
-        </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemControllerBase.DeleteAsync(System.String,System.String)">
-            <summary>
-            Deletes a line item.
-            </summary>
-            <param name="contextId">The context id.</param>
-            <param name="id">The line item id.</param>
-            <returns>The result.</returns>
-        </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemControllerBase.PutAsync(LtiAdvantage.AssignmentGradeServices.LineItem)">
-            <summary>
-            Updates a line item.
-            </summary>
-            <param name="lineItem">The updated line item.</param>
-            <returns>The result.</returns>
         </member>
         <member name="T:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase">
             <inheritdoc cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
@@ -407,6 +364,13 @@
             <param name="request">The request parameters.</param>
             <returns>The line item.</returns>
         </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.OnDeleteLineItemAsync(LtiAdvantage.AssignmentGradeServices.DeleteLineItemRequest)">
+            <summary>
+            Deletes a line item.
+            </summary>
+            <param name="request">The request parameters.</param>
+            <returns>The result.</returns>
+        </member>
         <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.OnGetLineItemAsync(LtiAdvantage.AssignmentGradeServices.GetLineItemRequest)">
             <summary>
             Get a line item.
@@ -421,6 +385,29 @@
             <param name="request">The request parameters.</param>
             <returns>The line items.</returns>
         </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.OnUpdateLineItemAsync(LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest)">
+            <summary>
+            Updates a line item.
+            </summary>
+            <param name="request">The request parameters.</param>
+            <returns>The result.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.AddLineItemAsync(System.String,LtiAdvantage.AssignmentGradeServices.LineItem)">
+            <summary>
+            Adds a line item to a context.
+            </summary>
+            <param name="contextId">The context id.</param>
+            <param name="lineItem">The line item to add.</param>
+            <returns>The line item added.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.DeleteLineItemAsync(System.String,System.String)">
+            <summary>
+            Deletes a line item.
+            </summary>
+            <param name="contextId">The context id.</param>
+            <param name="lineItemId">The line item id.</param>
+            <returns>The result.</returns>
+        </member>
         <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.GetLineItemAsync(System.String,System.String)">
             <summary>
             Returns a line item.
@@ -429,7 +416,7 @@
             <param name="lineItemId">The line item id.</param>
             <returns>The line item.</returns>
         </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.GetAsync(System.String,System.String,System.String,System.String,System.Nullable{System.Int32})">
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.GetLineItemsAsync(System.String,System.String,System.String,System.String,System.Nullable{System.Int32})">
             <summary>
             Returns the line items in a context.
             </summary>
@@ -440,13 +427,14 @@
             <param name="limit">Optional limit on number of line items to return.</param>
             <returns>The line items.</returns>
         </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.PostAsync(System.String,LtiAdvantage.AssignmentGradeServices.LineItem)">
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.UpdateLineItemAsync(System.String,System.String,LtiAdvantage.AssignmentGradeServices.LineItem)">
             <summary>
-            Adds a line item to a context.
+            Updates a line item.
             </summary>
             <param name="contextId">The context id.</param>
-            <param name="lineItem">The line item to add.</param>
-            <returns>The line item added.</returns>
+            <param name="lineItemId">The line item id.</param>
+            <param name="lineItem">The updated line item.</param>
+            <returns>The result.</returns>
         </member>
         <member name="T:LtiAdvantage.AssignmentGradeServices.Result">
             <summary>
@@ -493,6 +481,19 @@
             <summary>
             A collection of results.
             </summary>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ResultContainer.#ctor">
+            <inheritdoc />
+            <summary>
+            Create an empty ResultContainer
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ResultContainer.#ctor(System.Collections.Generic.IEnumerable{LtiAdvantage.AssignmentGradeServices.Result})">
+            <inheritdoc />
+            <summary>
+            Create a ResultContainer that contains the results.
+            </summary>
+            <param name="results"></param>
         </member>
         <member name="T:LtiAdvantage.AssignmentGradeServices.ResultsControllerBase">
             <inheritdoc />
@@ -633,14 +634,24 @@
             Represents an update line item request.
             </summary>
         </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest.#ctor(LtiAdvantage.AssignmentGradeServices.LineItem)">
+        <member name="M:LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest.#ctor(System.String,System.String,LtiAdvantage.AssignmentGradeServices.LineItem)">
             <summary>
             Initialize a new instance of the class.
             </summary>
         </member>
+        <member name="P:LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest.ContextId">
+            <summary>
+            Get or set the context id.
+            </summary>
+        </member>
         <member name="P:LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest.LineItem">
             <summary>
-            Get or set the LineItem.
+            Get or set the line item.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest.LineItemId">
+            <summary>
+            Get or set the line item id.
             </summary>
         </member>
         <member name="T:LtiAdvantage.Constants">

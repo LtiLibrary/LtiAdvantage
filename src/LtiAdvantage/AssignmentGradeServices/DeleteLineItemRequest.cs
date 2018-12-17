@@ -8,10 +8,10 @@
         /// <summary>
         /// Initialize a new instance of the class.
         /// </summary>
-        public DeleteLineItemRequest(string contextId, string id)
+        public DeleteLineItemRequest(string contextId, string lineItemId)
         {
             ContextId = contextId;
-            Id = id;
+            LineItemId = lineItemId;
         }
 
         /// <summary>
@@ -22,6 +22,6 @@
         /// <summary>
         /// Get or set the Id.
         /// </summary>
-        public string Id { get; }
+        public string LineItemId { get; }
     }
 }

@@ -14,8 +14,6 @@ namespace LtiAdvantage.AssignmentGradeServices
     /// <summary>
     /// Implements the Assignment and Grade Services line items endpoint.
     /// </summary>
-    [Route("context/{contextId}/lineitems", Name = Constants.ServiceEndpoints.AgsLineItemsService)]
-    [Route("context/{contextId}/lineitems.{format}")]
     [ApiController]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -42,6 +40,13 @@ namespace LtiAdvantage.AssignmentGradeServices
         protected abstract Task<ActionResult<LineItem>> OnAddLineItemAsync(AddLineItemRequest request);
         
         /// <summary>
+        /// Deletes a line item.
+        /// </summary>
+        /// <param name="request">The request parameters.</param>
+        /// <returns>The result.</returns>
+        protected abstract Task<ActionResult> OnDeleteLineItemAsync(DeleteLineItemRequest request);
+
+        /// <summary>
         /// Get a line item.
         /// </summary>
         /// <param name="request">The request parameters.</param>
@@ -56,13 +61,109 @@ namespace LtiAdvantage.AssignmentGradeServices
         protected abstract Task<ActionResult<LineItemContainer>> OnGetLineItemsAsync(GetLineItemsRequest request);
         
         /// <summary>
+        /// Updates a line item.
+        /// </summary>
+        /// <param name="request">The request parameters.</param>
+        /// <returns>The result.</returns>
+        protected abstract Task<ActionResult> OnUpdateLineItemAsync(UpdateLineItemRequest request);
+        
+        /// <summary>
+        /// Adds a line item to a context.
+        /// </summary>
+        /// <param name="contextId">The context id.</param>
+        /// <param name="lineItem">The line item to add.</param>
+        /// <returns>The line item added.</returns>
+        [HttpPost]
+        [Consumes(Constants.MediaTypes.LineItem)]
+        [Produces(Constants.MediaTypes.LineItem)]
+        [ProducesResponseType(typeof(LineItem), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
+        [Route("context/{contextId}/lineitems", Name = Constants.ServiceEndpoints.AgsLineItemsService)]
+        [Route("context/{contextId}/lineitems.{format}")]
+        public async Task<ActionResult<LineItem>> AddLineItemAsync([Required] string contextId, [Required] [FromBody] LineItem lineItem)
+        {
+            try
+            {
+                _logger.LogDebug($"Entering {nameof(AddLineItemAsync)}.");
+
+                try
+                {
+                    var request = new AddLineItemRequest(contextId, lineItem);
+                    return await OnAddLineItemAsync(request).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(OnAddLineItemAsync)}.");
+                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                    {
+                        Title = "An unexpected error occurred",
+                        Status = StatusCodes.Status500InternalServerError,
+                        Detail = _env.IsDevelopment()
+                            ? ex.Message + ex.StackTrace
+                            : ex.Message
+                    });
+                }
+            }
+            finally
+            {
+                _logger.LogDebug($"Exiting {nameof(AddLineItemAsync)}.");
+            }
+        }
+
+        /// <summary>
+        /// Deletes a line item.
+        /// </summary>
+        /// <param name="contextId">The context id.</param>
+        /// <param name="lineItemId">The line item id.</param>
+        /// <returns>The result.</returns>
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
+        [Route("context/{contextId}/lineitems/{lineItemId}", Name = Constants.ServiceEndpoints.AgsLineItemService)]
+        [Route("context/{contextId}/lineitems/{lineItemId}.{format}")]
+        public async Task<ActionResult> DeleteLineItemAsync([Required] string contextId, [Required] string lineItemId)
+        {
+            try
+            {
+                _logger.LogDebug($"Entering {nameof(DeleteLineItemAsync)}.");
+
+                try
+                {
+                    var request = new DeleteLineItemRequest(contextId, lineItemId);
+                    return await OnDeleteLineItemAsync(request).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(DeleteLineItemAsync)}.");
+                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                    {
+                        Title = "An unexpected error occurred",
+                        Status = StatusCodes.Status500InternalServerError,
+                        Detail = _env.IsDevelopment()
+                            ? ex.Message + ex.StackTrace
+                            : ex.Message
+                    });
+                }
+            }
+            finally 
+            {
+                _logger.LogDebug($"Entering {nameof(DeleteLineItemAsync)}.");
+            }
+        }
+
+        /// <summary>
         /// Returns a line item.
         /// </summary>
         /// <param name="contextId">The context id.</param>
         /// <param name="lineItemId">The line item id.</param>
         /// <returns>The line item.</returns>
-        [HttpGet("{lineItemId}")]
-        [HttpGet("{lineItemId}.{format2}")]
+        [HttpGet]
         [Produces(Constants.MediaTypes.LineItem)]
         [ProducesResponseType(typeof(LineItem), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -70,6 +171,8 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, 
             Policy = Constants.LtiScopes.AgsLineItem + " " + Constants.LtiScopes.AgsLineItemReadonly)]
+        [Route("context/{contextId}/lineitems/{lineItemId}", Name = Constants.ServiceEndpoints.AgsLineItemService)]
+        [Route("context/{contextId}/lineitems/{lineItemId}.{format}")]
         public async Task<ActionResult<LineItem>> GetLineItemAsync([Required] string contextId, [Required] string lineItemId)
         {
             try
@@ -117,6 +220,8 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, 
             Policy = Constants.LtiScopes.AgsLineItem + " " + Constants.LtiScopes.AgsLineItemReadonly)]
+        [Route("context/{contextId}/lineitems", Name = Constants.ServiceEndpoints.AgsLineItemsService)]
+        [Route("context/{contextId}/lineitems.{format}")]
         public async Task<ActionResult<LineItemContainer>> GetLineItemsAsync([Required] string contextId,
             [FromQuery(Name = "resourceLinkId")] string resourceLinkId = null,
             [FromQuery(Name = "resourceId")] string resourceId = null,
@@ -152,29 +257,31 @@ namespace LtiAdvantage.AssignmentGradeServices
         }
 
         /// <summary>
-        /// Adds a line item to a context.
+        /// Updates a line item.
         /// </summary>
         /// <param name="contextId">The context id.</param>
-        /// <param name="lineItem">The line item to add.</param>
-        /// <returns>The line item added.</returns>
-        [HttpPost]
+        /// <param name="lineItemId">The line item id.</param>
+        /// <param name="lineItem">The updated line item.</param>
+        /// <returns>The result.</returns>
+        [HttpPut]
         [Consumes(Constants.MediaTypes.LineItem)]
-        [Produces(Constants.MediaTypes.LineItem)]
-        [ProducesResponseType(typeof(LineItem), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
-        public async Task<ActionResult<LineItem>> PostAsync([Required] string contextId, [Required] [FromBody] LineItem lineItem)
+        [Route("context/{contextId}/lineitems/{lineItemId}", Name = Constants.ServiceEndpoints.AgsLineItemService)]
+        [Route("context/{contextId}/lineitems/{lineItemId}.{format}")]
+        public async Task<ActionResult> UpdateLineItemAsync([Required] string contextId, [Required] string lineItemId, [Required] LineItem lineItem)
         {
             try
             {
-                _logger.LogDebug($"Entering {nameof(PostAsync)}.");
+                _logger.LogDebug($"Entering {nameof(UpdateLineItemAsync)}.");
 
                 try
                 {
-                    var request = new AddLineItemRequest(contextId, lineItem);
-                    return await OnAddLineItemAsync(request).ConfigureAwait(false);
+                    var request = new UpdateLineItemRequest(contextId, lineItemId, lineItem);
+                    return await OnUpdateLineItemAsync(request).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -191,7 +298,7 @@ namespace LtiAdvantage.AssignmentGradeServices
             }
             finally
             {
-                _logger.LogDebug($"Exiting {nameof(PostAsync)}.");
+                _logger.LogDebug($"Exiting {nameof(UpdateLineItemAsync)}.");
             }
         }
     }

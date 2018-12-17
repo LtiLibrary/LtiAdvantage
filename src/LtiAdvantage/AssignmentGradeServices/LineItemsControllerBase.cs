@@ -20,11 +20,11 @@ namespace LtiAdvantage.AssignmentGradeServices
     public abstract class LineItemsControllerBase : ControllerBase, ILineItemsController
     {
         private readonly IHostingEnvironment _env;
-        private readonly ILogger<ILineItemsController> _logger;
+        private readonly ILogger<LineItemsControllerBase> _logger;
 
         /// <summary>
         /// </summary>
-        protected LineItemsControllerBase(IHostingEnvironment env, ILogger<ILineItemsController> logger)
+        protected LineItemsControllerBase(IHostingEnvironment env, ILogger<LineItemsControllerBase> logger)
         {
             _env = env;
             _logger = logger;
@@ -118,7 +118,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <param name="lineItemId">The line item id.</param>
         /// <returns>The result.</returns>
         [HttpDelete]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]

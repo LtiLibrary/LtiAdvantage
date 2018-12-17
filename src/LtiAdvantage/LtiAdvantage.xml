@@ -278,6 +278,16 @@
             Marker for ILogger dependency injection.
             </summary>
         </member>
+        <member name="T:LtiAdvantage.AssignmentGradeServices.IResultsController">
+            <summary>
+            Marker for ILogger dependency injection.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.AssignmentGradeServices.IScoresController">
+            <summary>
+            Marker for ILogger dependency injection.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AssignmentGradeServices.LineItem">
             <summary>
             Represents a gradebook column (e.g. an assignment).
@@ -349,11 +359,7 @@
             Implements the Assignment and Grade Services line items endpoint.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase._logger">
-            <summary>
-            </summary>
-        </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AssignmentGradeServices.ILineItemsController})">
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase})">
             <summary>
             </summary>
         </member>
@@ -496,16 +502,12 @@
             <param name="results"></param>
         </member>
         <member name="T:LtiAdvantage.AssignmentGradeServices.ResultsControllerBase">
-            <inheritdoc />
+            <inheritdoc cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
             <summary>
             Implements the Assignment and Grade Services results endpoint.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.AssignmentGradeServices.ResultsControllerBase.Logger">
-            <summary>
-            </summary>
-        </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.ResultsControllerBase.#ctor(Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AssignmentGradeServices.ResultsControllerBase})">
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ResultsControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AssignmentGradeServices.ResultsControllerBase})">
             <summary>
             </summary>
         </member>
@@ -516,7 +518,7 @@
             <param name="request">The request parameters.</param>
             <returns>The results.</returns>
         </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.ResultsControllerBase.GetAsync(System.String,System.String,System.String,System.Nullable{System.Int32})">
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ResultsControllerBase.GetResultsAsync(System.String,System.String,System.String,System.Nullable{System.Int32})">
             <summary>
             Returns the results for a lineitem.
             </summary>
@@ -566,50 +568,13 @@
             The user id.
             </summary>
         </member>
-        <member name="T:LtiAdvantage.AssignmentGradeServices.ScoreControllerBase">
-            <inheritdoc />
-            <summary>
-            A custom Assignment and Grade Services endpoint with readonly access to individual scores.
-            </summary>
-            <remarks>
-            This is not part of Assignment and Grade Services spec.
-            </remarks>
-        </member>
-        <member name="F:LtiAdvantage.AssignmentGradeServices.ScoreControllerBase.Logger">
-            <summary>
-            </summary>
-        </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoreControllerBase.#ctor(Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AssignmentGradeServices.ScoreControllerBase})">
-            <summary>
-            </summary>
-        </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoreControllerBase.OnGetScoreAsync(LtiAdvantage.AssignmentGradeServices.GetScoreRequest)">
-            <summary>
-            Returns a score.
-            </summary>
-            <param name="request">The request parameters.</param>
-            <returns></returns>
-        </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoreControllerBase.GetAsync(System.String,System.String,System.String)">
-            <summary>
-            Returns a score.
-            </summary>
-            <param name="contextId">The context id.</param>
-            <param name="lineItemId">The line item id.</param>
-            <param name="scoreId">The score id.</param>
-            <returns>The score.</returns>
-        </member>
         <member name="T:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase">
-            <inheritdoc />
+            <inheritdoc cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
             <summary>
             Implements the Assignment and Grade Services score publish service endpoint.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase.Logger">
-            <summary>
-            </summary>
-        </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase.#ctor(Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AssignmentGradeServices.ScoresControllerBase})">
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AssignmentGradeServices.ScoresControllerBase})">
             <summary>
             </summary>
         </member>
@@ -620,7 +585,14 @@
             <param name="request">The request parameters.</param>
             <returns></returns>
         </member>
-        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase.PostAsync(System.String,System.String,LtiAdvantage.AssignmentGradeServices.Score)">
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase.OnGetScoreAsync(LtiAdvantage.AssignmentGradeServices.GetScoreRequest)">
+            <summary>
+            Returns a score.
+            </summary>
+            <param name="request">The request parameters.</param>
+            <returns></returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase.AddScoreAsync(System.String,System.String,LtiAdvantage.AssignmentGradeServices.Score)">
             <summary>
             Adds a score to a line item.
             </summary>
@@ -628,6 +600,18 @@
             <param name="lineItemId">The line item id.</param>
             <param name="score">The score to add.</param>
             <returns>The new score.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase.GetScoreAsync(System.String,System.String,System.String)">
+            <summary>
+            Returns a score.
+            </summary>
+            <remarks>
+            This is not part of the Assignment and Grades Services spec.
+            </remarks>
+            <param name="contextId">The context id.</param>
+            <param name="lineItemId">The line item id.</param>
+            <param name="scoreId">The score id.</param>
+            <returns>The score.</returns>
         </member>
         <member name="T:LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest">
             <summary>
@@ -2553,6 +2537,11 @@
             See https://www.imsglobal.org/spec/lti-nrps/v2p0#role-query-parameter.
             </remarks>
         </member>
+        <member name="T:LtiAdvantage.NamesRoleProvisioningService.IMembershipController">
+            <summary>
+            Marker for ILogger dependency injection.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.NamesRoleProvisioningService.Member">
             <summary>
             Represents a member in the Membership container of the Membership service.
@@ -2660,16 +2649,12 @@
             </summary>
         </member>
         <member name="T:LtiAdvantage.NamesRoleProvisioningService.MembershipControllerBase">
-            <inheritdoc />
+            <inheritdoc cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
             <summary>
             Implements the Names and Role Provisioning Service membership endpoint.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.NamesRoleProvisioningService.MembershipControllerBase.Logger">
-            <summary>
-            </summary>
-        </member>
-        <member name="M:LtiAdvantage.NamesRoleProvisioningService.MembershipControllerBase.#ctor(Microsoft.Extensions.Logging.ILogger{LtiAdvantage.NamesRoleProvisioningService.MembershipControllerBase})">
+        <member name="M:LtiAdvantage.NamesRoleProvisioningService.MembershipControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.NamesRoleProvisioningService.MembershipControllerBase})">
             <summary>
             </summary>
         </member>
@@ -2678,7 +2663,7 @@
             Returns the membership.
             </summary>
         </member>
-        <member name="M:LtiAdvantage.NamesRoleProvisioningService.MembershipControllerBase.GetAsync(System.String,System.Nullable{System.Int32},System.String,System.Nullable{LtiAdvantage.Lti.Role})">
+        <member name="M:LtiAdvantage.NamesRoleProvisioningService.MembershipControllerBase.GetMembershipAsync(System.String,System.Nullable{System.Int32},System.String,System.Nullable{LtiAdvantage.Lti.Role})">
             <summary>
             Returns the membership of a context.
             </summary>

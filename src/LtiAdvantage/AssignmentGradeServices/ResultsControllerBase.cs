@@ -20,11 +20,11 @@ namespace LtiAdvantage.AssignmentGradeServices
     public abstract class ResultsControllerBase : ControllerBase, IResultsController
     {
         private readonly IHostingEnvironment _env;
-        private readonly ILogger<IResultsController> _logger;
+        private readonly ILogger<ResultsControllerBase> _logger;
 
         /// <summary>
         /// </summary>
-        protected ResultsControllerBase(IHostingEnvironment env, ILogger<IResultsController> logger)
+        protected ResultsControllerBase(IHostingEnvironment env, ILogger<ResultsControllerBase> logger)
         {
             _env = env;
             _logger = logger;

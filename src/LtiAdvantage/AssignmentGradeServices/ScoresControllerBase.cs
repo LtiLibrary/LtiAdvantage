@@ -3,33 +3,31 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="ControllerBase" />
     /// <summary>
     /// Implements the Assignment and Grade Services score publish service endpoint.
     /// </summary>
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsScore)]
-    [Route("context/{contextId}/lineitems/{lineItemId}/scores", Name = Constants.ServiceEndpoints.AgsScoresService)]
-    [Route("context/{contextId}/lineitems/{lineItemId}/scores.{format}")]
     [ApiController]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public abstract class ScoresControllerBase : ControllerBase
+    public abstract class ScoresControllerBase : ControllerBase, IScoresController
     {
-        /// <summary>
-        /// </summary>
-        protected readonly ILogger<ScoresControllerBase> Logger;
+        private readonly IHostingEnvironment _env;
+        private readonly ILogger<ScoresControllerBase> _logger;
 
         /// <summary>
         /// </summary>
-        protected ScoresControllerBase(ILogger<ScoresControllerBase> logger)
+        protected ScoresControllerBase(IHostingEnvironment env, ILogger<ScoresControllerBase> logger)
         {
-            Logger = logger;
+            _env = env;
+            _logger = logger;
         }
                 
         /// <summary>
@@ -38,6 +36,13 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <param name="request">The request parameters.</param>
         /// <returns></returns>
         protected abstract Task<ActionResult<Score>> OnAddScoreAsync(AddScoreRequest request);
+                        
+        /// <summary>
+        /// Returns a score.
+        /// </summary>
+        /// <param name="request">The request parameters.</param>
+        /// <returns></returns>
+        protected abstract Task<ActionResult<Score>> OnGetScoreAsync(GetScoreRequest request);
 
         /// <summary>
         /// Adds a score to a line item.
@@ -53,35 +58,14 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Score>> PostAsync(string contextId, string lineItemId, [Required] [FromBody] Score score)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsScore)]
+        [Route("context/{contextId}/lineitems/{lineItemId}/scores", Name = Constants.ServiceEndpoints.AgsScoresService)]
+        [Route("context/{contextId}/lineitems/{lineItemId}/scores.{format}")]
+        public async Task<ActionResult<Score>> AddScoreAsync(string contextId, string lineItemId, [Required] [FromBody] Score score)
         {
             try
             {
-                Logger.LogDebug($"Entering {nameof(PostAsync)}.");
-                
-                if (!ModelState.IsValid)
-                {
-                    Logger.LogError($"{nameof(score)} model binding failed.");
-                    return BadRequest(new ValidationProblemDetails(ModelState));
-                }
-            
-                if (string.IsNullOrWhiteSpace(contextId))
-                {
-                    Logger.LogError($"{nameof(contextId)} is missing.");
-                    return BadRequest(new ProblemDetails { Title = $"{nameof(contextId)} is required." });
-                }
-
-                if (string.IsNullOrWhiteSpace(lineItemId))
-                {
-                    Logger.LogError($"{nameof(lineItemId)} is missing.");
-                    return BadRequest(new ProblemDetails { Title = $"{nameof(lineItemId)} is required." });
-                }
-
-                if (score == null)
-                {
-                    Logger.LogError($"{nameof(score)} is missing.");
-                    return BadRequest(new ProblemDetails { Title = $"{nameof(score)} is required." });
-                }
+                _logger.LogDebug($"Entering {nameof(AddScoreAsync)}.");
 
                 try
                 {
@@ -90,7 +74,58 @@ namespace LtiAdvantage.AssignmentGradeServices
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "Cannot add score.");
+                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(AddScoreAsync)}.");
+                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                    {
+                        Title = "An unexpected error occurred",
+                        Status = StatusCodes.Status500InternalServerError,
+                        Detail = _env.IsDevelopment()
+                            ? ex.Message + ex.StackTrace
+                            : ex.Message
+                    });
+                }
+            }
+            finally
+            {
+                _logger.LogDebug($"Exiting {nameof(AddScoreAsync)}.");
+            }
+        }
+
+        /// <summary>
+        /// Returns a score.
+        /// </summary>
+        /// <remarks>
+        /// This is not part of the Assignment and Grades Services spec.
+        /// </remarks>
+        /// <param name="contextId">The context id.</param>
+        /// <param name="lineItemId">The line item id.</param>
+        /// <param name="scoreId">The score id.</param>
+        /// <returns>The score.</returns>
+        [HttpGet]
+        [Produces(Constants.MediaTypes.Score)]
+        [ProducesResponseType(typeof(Score), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, 
+            Policy = Constants.LtiScopes.AgsScoreReadonly + " " + Constants.LtiScopes.AgsScore)]
+        [Route("context/{contextId}/lineitems/{lineItemId}/scores/{scoreId}", Name = Constants.ServiceEndpoints.AgsScoreService)]
+        [Route("context/{contextId}/lineitems/{lineItemId}/scores/{scoreId}.{format}")]
+        public async Task<ActionResult<Score>> GetScoreAsync([Required] string contextId, 
+            [Required] string lineItemId, [Required] string scoreId)
+        {
+            try
+            {
+                _logger.LogDebug($"Entering {nameof(GetScoreAsync)}.");
+
+                try
+                {
+                    var request = new GetScoreRequest(contextId, lineItemId, scoreId);
+                    return await OnGetScoreAsync(request).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Cannot get score.");
                     return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
                     {
                         Title = ex.Message,
@@ -100,7 +135,7 @@ namespace LtiAdvantage.AssignmentGradeServices
             }
             finally
             {
-                Logger.LogDebug($"Exiting {nameof(PostAsync)}.");
+                _logger.LogDebug($"Exiting {nameof(GetScoreAsync)}.");
             }
         }
     }

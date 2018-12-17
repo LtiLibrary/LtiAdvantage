@@ -21,11 +21,11 @@ namespace LtiAdvantage.NamesRoleProvisioningService
     public abstract class MembershipControllerBase : ControllerBase, IMembershipController
     {
         private readonly IHostingEnvironment _env;
-        private readonly ILogger<IMembershipController> _logger;
+        private readonly ILogger<MembershipControllerBase> _logger;
 
         /// <summary>
         /// </summary>
-        protected MembershipControllerBase(IHostingEnvironment env, ILogger<IMembershipController> logger)
+        protected MembershipControllerBase(IHostingEnvironment env, ILogger<MembershipControllerBase> logger)
         {
             _env = env;
             _logger = logger;

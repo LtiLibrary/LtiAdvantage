@@ -19,7 +19,7 @@ namespace LtiAdvantage.Lti
         /// will be displayed.
         /// </summary>
         [JsonProperty("height")]
-        public int Height { get; set; }
+        public int? Height { get; set; }
         
         /// <summary>
         /// End-User's locale, represented as a BCP47 [RFC5646] language tag. This is typically an
@@ -47,6 +47,6 @@ namespace LtiAdvantage.Lti
         /// will be displayed.
         /// </summary>
         [JsonProperty("width")]
-        public int Width { get; set; }
+        public int? Width { get; set; }
     }
 }

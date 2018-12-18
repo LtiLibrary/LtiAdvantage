@@ -11,6 +11,11 @@
         public static class Lti
         {
             /// <summary>
+            /// The message type of an LtiDeepLinkingRequest.
+            /// </summary>
+            public const string LtiDeepLinkingRequestMessageType = "LtiDeepLinkingRequest";
+
+            /// <summary>
             /// The message type of an LtiResourceLinkRequest.
             /// </summary>
             public const string LtiResourceLinkRequestMessageType = "LtiResourceLinkRequest";
@@ -40,6 +45,11 @@
             /// This is a map of key/value custom parameters which are to be included with the launch.
             /// </summary>
             public const string Custom = "https://purl.imsglobal.org/spec/lti/claim/custom";
+
+            /// <summary>
+            /// Deep Linking settings.
+            /// </summary>
+            public const string DeepLinkingSettings = "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings";
 
             /// <summary>
             /// The deployment identifier, uniquely identifying the tool's deployment on the platform.

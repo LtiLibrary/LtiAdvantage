@@ -5,13 +5,13 @@ namespace LtiAdvantage.DeepLinking
     /// <summary>
     /// Properties for embedded iframe.
     /// </summary>
-    public class IframePropertyType
+    public class IframeProperty
     {
         /// <summary>
         /// Height in pixels.
         /// </summary>
         [JsonProperty("height")]
-        public int Height { get; set; }
+        public int? Height { get; set; }
 
         /// <summary>
         /// URL to use as src of the iframe.
@@ -23,6 +23,6 @@ namespace LtiAdvantage.DeepLinking
         /// Width in pixels.
         /// </summary>
         [JsonProperty("width")]
-        public int Width { get; set; }
+        public int? Width { get; set; }
     }
 }

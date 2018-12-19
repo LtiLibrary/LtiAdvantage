@@ -6,7 +6,7 @@ namespace LtiAdvantage.DeepLinking
     /// <summary>
     /// Start and end date and time.
     /// </summary>
-    public class StartEndPropertyType
+    public class StartEndProperty
     {
         /// <summary>
         /// Optional end date and time.

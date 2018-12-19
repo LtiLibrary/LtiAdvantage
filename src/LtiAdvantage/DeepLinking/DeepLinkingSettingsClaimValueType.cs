@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using LtiAdvantage.Lti;
+﻿using LtiAdvantage.Lti;
 using Newtonsoft.Json;
 
 namespace LtiAdvantage.DeepLinking
@@ -26,13 +24,13 @@ namespace LtiAdvantage.DeepLinking
         /// The document targets supported.
         /// </summary>
         [JsonProperty("accept_presentation_document_targets")]
-        public List<DocumentTarget> AcceptPresentationDocumentTargets { get; set; }
+        public DocumentTarget[] AcceptPresentationDocumentTargets { get; set; }
 
         /// <summary>
         /// The content types supported.
         /// </summary>
         [JsonProperty("accept_types")]
-        public List<ContentType> AcceptTypes { get; set; }
+        public string[] AcceptTypes { get; set; }
 
         /// <summary>
         /// True if the items are automatically created without confirmation.

@@ -1,4 +1,7 @@
-﻿using LtiAdvantage.Lti;
+﻿using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using LtiAdvantage.Lti;
 using LtiAdvantage.Utilities;
 
 namespace LtiAdvantage.DeepLinking
@@ -17,6 +20,24 @@ namespace LtiAdvantage.DeepLinking
         {
             MessageType = Constants.Lti.LtiDeepLinkingRequestMessageType;
             Version = Constants.Lti.Version;
+        }
+        
+        /// <inheritdoc />
+        /// <summary>
+        /// Create a request with the claims.
+        /// </summary>
+        /// <param name="claims">A list of claims.</param>
+        public LtiDeepLinkingRequest(IEnumerable<Claim> claims) : base(claims)
+        {
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Create a request with the claims in payload.
+        /// </summary>
+        /// <param name="payload"></param>
+        public LtiDeepLinkingRequest(JwtPayload payload) : base(payload.Claims)
+        {
         }
 
         /// <summary>

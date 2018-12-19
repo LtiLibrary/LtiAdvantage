@@ -5,7 +5,7 @@ namespace LtiAdvantage.DeepLinking
     /// <summary>
     /// Line item definition.
     /// </summary>
-    public class LineItemPropertyType
+    public class LineItemProperty
     {
         /// <summary>
         /// Optional label.
@@ -23,7 +23,7 @@ namespace LtiAdvantage.DeepLinking
         /// Maximum score possible.
         /// </summary>
         [JsonProperty("scoreMaximum")]
-        public double ScoreMaxium { get; set; }
+        public float? ScoreMaxium { get; set; }
 
         /// <summary>
         /// Optional tag.

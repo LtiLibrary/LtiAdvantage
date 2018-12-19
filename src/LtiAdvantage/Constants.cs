@@ -6,6 +6,40 @@
     public static class Constants
     {
         /// <summary>
+        /// Deep linking content item types.
+        /// </summary>
+        public static class ContentItemTypes
+        {
+            /// <summary>
+            /// A file is a resource transferred from the tool to stored and/or processed
+            /// by the platform.
+            /// </summary>
+            public const string File = "file";
+
+            /// <summary>
+            /// An HTML fragment to be embedded in html document.
+            /// </summary>
+            public const string Html = "html";
+
+            /// <summary>
+            /// Image is a URL pointing to an image resource that SHOULD be rendered directly
+            /// in the browser agent using the HTML img tag.
+            /// </summary>
+            public const string Image = "image";
+
+            /// <summary>
+            /// A link is a fully qualified URL to a resource hosted on the internet.
+            /// </summary>
+            public const string Link = "link";
+
+            /// <summary>
+            /// A link to an LTI resource, usually delivered by the same tool to which
+            /// the deep linking request was made to.
+            /// </summary>
+            public const string LtiLink = "ltiLink";
+        }
+
+        /// <summary>
         /// LTI Advantage constants.
         /// </summary>
         public static class Lti
@@ -14,6 +48,11 @@
             /// The message type of an LtiDeepLinkingRequest.
             /// </summary>
             public const string LtiDeepLinkingRequestMessageType = "LtiDeepLinkingRequest";
+
+            /// <summary>
+            /// The message type of an LtiDeepLinkingRequest.
+            /// </summary>
+            public const string LtiDeepLinkingResponseMessageType = "LtiDeepLinkingResponse";
 
             /// <summary>
             /// The message type of an LtiResourceLinkRequest.
@@ -37,6 +76,11 @@
             public const string AssignmentGradeServices = "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint";
 
             /// <summary>
+            /// A list of content items.
+            /// </summary>
+            public const string ContentItems = "https://purl.imsglobal.org/spec/lti-dl/claim/content_items";
+
+            /// <summary>
             /// Properties of the context from which the launch originated (for example, course id and title).
             /// </summary>
             public const string Context = "https://purl.imsglobal.org/spec/lti/claim/context";
@@ -45,6 +89,11 @@
             /// This is a map of key/value custom parameters which are to be included with the launch.
             /// </summary>
             public const string Custom = "https://purl.imsglobal.org/spec/lti/claim/custom";
+
+            /// <summary>
+            /// An opaque value data claim used by Deep Linking.
+            /// </summary>
+            public const string Data = "https://purl.imsglobal.org/spec/lti-dl/claim/data";
 
             /// <summary>
             /// Deep Linking settings.
@@ -57,6 +106,16 @@
             public const string DeploymentId = "https://purl.imsglobal.org/spec/lti/claim/deployment_id";
 
             /// <summary>
+            /// Optional plain text message.
+            /// </summary>
+            public const string ErrorLog = "https://purl.imsglobal.org/spec/lti-dl/claim/errorlog";
+
+            /// <summary>
+            /// Optional plain text message.
+            /// </summary>
+            public const string ErrorMessage = "https://purl.imsglobal.org/spec/lti-dl/claim/errormsg";
+
+            /// <summary>
             /// Information to help the Tool present itself appropriately.
             /// </summary>
             public const string LaunchPresentation = "https://purl.imsglobal.org/spec/lti/claim/launch_presentation";
@@ -66,11 +125,21 @@
             /// usually originating from the Student Information System.
             /// </summary>
             public const string Lis = "https://purl.imsglobal.org/spec/lti/claim/lis";
+            
+            /// <summary>
+            /// Optional plain text message.
+            /// </summary>
+            public const string Log = "https://purl.imsglobal.org/spec/lti-dl/claim/log";
 
             /// <summary>
             /// User ID as defined in LTI 1.1.
             /// </summary>
             public const string Lti11LegacyUserId = "https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id";
+            
+            /// <summary>
+            /// Optional plain text message.
+            /// </summary>
+            public const string Message = "https://purl.imsglobal.org/spec/lti-dl/claim/msg";
 
             /// <summary>
             /// The type of message.

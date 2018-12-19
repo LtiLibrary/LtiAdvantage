@@ -5,7 +5,7 @@ namespace LtiAdvantage.DeepLinking
     /// <summary>
     /// Image.
     /// </summary>
-    public class ImagePropertyType
+    public class ImageProperty
     {
         /// <summary>
         /// Height in pixels.

@@ -643,12 +643,50 @@
             LTI Advantage Library constants.
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Constants.ContentItemTypes">
+            <summary>
+            Deep linking content item types.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ContentItemTypes.File">
+            <summary>
+            A file is a resource transferred from the tool to stored and/or processed
+            by the platform.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ContentItemTypes.Html">
+            <summary>
+            An HTML fragment to be embedded in html document.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ContentItemTypes.Image">
+            <summary>
+            Image is a URL pointing to an image resource that SHOULD be rendered directly
+            in the browser agent using the HTML img tag.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ContentItemTypes.Link">
+            <summary>
+            A link is a fully qualified URL to a resource hosted on the internet.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ContentItemTypes.LtiLink">
+            <summary>
+            A link to an LTI resource, usually delivered by the same tool to which
+            the deep linking request was made to.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.Constants.Lti">
             <summary>
             LTI Advantage constants.
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.Lti.LtiDeepLinkingRequestMessageType">
+            <summary>
+            The message type of an LtiDeepLinkingRequest.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.Lti.LtiDeepLinkingResponseMessageType">
             <summary>
             The message type of an LtiDeepLinkingRequest.
             </summary>
@@ -673,6 +711,11 @@
             The claim to include Names and Role Provisioning Service parameter in LTI 1.3 messages.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.ContentItems">
+            <summary>
+            A list of content items.
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.Context">
             <summary>
             Properties of the context from which the launch originated (for example, course id and title).
@@ -683,6 +726,11 @@
             This is a map of key/value custom parameters which are to be included with the launch.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.Data">
+            <summary>
+            An opaque value data claim used by Deep Linking.
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.DeepLinkingSettings">
             <summary>
             Deep Linking settings.
@@ -691,6 +739,16 @@
         <member name="F:LtiAdvantage.Constants.LtiClaims.DeploymentId">
             <summary>
             The deployment identifier, uniquely identifying the tool's deployment on the platform.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.ErrorLog">
+            <summary>
+            Optional plain text message.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.ErrorMessage">
+            <summary>
+            Optional plain text message.
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.LaunchPresentation">
@@ -704,9 +762,19 @@
             usually originating from the Student Information System.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.Log">
+            <summary>
+            Optional plain text message.
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.Lti11LegacyUserId">
             <summary>
             User ID as defined in LTI 1.1.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.Message">
+            <summary>
+            Optional plain text message.
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.MessageType">
@@ -915,59 +983,95 @@
             Names and Role Provisioning Service membership endpoint.
             </summary>
         </member>
-        <member name="T:LtiAdvantage.DeepLinking.ContentItemType">
+        <member name="T:LtiAdvantage.DeepLinking.ContentItem">
             <summary>
             Base class for all content item types
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.ContentItemType.Text">
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Available">
+            <summary>
+            Indicates the initial start and end time this activity should be made
+            available to learners.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Custom">
+            <summary>
+            Key/value custom parameters.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Embed">
+            <summary>
+            HTML embed code.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.ExpiresAt">
+            <summary>
+            The URL will be available until this time.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Height">
+            <summary>
+            Height in pixels.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Html">
+            <summary>
+            HTML fragment to embed.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Icon">
+            <summary>
+            URL of an icon image.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Iframe">
+            <summary>
+            iframe properties for embedding the item.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.LineItem">
+            <summary>
+            Indicates this item is expected to receive scores.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Submission">
+            <summary>
+            Start and end date and time for submissions.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Text">
             <summary>
             Plain text description.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.ContentItemType.Title">
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Thumbnail">
+            <summary>
+            URL of a thumbnail image.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Title">
             <summary>
             Plain text title.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.ContentItemType.Type">
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Type">
             <summary>
             The item type.
             </summary>
         </member>
-        <member name="T:LtiAdvantage.DeepLinking.ContentType">
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Url">
             <summary>
-            Content types.
+            URL of the resource.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.DeepLinking.ContentType.Unknown">
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Width">
             <summary>
-            Unknown type.
+            Width in pixels.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.DeepLinking.ContentType.File">
+        <member name="P:LtiAdvantage.DeepLinking.ContentItem.Window">
             <summary>
-            File.
-            </summary>
-        </member>
-        <member name="F:LtiAdvantage.DeepLinking.ContentType.Html">
-            <summary>
-            HTML fragment.
-            </summary>
-        </member>
-        <member name="F:LtiAdvantage.DeepLinking.ContentType.Image">
-            <summary>
-            Image.
-            </summary>
-        </member>
-        <member name="F:LtiAdvantage.DeepLinking.ContentType.Link">
-            <summary>
-            Link.
-            </summary>
-        </member>
-        <member name="F:LtiAdvantage.DeepLinking.ContentType.LtiLink">
-            <summary>
-            LTI link.
+            Window properties for a new window/tab.
             </summary>
         </member>
         <member name="T:LtiAdvantage.DeepLinking.DeepLinkingSettingsClaimValueType">
@@ -1020,165 +1124,301 @@
             Default title or alt text for items returned.
             </summary>
         </member>
-        <member name="T:LtiAdvantage.DeepLinking.HtmlItemType">
-            <inheritdoc />
+        <member name="T:LtiAdvantage.DeepLinking.FileItem">
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IFileItem" />
             <summary>
-            HTML fragment to embed.
+            A file is a resource transferred from the tool to stored and/or processed by the platform.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.HtmlItemType.Html">
+        <member name="M:LtiAdvantage.DeepLinking.FileItem.#ctor">
             <summary>
-            HTML fragment to embed.
+            Create a new content item.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.HtmlItemType.Type">
-            <inheritdoc />
+        <member name="T:LtiAdvantage.DeepLinking.HtmlItem">
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IHtmlItem" />
             <summary>
-            HTML fragment item type.
+            An HTML fragment to be embedded in html document.
             </summary>
         </member>
-        <member name="T:LtiAdvantage.DeepLinking.IframePropertyType">
+        <member name="M:LtiAdvantage.DeepLinking.HtmlItem.#ctor">
+            <summary>
+            Create a new content item.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.DeepLinking.IFileItem">
+            <summary>
+            A file is a resource transferred from the tool to stored and/or processed by the platform.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.IFileItem.ExpiresAt">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.IFileItem.Icon">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.IFileItem.Text">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.IFileItem.Thumbnail">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.IFileItem.Title">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.IFileItem.Type">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.IFileItem.Url">
+            <summary>
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.DeepLinking.IframeProperty">
             <summary>
             Properties for embedded iframe.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.IframePropertyType.Height">
+        <member name="P:LtiAdvantage.DeepLinking.IframeProperty.Height">
             <summary>
             Height in pixels.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.IframePropertyType.Src">
+        <member name="P:LtiAdvantage.DeepLinking.IframeProperty.Src">
             <summary>
             URL to use as src of the iframe.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.IframePropertyType.Width">
+        <member name="P:LtiAdvantage.DeepLinking.IframeProperty.Width">
             <summary>
             Width in pixels.
             </summary>
         </member>
-        <member name="T:LtiAdvantage.DeepLinking.ImageItemType">
-            <inheritdoc />
+        <member name="T:LtiAdvantage.DeepLinking.IHtmlItem">
             <summary>
-            Image item type.
+            An HTML fragment to be embedded in html document.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.ImageItemType.Height">
+        <member name="P:LtiAdvantage.DeepLinking.IHtmlItem.Html">
             <summary>
-            Height in pixels.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.ImageItemType.Icon">
+        <member name="P:LtiAdvantage.DeepLinking.IHtmlItem.Text">
             <summary>
-            URL of an icon image.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.ImageItemType.Thumbnail">
+        <member name="P:LtiAdvantage.DeepLinking.IHtmlItem.Title">
             <summary>
-            URL of a thumbnail image.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.ImageItemType.Type">
-            <inheritdoc />
+        <member name="P:LtiAdvantage.DeepLinking.IHtmlItem.Type">
             <summary>
-            Image item type.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.ImageItemType.Url">
+        <member name="T:LtiAdvantage.DeepLinking.IImageItem">
             <summary>
-            Required URL of the resource.
+            Image is a URL pointing to an image resource that SHOULD be rendered
+            directly in the browser agent using the HTML img tag.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.ImageItemType.Width">
+        <member name="P:LtiAdvantage.DeepLinking.IImageItem.Height">
             <summary>
-            Width in pixels.
             </summary>
         </member>
-        <member name="T:LtiAdvantage.DeepLinking.ImagePropertyType">
+        <member name="P:LtiAdvantage.DeepLinking.IImageItem.Icon">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.IImageItem.Text">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.IImageItem.Thumbnail">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.IImageItem.Title">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.IImageItem.Type">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.IImageItem.Url">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.IImageItem.Width">
+            <summary>
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.DeepLinking.ILinkItem">
+            <summary>
+            A link is a fully qualified URL to a resource hosted on the internet.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILinkItem.Embed">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILinkItem.Icon">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILinkItem.Iframe">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILinkItem.Text">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILinkItem.Thumbnail">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILinkItem.Title">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILinkItem.Type">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILinkItem.Url">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILinkItem.Window">
+            <summary>
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.DeepLinking.ILtiLinkItem">
+            <summary>
+            A link to an LTI resource, usually delivered by the same tool to
+            which the deep linking request was made to.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.Available">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.Custom">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.Icon">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.Iframe">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.LineItem">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.Submission">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.Text">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.Thumbnail">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.Title">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.Type">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.Url">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.Window">
+            <summary>
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.DeepLinking.ImageItem">
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IImageItem" />
+            <summary>
+            Image is a URL pointing to an image resource that SHOULD be rendered
+            directly in the browser agent using the HTML img tag.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.DeepLinking.ImageItem.#ctor">
+            <summary>
+            Create a new content item.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.DeepLinking.ImageProperty">
             <summary>
             Image.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.ImagePropertyType.Height">
+        <member name="P:LtiAdvantage.DeepLinking.ImageProperty.Height">
             <summary>
             Height in pixels.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.ImagePropertyType.Url">
+        <member name="P:LtiAdvantage.DeepLinking.ImageProperty.Url">
             <summary>
             Url to the image.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.ImagePropertyType.Width">
+        <member name="P:LtiAdvantage.DeepLinking.ImageProperty.Width">
             <summary>
             Width in pixels.
             </summary>
         </member>
-        <member name="T:LtiAdvantage.DeepLinking.LineItemPropertyType">
+        <member name="T:LtiAdvantage.DeepLinking.LineItemProperty">
             <summary>
             Line item definition.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.LineItemPropertyType.Label">
+        <member name="P:LtiAdvantage.DeepLinking.LineItemProperty.Label">
             <summary>
             Optional label.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.LineItemPropertyType.ResourceId">
+        <member name="P:LtiAdvantage.DeepLinking.LineItemProperty.ResourceId">
             <summary>
             Optional resource id.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.LineItemPropertyType.ScoreMaxium">
+        <member name="P:LtiAdvantage.DeepLinking.LineItemProperty.ScoreMaxium">
             <summary>
             Maximum score possible.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.LineItemPropertyType.Tag">
+        <member name="P:LtiAdvantage.DeepLinking.LineItemProperty.Tag">
             <summary>
             Optional tag.
             </summary>
         </member>
-        <member name="T:LtiAdvantage.DeepLinking.LinkItemType">
-            <inheritdoc />
+        <member name="T:LtiAdvantage.DeepLinking.LinkItem">
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILinkItem" />
             <summary>
-            Link item type.
+            A link is a fully qualified URL to a resource hosted on the internet.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.LinkItemType.Embed">
+        <member name="M:LtiAdvantage.DeepLinking.LinkItem.#ctor">
             <summary>
-            HTML embed code.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.LinkItemType.Icon">
-            <summary>
-            URL of an icon image.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.LinkItemType.Iframe">
-            <summary>
-            iframe properties for embedding the item.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.LinkItemType.Thumbnail">
-            <summary>
-            URL of a thumbnail image.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.LinkItemType.Type">
-            <inheritdoc />
-            <summary>
-            The item type.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.LinkItemType.Url">
-            <summary>
-            Required URL of the resource.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.LinkItemType.Window">
-            <summary>
-            Window properties for a new window/tab.
+            Create a new content item.
             </summary>
         </member>
         <member name="T:LtiAdvantage.DeepLinking.LtiDeepLinkingRequest">
@@ -1193,94 +1433,129 @@
             Create an empty request.
             </summary>
         </member>
+        <member name="M:LtiAdvantage.DeepLinking.LtiDeepLinkingRequest.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <inheritdoc />
+            <summary>
+            Create a request with the claims.
+            </summary>
+            <param name="claims">A list of claims.</param>
+        </member>
+        <member name="M:LtiAdvantage.DeepLinking.LtiDeepLinkingRequest.#ctor(System.IdentityModel.Tokens.Jwt.JwtPayload)">
+            <inheritdoc />
+            <summary>
+            Create a request with the claims in payload.
+            </summary>
+            <param name="payload"></param>
+        </member>
         <member name="P:LtiAdvantage.DeepLinking.LtiDeepLinkingRequest.DeepLinkingSettings">
             <summary>
             Deep Linking settings.
             </summary>
         </member>
-        <member name="T:LtiAdvantage.DeepLinking.LtiLinkItemType">
+        <member name="T:LtiAdvantage.DeepLinking.LtiDeepLinkingResponse">
             <inheritdoc />
             <summary>
-            LTI Link item type.
+            LTI Deep Linking response.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.LtiLinkItemType.Available">
-            <summary>
-            LTI link availability.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.LtiLinkItemType.Custom">
-            <summary>
-            Key/value custom parameters.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.LtiLinkItemType.Icon">
-            <summary>
-            URL of an icon image.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.LtiLinkItemType.LineItem">
-            <summary>
-            Indicates this item is expected to receive scores.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.LtiLinkItemType.Submission">
-            <summary>
-            Start and end date and time for submissions.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.LtiLinkItemType.Thumbnail">
-            <summary>
-            URL of a thumbnail image.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.LtiLinkItemType.Type">
+        <member name="M:LtiAdvantage.DeepLinking.LtiDeepLinkingResponse.#ctor">
             <inheritdoc />
             <summary>
-            Item type.
+            Create an empty request.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.LtiLinkItemType.Url">
+        <member name="M:LtiAdvantage.DeepLinking.LtiDeepLinkingResponse.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <inheritdoc />
             <summary>
-            Required URL of the resource.
+            Create a request with the claims.
+            </summary>
+            <param name="claims">A list of claims.</param>
+        </member>
+        <member name="M:LtiAdvantage.DeepLinking.LtiDeepLinkingResponse.#ctor(System.IdentityModel.Tokens.Jwt.JwtPayload)">
+            <inheritdoc />
+            <summary>
+            Create a request with the claims in payload.
+            </summary>
+            <param name="payload"></param>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.LtiDeepLinkingResponse.ContentItems">
+            <summary>
+            A possibly empty list of content items.
             </summary>
         </member>
-        <member name="T:LtiAdvantage.DeepLinking.StartEndPropertyType">
+        <member name="P:LtiAdvantage.DeepLinking.LtiDeepLinkingResponse.Data">
+            <summary>
+            The value from deep linking settings.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.LtiDeepLinkingResponse.ErrorLog">
+            <summary>
+            Optional plain text message.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.LtiDeepLinkingResponse.ErrorMessage">
+            <summary>
+            Optional plain text message.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.LtiDeepLinkingResponse.Log">
+            <summary>
+            Optional plain text message.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.LtiDeepLinkingResponse.Message">
+            <summary>
+            Optional plain text message.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.DeepLinking.LtiLinkItem">
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILtiLinkItem" />
+            <summary>
+            A link to an LTI resource, usually delivered by the same tool to which the
+            deep linking request was made to. 
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.DeepLinking.LtiLinkItem.#ctor">
+            <summary>
+            Create a new content item.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.DeepLinking.StartEndProperty">
             <summary>
             Start and end date and time.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.StartEndPropertyType.EndDateTime">
+        <member name="P:LtiAdvantage.DeepLinking.StartEndProperty.EndDateTime">
             <summary>
             Optional end date and time.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.StartEndPropertyType.StartDateTime">
+        <member name="P:LtiAdvantage.DeepLinking.StartEndProperty.StartDateTime">
             <summary>
             Optional start date and time.
             </summary>
         </member>
-        <member name="T:LtiAdvantage.DeepLinking.WindowPropertyType">
+        <member name="T:LtiAdvantage.DeepLinking.WindowProperty">
             <summary>
             How to open a resource in a new window/tab.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.WindowPropertyType.Height">
+        <member name="P:LtiAdvantage.DeepLinking.WindowProperty.Height">
             <summary>
             Height in pixels.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.WindowPropertyType.TargetName">
+        <member name="P:LtiAdvantage.DeepLinking.WindowProperty.TargetName">
             <summary>
             Name of the window to open.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.WindowPropertyType.Width">
+        <member name="P:LtiAdvantage.DeepLinking.WindowProperty.Width">
             <summary>
             Width in pixels.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.WindowPropertyType.WindowFeatures">
+        <member name="P:LtiAdvantage.DeepLinking.WindowProperty.WindowFeatures">
             <summary>
             Comma-separate list of features for window.open().
             </summary>

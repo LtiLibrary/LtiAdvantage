@@ -1,6 +1,8 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using LtiAdvantage.Lti;
 using Newtonsoft.Json;
 
 namespace LtiAdvantage.Utilities
@@ -10,6 +12,8 @@ namespace LtiAdvantage.Utilities
     /// </summary>
     internal static class JwtExtensions
     {
+        private static JsonSerializerSettings _settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+
         /// <summary>
         /// Get the payload claim value as a string.
         /// </summary>
@@ -47,8 +51,13 @@ namespace LtiAdvantage.Utilities
         {
             var values = payload.Claims
                 .Where(c => c.Type == type)
-                .Select(c => c.Value).ToList();
+                .Select(c => c.Value).ToArray();
 
+            var elementType = typeof(T).GetElementType();
+            if (elementType != null && elementType.IsClass)
+            {
+                return JsonConvert.DeserializeObject<T>("[" + string.Join(",", values) + "]");
+            }
             return JsonConvert.DeserializeObject<T>("[\"" + string.Join("\",\"", values) + "\"]");
         }
 
@@ -61,7 +70,11 @@ namespace LtiAdvantage.Utilities
 
             if (typeof(T) == typeof(string))
             {
-                payload.AddClaim(new Claim(type, value.ToString(), ClaimValueTypes.String));
+                var stringValue = value?.ToString();
+                if (!string.IsNullOrWhiteSpace(stringValue))
+                {
+                    payload.AddClaim(new Claim(type, stringValue, ClaimValueTypes.String));
+                }
             } 
             else if (typeof(T) == typeof(int))
             {
@@ -69,11 +82,11 @@ namespace LtiAdvantage.Utilities
             }
             else if (typeof(T).IsArray)
             {
-                payload.AddClaim(new Claim(type, JsonConvert.SerializeObject(value), JsonClaimValueTypes.JsonArray));
+                payload.AddClaim(new Claim(type, JsonConvert.SerializeObject(value, _settings), JsonClaimValueTypes.JsonArray));
             }
             else
             {
-                var json = JsonConvert.SerializeObject(value);
+                var json = JsonConvert.SerializeObject(value, _settings);
                 payload.AddClaim(new Claim(type, json, JsonClaimValueTypes.Json));
             }
         }

@@ -23,7 +23,7 @@ namespace LtiAdvantage.DeepLinking
         /// Maximum score possible.
         /// </summary>
         [JsonProperty("scoreMaximum")]
-        public float? ScoreMaxium { get; set; }
+        public float? ScoreMaximum { get; set; }
 
         /// <summary>
         /// Optional tag.

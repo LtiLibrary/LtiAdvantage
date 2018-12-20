@@ -1,8 +1,6 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using LtiAdvantage.Lti;
 using Newtonsoft.Json;
 
 namespace LtiAdvantage.Utilities
@@ -12,7 +10,10 @@ namespace LtiAdvantage.Utilities
     /// </summary>
     internal static class JwtExtensions
     {
-        private static JsonSerializerSettings _settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+        private static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        };
 
         /// <summary>
         /// Get the payload claim value as a string.
@@ -82,11 +83,11 @@ namespace LtiAdvantage.Utilities
             }
             else if (typeof(T).IsArray)
             {
-                payload.AddClaim(new Claim(type, JsonConvert.SerializeObject(value, _settings), JsonClaimValueTypes.JsonArray));
+                payload.AddClaim(new Claim(type, JsonConvert.SerializeObject(value, Settings), JsonClaimValueTypes.JsonArray));
             }
             else
             {
-                var json = JsonConvert.SerializeObject(value, _settings);
+                var json = JsonConvert.SerializeObject(value, Settings);
                 payload.AddClaim(new Claim(type, json, JsonClaimValueTypes.Json));
             }
         }

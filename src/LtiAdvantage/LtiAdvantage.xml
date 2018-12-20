@@ -1400,7 +1400,7 @@
             Optional resource id.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.LineItemProperty.ScoreMaxium">
+        <member name="P:LtiAdvantage.DeepLinking.LineItemProperty.ScoreMaximum">
             <summary>
             Maximum score possible.
             </summary>

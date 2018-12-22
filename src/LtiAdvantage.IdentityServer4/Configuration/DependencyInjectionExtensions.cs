@@ -1,5 +1,4 @@
 ﻿using System;
-using LtiAdvantage.IdentityServer4.ResponseHandling;
 using LtiAdvantage.IdentityServer4.Validation;
 
 // ReSharper disable once CheckNamespace
@@ -23,7 +22,6 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             builder.AddCustomAuthorizeRequestValidator<ImpersonationAuthorizeRequestValidator>();
-            builder.AddAuthorizeInteractionResponseGenerator<ImpersonationInteractionResponseGenerator>();
 
             return builder;
         }

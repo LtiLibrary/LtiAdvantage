@@ -15,6 +15,8 @@ namespace LtiAdvantage.IdentityServer4.Validation
     /// </summary>
     public class ImpersonationAuthorizeRequestValidator : ICustomAuthorizeRequestValidator
     {
+        public const string AuthenticationType = @"Impersonation";
+
         public Task ValidateAsync(CustomAuthorizeRequestValidationContext context)
         {
             var subject = context.Result.ValidatedRequest.Subject.Claims.SingleOrDefault(c => c.Type == "sub")?.Value;
@@ -28,7 +30,7 @@ namespace LtiAdvantage.IdentityServer4.Validation
                     new Claim("sub", loginHint),
                     new Claim("auth_time", DateTime.UtcNow.ToEpochTime().ToString()),
                     new Claim("idp", "local")
-                }));
+                }, AuthenticationType));
             }
 
             return Task.CompletedTask;

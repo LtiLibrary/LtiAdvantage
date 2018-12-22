@@ -36,7 +36,7 @@
             /// A link to an LTI resource, usually delivered by the same tool to which
             /// the deep linking request was made to.
             /// </summary>
-            public const string LtiLink = "ltiLink";
+            public const string LtiLink = "ltiResourceLink";
         }
 
         /// <summary>

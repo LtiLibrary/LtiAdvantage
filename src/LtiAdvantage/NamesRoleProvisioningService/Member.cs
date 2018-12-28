@@ -19,7 +19,6 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// <summary>
         /// The primary email address for the person.
         /// Not specified if not included in a basic launch from same context.
-        /// Corresponds to <see cref="LtiResourceLinkRequest.Email"/>.
         /// </summary>
         [JsonProperty("email")]
         public string Email { get; set; }
@@ -27,7 +26,6 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// <summary>
         /// The person's assigned family name.
         /// Not specified  if not included in a basic launch from same context. 
-        /// Corresponds to <see cref="LtiResourceLinkRequest.FamilyName"/>.
         /// </summary>
         [JsonProperty("family_name")]
         public string FamilyName { get; set; }
@@ -35,7 +33,6 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// <summary>
         /// The person's assigned first name.
         /// Not specified  if not included in a basic launch from same context. 
-        /// Corresponds to <see cref="LtiResourceLinkRequest.GivenName"/>.
         /// </summary>
         [JsonProperty("given_name")]
         public string GivenName { get; set; }
@@ -55,7 +52,6 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// The person's assigned full name (typically their first name followed
         /// by their family name separated with a space).
         /// Not specified  if not included in a basic launch from same context. 
-        /// Corresponds to <see cref="LtiResourceLinkRequest.Name"/>.
         /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -63,22 +59,18 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// <summary>
         /// A URL to an image for the person.
         /// Not specified  if not included in a basic launch from same context. 
-        /// Corresponds to <see cref="LtiResourceLinkRequest.Picture"/>.
         /// </summary>
         [JsonProperty("picture")]
         public Uri Picture { get; set; }
 
         /// <summary>
         /// The role/s this member has in the context. Does not include non-context roles.
-        /// Corresponds to <see cref="LtiResourceLinkRequest.Roles"/> (without non-context
-        /// roles).
         /// </summary>
         [JsonProperty("roles")]
         public Role[] Roles { get; set; }
 
         /// <summary>
         /// A unique identifier for the person as provisioned by an external system such as an SIS.
-        /// Corresponds to <code>PersonSourcedId</code> in <see cref="LtiResourceLinkRequest.Lis"/>.
         /// </summary>
         [JsonProperty("lis_person_sourcedid")]
         public string LisPersonSourcedId { get; set; }

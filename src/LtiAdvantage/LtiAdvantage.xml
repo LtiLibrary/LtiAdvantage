@@ -3147,19 +3147,16 @@
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Context.Id">
             <summary>
             The context id.
-            Corresponds to <code>Id</code> in <see cref="!:LtiResourceLinkRequest.Context"/>.
             </summary>
         </member>
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Context.Label">
             <summary>
             The context label.
-            Corresponds to <code>Label</code> in <see cref="!:LtiResourceLinkRequest.Context"/>.
             </summary>
         </member>
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Context.Title">
             <summary>
             The context title.
-            Corresponds to <code>Title</code> in <see cref="!:LtiResourceLinkRequest.Context"/>.
             </summary>
         </member>
         <member name="T:LtiAdvantage.NamesRoleProvisioningService.GetMembershipRequest">
@@ -3241,21 +3238,18 @@
             <summary>
             The primary email address for the person.
             Not specified if not included in a basic launch from same context.
-            Corresponds to <see cref="!:LtiResourceLinkRequest.Email"/>.
             </summary>
         </member>
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.FamilyName">
             <summary>
             The person's assigned family name.
             Not specified  if not included in a basic launch from same context. 
-            Corresponds to <see cref="!:LtiResourceLinkRequest.FamilyName"/>.
             </summary>
         </member>
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.GivenName">
             <summary>
             The person's assigned first name.
             Not specified  if not included in a basic launch from same context. 
-            Corresponds to <see cref="!:LtiResourceLinkRequest.GivenName"/>.
             </summary>
         </member>
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.Message">
@@ -3273,27 +3267,22 @@
             The person's assigned full name (typically their first name followed
             by their family name separated with a space).
             Not specified  if not included in a basic launch from same context. 
-            Corresponds to <see cref="!:LtiResourceLinkRequest.Name"/>.
             </summary>
         </member>
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.Picture">
             <summary>
             A URL to an image for the person.
             Not specified  if not included in a basic launch from same context. 
-            Corresponds to <see cref="!:LtiResourceLinkRequest.Picture"/>.
             </summary>
         </member>
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.Roles">
             <summary>
             The role/s this member has in the context. Does not include non-context roles.
-            Corresponds to <see cref="!:LtiResourceLinkRequest.Roles"/> (without non-context
-            roles).
             </summary>
         </member>
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.LisPersonSourcedId">
             <summary>
             A unique identifier for the person as provisioned by an external system such as an SIS.
-            Corresponds to <code>PersonSourcedId</code> in <see cref="!:LtiResourceLinkRequest.Lis"/>.
             </summary>
         </member>
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.Status">
@@ -3410,9 +3399,14 @@
             See https://www.jerriepelser.com/blog/creating-dynamic-authorization-policies-aspnet-core/.
             </summary>
             <example>
-            To protect an API
+            To protect an API:
             
-            [Authorize("https://purl.imsglobal.org/spec/lti-ags/scope/lineitem")]
+            [Authorize(Policy = "scope")]
+            </example>
+            <example>
+            If either scope is sufficient, separate with a space:
+            
+            [Authorize("scope1 scope2")]
             </example>
         </member>
         <member name="M:LtiAdvantage.Utilities.AuthorizationScopePolicyProvider.#ctor(Microsoft.Extensions.Logging.ILogger{LtiAdvantage.Utilities.AuthorizationScopePolicyProvider},Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.Authorization.AuthorizationOptions})">

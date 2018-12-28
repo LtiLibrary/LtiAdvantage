@@ -3403,7 +3403,7 @@
             Service version. Default is <see cref="F:LtiAdvantage.NamesRoleProvisioningService.NamesRoleServiceClaimValueType.Version"/>.
             </summary>
         </member>
-        <member name="T:LtiAdvantage.Utilities.AuthorizationPolicyProvider">
+        <member name="T:LtiAdvantage.Utilities.AuthorizationScopePolicyProvider">
             <inheritdoc />
             <summary>
             Dynamically add required scope authorization policy.
@@ -3415,12 +3415,12 @@
             [Authorize("https://purl.imsglobal.org/spec/lti-ags/scope/lineitem")]
             </example>
         </member>
-        <member name="M:LtiAdvantage.Utilities.AuthorizationPolicyProvider.#ctor(Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.Authorization.AuthorizationOptions})">
+        <member name="M:LtiAdvantage.Utilities.AuthorizationScopePolicyProvider.#ctor(Microsoft.Extensions.Logging.ILogger{LtiAdvantage.Utilities.AuthorizationScopePolicyProvider},Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.Authorization.AuthorizationOptions})">
             <inheritdoc />
             <summary>
             </summary>
         </member>
-        <member name="M:LtiAdvantage.Utilities.AuthorizationPolicyProvider.GetPolicyAsync(System.String)">
+        <member name="M:LtiAdvantage.Utilities.AuthorizationScopePolicyProvider.GetPolicyAsync(System.String)">
             <inheritdoc />
             <summary>
             Returns a policy that requires a scope claim = policyName.
@@ -3476,15 +3476,14 @@
         </member>
         <member name="T:Microsoft.Extensions.DependencyInjection.DependencyInjectionExtensions">
             <summary>
-            Extensions methods to configure an <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> for <see cref="T:LtiAdvantage.Utilities.AuthorizationPolicyProvider"/>.
+            Extension methods for registering additional services.
             </summary>
         </member>
         <member name="M:Microsoft.Extensions.DependencyInjection.DependencyInjectionExtensions.AddLtiAdvantagePolicies(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
-            Adds the <see cref="T:LtiAdvantage.Utilities.AuthorizationPolicyProvider"/> and related services to the <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
+            Adds LTI Advantage authorization policy provider that converts the policy name into
+            a <see cref="T:Microsoft.AspNetCore.Authorization.Infrastructure.ClaimsAuthorizationRequirement"/>s of type "scope".
             </summary>
-            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.</param>
-            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.</returns>
         </member>
     </members>
 </doc>

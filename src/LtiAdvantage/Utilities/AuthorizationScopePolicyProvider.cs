@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace LtiAdvantage.Utilities
@@ -10,19 +11,28 @@ namespace LtiAdvantage.Utilities
     /// See https://www.jerriepelser.com/blog/creating-dynamic-authorization-policies-aspnet-core/.
     /// </summary>
     /// <example>
-    /// To protect an API
+    /// To protect an API:
     /// 
-    /// [Authorize("https://purl.imsglobal.org/spec/lti-ags/scope/lineitem")]
+    /// [Authorize(Policy = "scope")]
     /// </example>
-    public class AuthorizationPolicyProvider : DefaultAuthorizationPolicyProvider
+    /// <example>
+    /// If either scope is sufficient, separate with a space:
+    /// 
+    /// [Authorize("scope1 scope2")]
+    /// </example>
+    public class AuthorizationScopePolicyProvider : DefaultAuthorizationPolicyProvider
     {
+        private readonly ILogger<AuthorizationScopePolicyProvider> _logger;
         private readonly IOptions<AuthorizationOptions> _options;
 
         /// <inheritdoc />
         /// <summary>
         /// </summary>
-        public AuthorizationPolicyProvider(IOptions<AuthorizationOptions> options) : base(options)
+        public AuthorizationScopePolicyProvider(
+            ILogger<AuthorizationScopePolicyProvider> logger,
+            IOptions<AuthorizationOptions> options) : base(options)
         {
+            _logger = logger;
             _options = options;
         }
 
@@ -34,11 +44,19 @@ namespace LtiAdvantage.Utilities
         /// <returns></returns>
         public override async Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
         {
+            if (string.IsNullOrWhiteSpace(policyName))
+            {
+                _logger.LogError($"{nameof(policyName)} is required.");
+                return null;
+            }
+
             // Check static policies first
             var policy = await base.GetPolicyAsync(policyName);
 
             if (policy == null)
             {
+                _logger.LogInformation($"Adding required scope {policyName}.");
+
                 policy = new AuthorizationPolicyBuilder().AddRequirements()
                     .RequireClaim("scope", policyName.Split(' '))
                     .Build();

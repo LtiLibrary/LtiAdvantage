@@ -54,7 +54,8 @@ namespace LtiAdvantage.IdentityServer4.Validation
         /// <summary>
         /// Instantiates an instance of Signed JWT secret validator.
         /// </summary>
-        public PrivatePemKeyJwtSecretValidator(IHttpContextAccessor contextAccessor, ILogger<PrivatePemKeyJwtSecretValidator> logger)
+        public PrivatePemKeyJwtSecretValidator(IHttpContextAccessor contextAccessor, 
+            ILogger<PrivatePemKeyJwtSecretValidator> logger)
         {
             _audienceUri = contextAccessor.HttpContext.GetIdentityServerIssuerUri();
             _logger = logger;

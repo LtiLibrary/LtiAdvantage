@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using IdentityModel;
 using IdentityServer4.Validation;
+using Microsoft.Extensions.Logging;
 
 namespace LtiAdvantage.IdentityServer4.Validation
 {
@@ -15,7 +16,14 @@ namespace LtiAdvantage.IdentityServer4.Validation
     /// </summary>
     public class ImpersonationAuthorizeRequestValidator : ICustomAuthorizeRequestValidator
     {
+        private readonly ILogger<ImpersonationAuthorizeRequestValidator> _logger;
+
         public const string AuthenticationType = @"Impersonation";
+
+        public ImpersonationAuthorizeRequestValidator(ILogger<ImpersonationAuthorizeRequestValidator> logger)
+        {
+            _logger = logger;
+        }
 
         public Task ValidateAsync(CustomAuthorizeRequestValidationContext context)
         {
@@ -24,6 +32,8 @@ namespace LtiAdvantage.IdentityServer4.Validation
 
             if (loginHint.IsPresent() && subject != loginHint)
             {
+                _logger.LogInformation($"Impersonating subject {loginHint}.");
+
                 // Replace the subject with the person being impersonated in login_hint
                 context.Result.ValidatedRequest.Subject = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {

@@ -1,5 +1,4 @@
-﻿using LtiAdvantage.Lti;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace LtiAdvantage.NamesRoleProvisioningService
 {

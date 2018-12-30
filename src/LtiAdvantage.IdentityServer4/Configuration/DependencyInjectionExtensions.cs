@@ -1,5 +1,4 @@
-﻿using System;
-using IdentityServer4.Validation;
+﻿using IdentityServer4.Validation;
 using LtiAdvantage.IdentityServer4.Validation;
 
 // ReSharper disable once CheckNamespace

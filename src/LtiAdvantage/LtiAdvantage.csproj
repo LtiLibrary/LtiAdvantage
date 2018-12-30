@@ -8,6 +8,10 @@
     <DocumentationFile>C:\Users\aamil\Documents\Visual Studio 2017\Projects\LTI\LtiAdvantage\src\LtiAdvantage\LtiAdvantage.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C:\Users\aamil\Documents\Visual Studio 2017\Projects\LTI\LtiAdvantage\src\LtiAdvantage\LtiAdvantage.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="1.8.3" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />

@@ -1,7 +1,7 @@
 ﻿namespace LtiAdvantage.IdentityServer4.Validation
 {
     /// <summary>
-    /// Identity Server contants used by <see cref="PrivatePemKeyJwtSecretValidator"/>.
+    /// Identity Server constants used by <see cref="PrivatePemKeyJwtSecretValidator"/>.
     /// </summary>
     public static class Constants
     {
@@ -11,9 +11,14 @@
         public static class SecretTypes
         {
             /// <summary>
-            /// The ClientSecret is a public key in PEM format.
+            /// The ClientSecret is a private key in PEM format.
             /// </summary>
             public const string PrivatePemKey = "PrivatePemKey";
+
+            /// <summary>
+            /// The ClientSecret is a public key in PEM format.
+            /// </summary>
+            public const string PublicPemKey = "PublicPemKey";
         }
     }
 }

@@ -149,7 +149,7 @@ namespace LtiAdvantage.IdentityServer4.Validation
         private static List<RsaSecurityKey> GetPemKeys(IEnumerable<Secret> secrets)
         {
             var pemKeys = secrets
-                .Where(s => s.Type == Constants.SecretTypes.PrivatePemKey)
+                .Where(s => s.Type == Constants.SecretTypes.PublicPemKey)
                 .Select(s => s.Value)
                 .ToList();
 
@@ -160,9 +160,8 @@ namespace LtiAdvantage.IdentityServer4.Validation
                 using (var keyTextReader = new StringReader(pemKey))
                 {
                     // PemReader can read any PEM file. Only interested in RsaKeyParameters.
-                    if (new PemReader(keyTextReader).ReadObject() is AsymmetricCipherKeyPair bouncyKeyPair)
+                    if (new PemReader(keyTextReader).ReadObject() is RsaKeyParameters bouncyKeyParameters)
                     {
-                        var bouncyKeyParameters = (RsaKeyParameters) bouncyKeyPair.Public;
                         var rsaParameters = new RSAParameters
                         {
                             Modulus = bouncyKeyParameters.Modulus.ToByteArrayUnsigned(),

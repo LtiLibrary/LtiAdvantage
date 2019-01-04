@@ -1,8 +1,11 @@
 # LtiAdvantage.IdentityServer4
 
-LtiAdvantage.IdentityServer4 has an Identity Server 4 secret validator that understands the 
+This project has two Identity Server 4 extensions:
+
+1. A secret validator that understands the 
 [IMS recommended format](https://www.imsglobal.org/spec/security/v1p0#using-json-web-tokens-with-oauth-2-0-client-credentials-grant)
-of client-credentials grant. This is only useful if you use IdentityServer4 to serve up authorization tokens.
+of client-credentials grant.
+2. Impersonation support that allows a user (such as an admin) impersonate another user (such as a member of a course).
 
 ## .NET Standard
 
@@ -11,11 +14,16 @@ for compatibility with the [IMS LTI Reference Implementation](https://github.com
 
 ## Getting Started
 
-Add the `PublicKeyJwtSecretValidator` to Startup.cs:
+Add the secret validator to IdentityServer in `ConfigureServices`:
 ```
-// Add JWT client credentials validation
-.AddSecretParser<JwtBearerClientAssertionSecretParser>()
-.AddSecretValidator<PublicKeyJwtSecretValidator>()
+services.AddIdentityServer()
+  .AddLtiJwtBearerClientAuthentication();
+```
+
+Add impersonation support to IdentityServer in `ConfigureServices`:
+```
+services.AddIdentityServer()
+  .AddImpersonationSupport();
 ```
 
 There are two sample applications you can reference for ideas:

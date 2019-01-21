@@ -5,11 +5,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\Users\aamil\Documents\Visual Studio 2017\Projects\LTI\LtiAdvantage\src\LtiAdvantage\LtiAdvantage.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)LtiAdvantage.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\Users\aamil\Documents\Visual Studio 2017\Projects\LTI\LtiAdvantage\src\LtiAdvantage\LtiAdvantage.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)LtiAdvantage.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

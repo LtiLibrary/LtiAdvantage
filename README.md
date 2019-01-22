@@ -8,7 +8,7 @@
 
 | CI | Env | Status |
 | --- | --- | --- |
-| AppVeyor | Windows | [![Build status](https://ci.appveyor.com/api/projects/status/qpkjtvp91mra9ogr?svg=true)](https://ci.appveyor.com/project/andyfmiller/ltiadvantage) |
+| AppVeyor | Windows | [![Build status](https://ci.appveyor.com/api/projects/status/osmx09wp6le8ue03?svg=true)](https://ci.appveyor.com/project/andyfmiller/ltiadvantage) |
 | travis-ci | Ubuntu | [![Build Status](https://travis-ci.org/andyfmiller/LtiLibrary.svg?branch=master)](https://travis-ci.org/andyfmiller/ltiadvantage) |
 
 ## Getting Started

@@ -1,0 +1,8 @@
+language: csharp
+solution: LtiAdvantage.sln
+mono: none
+dotnet: 2.2
+dist: xenial
+script:
+ - dotnet restore
+ - dotnet build

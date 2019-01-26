@@ -1,4 +1,5 @@
 ﻿using LtiAdvantage.Lti;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -11,7 +12,7 @@ namespace LtiAdvantage.Tests.Lti
         /// and required message claim setters, and test their values directly.
         /// </summary>
         [Fact]
-        public void FormValidResourceLinkRequest()
+        public void CreateValidResourceLinkRequestFromScratch()
         {
             var request = new LtiResourceLinkRequest
             {
@@ -53,6 +54,21 @@ namespace LtiAdvantage.Tests.Lti
             var roles = ((JArray) rolesJson).ToObject<string[]>();
             Assert.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor", roles);
             Assert.Contains("http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor", roles);
+        }
+
+        /// <summary>
+        /// Convert a valid LtiResourceLinkRequest from IMS documentation into an <see cref="LtiResourceLinkRequest"/>,
+        /// then serialize that back to JSON text and compare the JSON.
+        /// </summary>
+        [Fact]
+        public void ParseValidLtiResourceLinkRequest()
+        {
+            var referenceJson = TestUtils.LoadReferenceJsonFile("LtiResourceLinkRequest");
+
+            var request = JsonConvert.DeserializeObject<LtiResourceLinkRequest>(referenceJson);
+            var requestJson = JsonConvert.SerializeObject(request);
+
+            JsonAssertions.Equal(referenceJson, requestJson);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using LtiAdvantage.AssignmentGradeServices;
@@ -11,6 +12,7 @@ namespace LtiAdvantage.Lti
     /// <summary>
     /// https://purl.imsglobal.org/spec/lti/v1p3/schema/json/LtiResourceLinkRequest.json
     /// </summary>
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public class LtiResourceLinkRequest : LtiRequest
     {
         #region Constructors

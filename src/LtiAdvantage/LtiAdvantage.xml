@@ -2889,14 +2889,6 @@
             </example>
             </summary>
         </member>
-        <member name="M:LtiAdvantage.Lti.LtiRequest.GenerateCryptographicNonce">
-            <summary>
-            Generate a cryptographic nonce.
-            </summary>
-            <returns>
-            A cryptographic nonce as a string value.
-            </returns>
-        </member>
         <member name="T:LtiAdvantage.Lti.LtiResourceLinkRequest">
             <inheritdoc />
             <summary>

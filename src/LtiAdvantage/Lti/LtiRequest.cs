@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using LtiAdvantage.Utilities;
 
 namespace LtiAdvantage.Lti
@@ -293,22 +291,5 @@ namespace LtiAdvantage.Lti
         }
 
         #endregion
-
-        /// <summary>
-        /// Generate a cryptographic nonce.
-        /// </summary>
-        /// <returns>
-        /// A cryptographic nonce as a string value.
-        /// </returns>
-        public static string GenerateCryptographicNonce()
-        {
-            using (var provider = new RNGCryptoServiceProvider())
-            {
-                var byteArray = new byte[4];
-                provider.GetBytes(byteArray);
-                var randomInteger = BitConverter.ToUInt32(byteArray, 0);
-                return randomInteger.ToString();
-            }
-       }
     }
 }

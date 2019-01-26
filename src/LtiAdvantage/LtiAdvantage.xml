@@ -984,72 +984,104 @@
             </summary>
         </member>
         <member name="T:LtiAdvantage.DeepLinking.ContentItem">
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IFileItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IHtmlItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IImageItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILinkItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILtiLinkItem" />
             <summary>
             Base class for all content item types
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Available">
+            <inheritdoc />
             <summary>
             Indicates the initial start and end time this activity should be made
             available to learners.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Custom">
+            <inheritdoc />
             <summary>
             Key/value custom parameters.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Embed">
+            <inheritdoc />
             <summary>
             HTML embed code.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.ExpiresAt">
+            <inheritdoc />
             <summary>
             The URL will be available until this time.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Height">
+            <inheritdoc />
             <summary>
             Height in pixels.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Html">
+            <inheritdoc />
             <summary>
             HTML fragment to embed.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Icon">
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IFileItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IImageItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILinkItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILtiLinkItem" />
             <summary>
             URL of an icon image.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Iframe">
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILinkItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILtiLinkItem" />
             <summary>
             iframe properties for embedding the item.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.LineItem">
+            <inheritdoc />
             <summary>
             Indicates this item is expected to receive scores.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Submission">
+            <inheritdoc />
             <summary>
             Start and end date and time for submissions.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Text">
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IFileItem"/>
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IHtmlItem"/>
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IImageItem"/>
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILinkItem"/>
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILtiLinkItem"/>
             <summary>
             Plain text description.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Thumbnail">
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IFileItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IImageItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILinkItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILtiLinkItem" />
             <summary>
             URL of a thumbnail image.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Title">
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IFileItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IImageItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILinkItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILtiLinkItem" />
             <summary>
             Plain text title.
             </summary>
@@ -1060,16 +1092,23 @@
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Url">
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IFileItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.IImageItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILinkItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILtiLinkItem" />
             <summary>
             URL of the resource.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Width">
+            <inheritdoc />
             <summary>
             Width in pixels.
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.Window">
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILinkItem" />
+            <inheritdoc cref="T:LtiAdvantage.DeepLinking.ILtiLinkItem" />
             <summary>
             Window properties for a new window/tab.
             </summary>
@@ -1171,10 +1210,6 @@
             <summary>
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.IFileItem.Type">
-            <summary>
-            </summary>
-        </member>
         <member name="P:LtiAdvantage.DeepLinking.IFileItem.Url">
             <summary>
             </summary>
@@ -1216,10 +1251,6 @@
             <summary>
             </summary>
         </member>
-        <member name="P:LtiAdvantage.DeepLinking.IHtmlItem.Type">
-            <summary>
-            </summary>
-        </member>
         <member name="T:LtiAdvantage.DeepLinking.IImageItem">
             <summary>
             Image is a URL pointing to an image resource that SHOULD be rendered
@@ -1243,10 +1274,6 @@
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.IImageItem.Title">
-            <summary>
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.IImageItem.Type">
             <summary>
             </summary>
         </member>
@@ -1284,10 +1311,6 @@
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ILinkItem.Title">
-            <summary>
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.ILinkItem.Type">
             <summary>
             </summary>
         </member>
@@ -1338,10 +1361,6 @@
             </summary>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.Title">
-            <summary>
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.DeepLinking.ILtiLinkItem.Type">
             <summary>
             </summary>
         </member>

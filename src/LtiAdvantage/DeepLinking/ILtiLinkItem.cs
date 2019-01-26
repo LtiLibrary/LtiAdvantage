@@ -46,10 +46,6 @@ namespace LtiAdvantage.DeepLinking
 
         /// <summary>
         /// </summary>
-        string Type { get; set; }
-
-        /// <summary>
-        /// </summary>
         string Url { get; set; }
 
         /// <summary>

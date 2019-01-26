@@ -16,9 +16,5 @@
         /// <summary>
         /// </summary>
         string Title { get; set; }
-
-        /// <summary>
-        /// </summary>
-        string Type { get; set; }
     }
 }

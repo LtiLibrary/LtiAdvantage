@@ -6,3 +6,4 @@ dist: xenial
 script:
  - dotnet restore
  - dotnet build
+ - dotnet test test/LtiAdvantage.Tests/LtiAdvantage.Tests.csproj

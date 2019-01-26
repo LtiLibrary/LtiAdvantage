@@ -5,6 +5,7 @@ VisualStudioVersion = 15.0.28010.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C53CA168-7453-4035-8AB3-79781B00A4A4}"
 	ProjectSection(SolutionItems) = preProject
+		.travis.yml = .travis.yml
 		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
 		LICENSE = LICENSE
 		README.md = README.md
@@ -16,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage", "src\LtiAdva
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage.IdentityModel", "src\LtiAdvantage.IdentityModel\LtiAdvantage.IdentityModel.csproj", "{7C375F33-8D95-47A6-B56B-A570889BA6CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LtiAdvantage.Tests", "test\LtiAdvantage.Tests\LtiAdvantage.Tests.csproj", "{0FA6BCBD-EB34-49E0-A743-33D5165C7BE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage.Tests", "test\LtiAdvantage.Tests\LtiAdvantage.Tests.csproj", "{0FA6BCBD-EB34-49E0-A743-33D5165C7BE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -55,34 +55,6 @@ namespace LtiAdvantage.Tests
                 return result;
             }
 
-            /// <summary>
-            /// Modifies an object according to a diff.
-            /// </summary>
-            /// <typeparam name="T">The type of the T.</typeparam>
-            /// <param name="source">The source.</param>
-            /// <param name="diffJson">The diff json.</param>
-            /// <returns></returns>
-            public static T PatchObject<T>(T source, string diffJson) where T : class
-            {
-                var diff = JObject.Parse(diffJson);
-                return PatchObject(source, diff);
-            }
-
-            /// <summary>
-            /// Modifies an object according to a diff.
-            /// </summary>
-            /// <typeparam name="T">The type of the T.</typeparam>
-            /// <param name="source">The source.</param>
-            /// <param name="diffJson">The diff json.</param>
-            /// <returns></returns>
-            public static T PatchObject<T>(T source, JObject diffJson) where T : class
-            {
-                var sourceJson = source != null ? JObject.FromObject(source, GetJsonSerializer()) : null;
-                var resultJson = Patch(sourceJson, diffJson);
-
-                return resultJson?.ToObject<T>();
-            }
-
             private static ObjectDiffPatchResult Diff(JObject source, JObject target)
             {
                 var result = new ObjectDiffPatchResult();
@@ -103,29 +75,29 @@ namespace LtiAdvantage.Tests
                 var removedOld = new JArray();
                 JToken token;
                 // start by iterating in source fields
-                foreach (var i in source)
+                foreach (var pair in source)
                 {
                     // check if field exists
-                    if (!target.TryGetValue(i.Key, out token))
+                    if (!target.TryGetValue(pair.Key, out token))
                     {
-                        AddOldValuesToken(result, i.Value, i.Key);
-                        removedNew.Add(i.Key);
+                        AddOldValuesToken(result, pair.Value, pair.Key);
+                        removedNew.Add(pair.Key);
                     }
                     // compare field values
                     else
                     {
-                        DiffField(i.Key, i.Value, token, result);
+                        DiffField(pair.Key, pair.Value, token, result);
                     }
                 }
                 // then iterate in target fields that are not present in source
-                foreach (var i in target)
+                foreach (var pair in target)
                 {
                     // ignore alredy compared values
-                    if (source.TryGetValue(i.Key, out token))
+                    if (source.TryGetValue(pair.Key, out token))
                         continue;
                     // add missing tokens
-                    removedOld.Add(i.Key);
-                    AddNewValuesToken(result, i.Value, i.Key);
+                    removedOld.Add(pair.Key);
+                    AddNewValuesToken(result, pair.Value, pair.Key);
                 }
 
                 if (removedOld.Count > 0)
@@ -199,6 +171,29 @@ namespace LtiAdvantage.Tests
                             AddToken(result, fieldName, arrayDiff);
                         }
                     }
+                    else if (source.Type == JTokenType.Integer && target.Type != JTokenType.Integer)
+                    {
+                        var sourceValue = (JValue) source;
+                        if (target is JValue targetValue)
+                        {
+                            try
+                            {
+                                var objA = Convert.ChangeType(sourceValue.Value, targetValue.Value.GetType());
+                                if (!objA.Equals(targetValue.Value))
+                                {
+                                    AddToken(result, fieldName, source, target);
+                                }
+                            }
+                            catch
+                            {
+                                AddToken(result, fieldName, source, target);
+                            }
+                        }
+                        else if (!JToken.DeepEquals(source, target))
+                        {
+                            AddToken(result, fieldName, source, target);
+                        }                        
+                    }
                     else
                     {
                         if (!JToken.DeepEquals(source, target))
@@ -223,70 +218,6 @@ namespace LtiAdvantage.Tests
                 // create our custom serializer
                 var writer = JsonSerializer.Create(settings);
                 return writer;
-            }
-
-            private static JToken Patch(JToken sourceJson, JToken diffJson)
-            {
-                // deal with null values
-                if (sourceJson == null || diffJson == null)
-                {
-                    return diffJson;
-                }
-                if (diffJson.Type != JTokenType.Object)
-                {
-                    return diffJson;
-                }
-                // deal with objects
-                var diffObj = (JObject)diffJson;
-                JToken token;
-                if (sourceJson.Type == JTokenType.Array)
-                {
-                    var sz = 0;
-                    var foundArraySize = diffObj.TryGetValue(PrefixArraySize, out token);
-                    if (foundArraySize)
-                    {
-                        diffObj.Remove(PrefixArraySize);
-                        sz = token.Value<int>();
-                    }
-                    var array = sourceJson as JArray;
-                    // resize array
-                    if (array != null && foundArraySize && array.Count != sz)
-                    {
-                        var snapshot = array.DeepClone() as JArray;
-                        array.Clear();
-                        for (var i = 0; i < sz; i++)
-                        {
-                            array.Add(snapshot != null && i < snapshot.Count ? snapshot[i] : null);
-                        }
-                    }
-                    // patch it
-                    foreach (var f in diffObj)
-                    {
-                        if (int.TryParse(f.Key, out var ix))
-                        {
-                            if (array != null) array[ix] = Patch(array[ix], f.Value);
-                        }
-                    }
-                }
-                else
-                {
-                    var sourceObj = sourceJson as JObject ?? new JObject();
-                    // remove fields
-                    if (diffObj.TryGetValue(PrefixRemovedFields, out token))
-                    {
-                        diffObj.Remove(PrefixRemovedFields);
-                        if (token is JArray jArray)
-                            foreach (var f in jArray)
-                                sourceObj.Remove(f.ToString());
-                    }
-
-                    // patch it
-                    foreach (var f in diffObj)
-                    {
-                        sourceObj[f.Key] = Patch(sourceObj[f.Key], f.Value);
-                    }
-                }
-                return sourceJson;
             }
 
             private static void AddNewValuesToken(ObjectDiffPatchResult item, JToken newToken, string fieldName)

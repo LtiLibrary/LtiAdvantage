@@ -7,10 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ReferenceJson\LineItem.json" />
     <None Remove="ReferenceJson\LtiResourceLinkRequest.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="ReferenceJson\LineItem.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ReferenceJson\LtiResourceLinkRequest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

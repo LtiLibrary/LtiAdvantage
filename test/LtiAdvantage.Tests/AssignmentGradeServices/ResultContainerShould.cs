@@ -19,7 +19,7 @@ namespace LtiAdvantage.Tests.AssignmentGradeServices
             var referenceJson = TestUtils.LoadReferenceJsonFile("ResultContainer");
             var container = JsonConvert.DeserializeObject<ResultContainer>(referenceJson);
 
-            Assert.Equal(1, container.Count);
+            Assert.Single(container);
         }
         
         /// <summary>

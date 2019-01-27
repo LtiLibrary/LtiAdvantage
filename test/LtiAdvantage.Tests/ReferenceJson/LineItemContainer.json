@@ -1,0 +1,25 @@
+﻿[
+  {
+    "id": "https://lms.example.com/context/2923/lineitems/1",
+    "scoreMaximum": 60,
+    "label": "Chapter 5 Test",
+    "resourceId": "a-9334df-33",
+    "tag": "grade",
+    "resourceLinkId": "1g3k4dlk49fk",
+    "endDateTime": "2018-04-06T22:05:03Z"
+  },
+  {
+    "id": "https://lms.example.com/context/2923/lineitems/47",
+    "scoreMaximum": 100,
+    "label": "Chapter 5 Progress",
+    "resourceId": "a-9334df-33",
+    "tag": "originality",
+    "resourceLinkId": "1g3k4dlk49fk"
+  },
+  {
+    "id": "https://lms.example.com/context/2923/lineitems/69",
+    "scoreMaximum": 60,
+    "label": "Chapter 2 Essay",
+    "tag": "grade"
+  }
+]

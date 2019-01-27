@@ -216,17 +216,13 @@ namespace LtiAdvantage.Tests
                 {
                     var aT = target as JArray;
                     var aS = source as JArray;
-                    if (source.Type == JTokenType.Array)
+                    switch (source.Type)
                     {
-                        if (aS == null || aT == null)
-                        {
+                        case JTokenType.Array when aS == null || aT == null:
+                        case JTokenType.Array when (aS.Count == 0 || aT.Count == 0) && aS.Count != aT.Count:
                             AddToken(result, fieldName, source, target);
-                        }
-                        else if ((aS.Count == 0 || aT.Count == 0) && aS.Count != aT.Count)
-                        {
-                            AddToken(result, fieldName, source, target);
-                        }
-                        else
+                            break;
+                        case JTokenType.Array:
                         {
                             var arrayDiff = new ObjectDiffPatchResult();
                             var minCount = Math.Min(aS.Count, aT.Count);
@@ -251,36 +247,41 @@ namespace LtiAdvantage.Tests
                             if (aS.Count != aT.Count)
                                 AddToken(arrayDiff, PrefixArraySize, aS.Count, aT.Count);
                             AddToken(result, fieldName, arrayDiff);
+                            break;
                         }
-                    }
-                    else if (source.Type == JTokenType.Integer && target.Type != JTokenType.Integer)
-                    {
-                        var sourceValue = (JValue) source;
-                        if (target is JValue targetValue)
+                        case JTokenType.Integer when target.Type != JTokenType.Integer:
                         {
-                            try
+                            var sourceValue = (JValue) source;
+                            if (target is JValue targetValue)
                             {
-                                var objA = Convert.ChangeType(sourceValue.Value, targetValue.Value.GetType());
-                                if (!objA.Equals(targetValue.Value))
+                                try
+                                {
+                                    var objA = Convert.ChangeType(sourceValue.Value, targetValue.Value.GetType());
+                                    if (!objA.Equals(targetValue.Value))
+                                    {
+                                        AddToken(result, fieldName, source, target);
+                                    }
+                                }
+                                catch
                                 {
                                     AddToken(result, fieldName, source, target);
                                 }
                             }
-                            catch
+                            else if (!JToken.DeepEquals(source, target))
                             {
                                 AddToken(result, fieldName, source, target);
                             }
+
+                            break;
                         }
-                        else if (!JToken.DeepEquals(source, target))
+                        default:
                         {
-                            AddToken(result, fieldName, source, target);
-                        }                        
-                    }
-                    else
-                    {
-                        if (!JToken.DeepEquals(source, target))
-                        {
-                            AddToken(result, fieldName, source, target);
+                            if (!JToken.DeepEquals(source, target))
+                            {
+                                AddToken(result, fieldName, source, target);
+                            }
+
+                            break;
                         }
                     }
                 }

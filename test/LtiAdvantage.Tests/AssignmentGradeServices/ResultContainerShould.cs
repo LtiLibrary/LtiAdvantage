@@ -11,7 +11,7 @@ namespace LtiAdvantage.Tests.AssignmentGradeServices
         /// See https://www.imsglobal.org/spec/lti-ags/v2p0/#example-of-an-initial-application-vnd-ims-lis-v2-resultcontainer-json-
         /// </summary>
         [Fact]
-        public void DeserializeFromValueJson()
+        public void DeserializeFromValidJson()
         {
             var referenceJson = TestUtils.LoadReferenceJsonFile("ResultContainer");
             var container = JsonConvert.DeserializeObject<ResultContainer>(referenceJson);

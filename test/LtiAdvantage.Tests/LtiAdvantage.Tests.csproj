@@ -12,6 +12,7 @@
     <None Remove="ReferenceJson\LtiResourceLinkRequest.json" />
     <None Remove="ReferenceJson\Result.json" />
     <None Remove="ReferenceJson\ResultContainer.json" />
+    <None Remove="ReferenceJson\Score.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +29,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ReferenceJson\ResultContainer.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ReferenceJson\Score.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

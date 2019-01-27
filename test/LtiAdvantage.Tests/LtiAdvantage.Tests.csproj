@@ -10,6 +10,7 @@
     <None Remove="ReferenceJson\LineItem.json" />
     <None Remove="ReferenceJson\LineItemContainer.json" />
     <None Remove="ReferenceJson\LtiResourceLinkRequest.json" />
+    <None Remove="ReferenceJson\Result.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +21,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ReferenceJson\LtiResourceLinkRequest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ReferenceJson\Result.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

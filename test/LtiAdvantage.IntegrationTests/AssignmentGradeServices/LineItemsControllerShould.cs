@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -31,10 +30,6 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
                 })
                 .UseStartup<Startup>());
             _client = _server.CreateClient();
-
-            //// Set the current directory to the compiler output directory so that
-            //// the reference json is found
-            Directory.SetCurrentDirectory(AppContext.BaseDirectory);
         }
 
         /// <summary>

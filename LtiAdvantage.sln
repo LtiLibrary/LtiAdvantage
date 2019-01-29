@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage.IdentityModel"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage.UnitTests", "test\LtiAdvantage.UnitTests\LtiAdvantage.UnitTests.csproj", "{02187DC7-C6DD-4ACF-AFE0-45C4AAD6E1E0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage.IntegrationTests", "test\LtiAdvantage.IntegrationTests\LtiAdvantage.IntegrationTests.csproj", "{E882044C-C801-4F6F-8D2F-5E32693A8816}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{02187DC7-C6DD-4ACF-AFE0-45C4AAD6E1E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02187DC7-C6DD-4ACF-AFE0-45C4AAD6E1E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02187DC7-C6DD-4ACF-AFE0-45C4AAD6E1E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E882044C-C801-4F6F-8D2F-5E32693A8816}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E882044C-C801-4F6F-8D2F-5E32693A8816}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E882044C-C801-4F6F-8D2F-5E32693A8816}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E882044C-C801-4F6F-8D2F-5E32693A8816}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace LtiAdvantage.Tests.Lti
+namespace LtiAdvantage.UnitTests.Lti
 {
     public class LtiResourceLinkRequestShould
     {

@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace LtiAdvantage.Tests
+namespace LtiAdvantage.UnitTests
 {
     internal static class TestUtils
     {

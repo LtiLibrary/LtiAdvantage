@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace LtiAdvantage.Tests
+namespace LtiAdvantage.UnitTests
 {
     internal static class JsonAssertions
     {

@@ -4,7 +4,7 @@ using LtiAdvantage.AssignmentGradeServices;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace LtiAdvantage.Tests.AssignmentGradeServices
+namespace LtiAdvantage.UnitTests.AssignmentGradeServices
 {
     public class LineItemShould
     {

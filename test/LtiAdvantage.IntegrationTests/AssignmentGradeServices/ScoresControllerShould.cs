@@ -12,7 +12,7 @@ using Xunit;
 
 namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
 {
-    public class ScoresControllerShould
+    public class ScoresControllerShould : IDisposable
     {
         private readonly HttpClient _client;
         private readonly TestServer _server;
@@ -69,6 +69,12 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
             {
                 Assert.StartsWith(contentType, response.Content.Headers.ContentType.ToString());
             }
+        }
+
+        public void Dispose()
+        {
+            _client?.Dispose();
+            _server?.Dispose();
         }
     }
 }

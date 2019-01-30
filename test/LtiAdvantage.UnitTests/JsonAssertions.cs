@@ -216,6 +216,7 @@ namespace LtiAdvantage.UnitTests
                 {
                     var aT = target as JArray;
                     var aS = source as JArray;
+                    // ReSharper disable once SwitchStatementMissingSomeCases
                     switch (source.Type)
                     {
                         case JTokenType.Array when aS == null || aT == null:

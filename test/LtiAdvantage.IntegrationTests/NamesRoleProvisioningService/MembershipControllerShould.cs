@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
@@ -34,8 +32,8 @@ namespace LtiAdvantage.IntegrationTests.NamesRoleProvisioningService
         /// Check the return status code and content-type.
         /// </summary>
         [Theory]
-        [InlineData(Constants.LtiScopes.NrpsMembershipReadonly, HttpStatusCode.OK, Constants.MediaTypes.MembershipContainer)]
-        [InlineData(Constants.LtiScopes.AgsLineItem, HttpStatusCode.Forbidden, "")]
+        [InlineData(Constants.LtiScopes.Nrps.MembershipReadonly, HttpStatusCode.OK, Constants.MediaTypes.MembershipContainer)]
+        [InlineData(Constants.LtiScopes.Ags.LineItem, HttpStatusCode.Forbidden, "")]
         public async void ReturnMembership_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);

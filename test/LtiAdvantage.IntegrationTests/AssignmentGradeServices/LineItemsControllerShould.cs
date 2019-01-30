@@ -36,8 +36,8 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         /// Check the return status code and content-type.
         /// </summary>
         [Theory]
-        [InlineData(Constants.LtiScopes.AgsLineItem, HttpStatusCode.OK, Constants.MediaTypes.LineItem)]
-        [InlineData(Constants.LtiScopes.AgsLineItemReadonly, HttpStatusCode.Forbidden, "")]
+        [InlineData(Constants.LtiScopes.Ags.LineItem, HttpStatusCode.OK, Constants.MediaTypes.LineItem)]
+        [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.Forbidden, "")]
         public async void AddLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
             var lineItemContent = new StringContent(JsonConvert.SerializeObject(new LineItem()),
@@ -56,8 +56,8 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         /// Check the return status code.
         /// </summary>
         [Theory]
-        [InlineData(Constants.LtiScopes.AgsLineItem, HttpStatusCode.OK)]
-        [InlineData(Constants.LtiScopes.AgsLineItemReadonly, HttpStatusCode.Forbidden)]
+        [InlineData(Constants.LtiScopes.Ags.LineItem, HttpStatusCode.OK)]
+        [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.Forbidden)]
         public async void DeleteLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode)
         {
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);
@@ -69,9 +69,9 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         /// Check the return status code and content-type.
         /// </summary>
         [Theory]
-        [InlineData(Constants.LtiScopes.AgsLineItem, HttpStatusCode.OK, Constants.MediaTypes.LineItem)]
-        [InlineData(Constants.LtiScopes.AgsLineItemReadonly, HttpStatusCode.OK, Constants.MediaTypes.LineItem)]
-        [InlineData(Constants.LtiScopes.NrpsMembershipReadonly, HttpStatusCode.Forbidden, "")]
+        [InlineData(Constants.LtiScopes.Ags.LineItem, HttpStatusCode.OK, Constants.MediaTypes.LineItem)]
+        [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.OK, Constants.MediaTypes.LineItem)]
+        [InlineData(Constants.LtiScopes.Nrps.MembershipReadonly, HttpStatusCode.Forbidden, "")]
         public async void ReturnLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);
@@ -87,9 +87,9 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         /// Check the return status code and content-type.
         /// </summary>
         [Theory]
-        [InlineData(Constants.LtiScopes.AgsLineItem, HttpStatusCode.OK, Constants.MediaTypes.LineItemContainer)]
-        [InlineData(Constants.LtiScopes.AgsLineItemReadonly, HttpStatusCode.OK, Constants.MediaTypes.LineItemContainer)]
-        [InlineData(Constants.LtiScopes.NrpsMembershipReadonly, HttpStatusCode.Forbidden, "")]
+        [InlineData(Constants.LtiScopes.Ags.LineItem, HttpStatusCode.OK, Constants.MediaTypes.LineItemContainer)]
+        [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.OK, Constants.MediaTypes.LineItemContainer)]
+        [InlineData(Constants.LtiScopes.Nrps.MembershipReadonly, HttpStatusCode.Forbidden, "")]
         public async void ReturnLineItems_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);
@@ -105,8 +105,8 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         /// Check the return status code.
         /// </summary>
         [Theory]
-        [InlineData(Constants.LtiScopes.AgsLineItem, HttpStatusCode.OK)]
-        [InlineData(Constants.LtiScopes.AgsLineItemReadonly, HttpStatusCode.Forbidden)]
+        [InlineData(Constants.LtiScopes.Ags.LineItem, HttpStatusCode.OK)]
+        [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.Forbidden)]
         public async void UpdateLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode)
         {
             var lineItemContent = new StringContent(JsonConvert.SerializeObject(new LineItem()),

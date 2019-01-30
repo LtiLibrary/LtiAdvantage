@@ -78,8 +78,8 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
-        [Route("context/{contextId}/lineitems", Name = Constants.ServiceEndpoints.AgsLineItemsService)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.Ags.LineItem)]
+        [Route("context/{contextId}/lineitems", Name = Constants.ServiceEndpoints.Ags.LineItemsService)]
         [Route("context/{contextId}/lineitems.{format}")]
         public async Task<ActionResult<LineItem>> AddLineItemAsync([Required] string contextId, [Required] [FromBody] LineItem lineItem)
         {
@@ -122,8 +122,8 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
-        [Route("context/{contextId}/lineitems/{lineItemId}", Name = Constants.ServiceEndpoints.AgsLineItemService)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.Ags.LineItem)]
+        [Route("context/{contextId}/lineitems/{lineItemId}", Name = Constants.ServiceEndpoints.Ags.LineItemService)]
         [Route("context/{contextId}/lineitems/{lineItemId}.{format}")]
         public async Task<ActionResult> DeleteLineItemAsync([Required] string contextId, [Required] string lineItemId)
         {
@@ -168,8 +168,8 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, 
-            Policy = Constants.LtiScopes.AgsLineItem + " " + Constants.LtiScopes.AgsLineItemReadonly)]
-        [Route("context/{contextId}/lineitems/{lineItemId}", Name = Constants.ServiceEndpoints.AgsLineItemService)]
+            Policy = Constants.LtiScopes.Ags.LineItem + " " + Constants.LtiScopes.Ags.LineItemReadonly)]
+        [Route("context/{contextId}/lineitems/{lineItemId}", Name = Constants.ServiceEndpoints.Ags.LineItemService)]
         [Route("context/{contextId}/lineitems/{lineItemId}.{format}")]
         public async Task<ActionResult<LineItem>> GetLineItemAsync([Required] string contextId, [Required] string lineItemId)
         {
@@ -217,8 +217,8 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, 
-            Policy = Constants.LtiScopes.AgsLineItem + " " + Constants.LtiScopes.AgsLineItemReadonly)]
-        [Route("context/{contextId}/lineitems", Name = Constants.ServiceEndpoints.AgsLineItemsService)]
+            Policy = Constants.LtiScopes.Ags.LineItem + " " + Constants.LtiScopes.Ags.LineItemReadonly)]
+        [Route("context/{contextId}/lineitems", Name = Constants.ServiceEndpoints.Ags.LineItemsService)]
         [Route("context/{contextId}/lineitems.{format}")]
         public async Task<ActionResult<LineItemContainer>> GetLineItemsAsync([Required] string contextId,
             [FromQuery(Name = "resourceLinkId")] string resourceLinkId = null,
@@ -267,8 +267,8 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsLineItem)]
-        [Route("context/{contextId}/lineitems/{lineItemId}", Name = Constants.ServiceEndpoints.AgsLineItemService)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.Ags.LineItem)]
+        [Route("context/{contextId}/lineitems/{lineItemId}", Name = Constants.ServiceEndpoints.Ags.LineItemService)]
         [Route("context/{contextId}/lineitems/{lineItemId}.{format}")]
         public async Task<ActionResult> UpdateLineItemAsync([Required] string contextId, [Required] string lineItemId, [Required] LineItem lineItem)
         {

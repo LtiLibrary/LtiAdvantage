@@ -188,34 +188,46 @@
         public static class LtiScopes
         {
             /// <summary>
-            /// Assignment and Grade Service lineitem read/write scope.
+            /// Assignment and Grade Services scopes
             /// </summary>
-            public const string AgsLineItem = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem";
+            public static class Ags
+            {
+                /// <summary>
+                /// Assignment and Grade Service lineitem read/write scope.
+                /// </summary>
+                public const string LineItem = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem";
+
+                /// <summary>
+                /// Assignment and Grade Service lineitem readonly scope.
+                /// </summary>
+                public const string LineItemReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly";
+
+                /// <summary>
+                /// Assignment and Grade Service result readonly scope.
+                /// </summary>
+                public const string ResultReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly";
+
+                /// <summary>
+                /// Assignment and Grade Service score read/write scope.
+                /// </summary>
+                public const string Score = "https://purl.imsglobal.org/spec/lti-ags/scope/score";
+
+                /// <summary>
+                /// Custom Assignment and Grade Service score readonly scope.
+                /// </summary>
+                public const string ScoreReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/score.readonly";
+            }
 
             /// <summary>
-            /// Assignment and Grade Service lineitem readonly scope.
+            /// Names and Role Provisioning Service scopes.
             /// </summary>
-            public const string AgsLineItemReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly";
-
-            /// <summary>
-            /// Assignment and Grade Service result readonly scope.
-            /// </summary>
-            public const string AgsResultReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly";
-
-            /// <summary>
-            /// Assignment and Grade Service score read/write scope.
-            /// </summary>
-            public const string AgsScore = "https://purl.imsglobal.org/spec/lti-ags/scope/score";
-
-            /// <summary>
-            /// Custom Assignment and Grade Service score readonly scope.
-            /// </summary>
-            public const string AgsScoreReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/score.readonly";
-
-            /// <summary>
-            /// Names and Role Service readonly scope.
-            /// </summary>
-            public const string NrpsMembershipReadonly = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly";
+            public static class Nrps
+            {
+                /// <summary>
+                /// Names and Role Service readonly scope.
+                /// </summary>
+                public const string MembershipReadonly = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly";
+            }
         }
 
         /// <summary>
@@ -322,34 +334,46 @@
         public static class ServiceEndpoints
         {
             /// <summary>
-            /// Assignment and Grade Services line item endpoint.
+            /// Assignment and Grade Services endpoints.
             /// </summary>
-            public const string AgsLineItemService = "lineitem";
+            public static class Ags
+            {
+                /// <summary>
+                /// Line item endpoint.
+                /// </summary>
+                public const string LineItemService = "lineitem";
+
+                /// <summary>
+                /// Line items endpoint.
+                /// </summary>
+                public const string LineItemsService = "lineitems";
+
+                /// <summary>
+                /// Results endpoint.
+                /// </summary>
+                public const string ResultsService = "results";
+
+                /// <summary>
+                /// Score endpoint.
+                /// </summary>
+                public const string ScoreService = "score";
+
+                /// <summary>
+                /// Scores endpoint.
+                /// </summary>
+                public const string ScoresService = "scores";
+            }
 
             /// <summary>
-            /// Assignment and Grade Services line items endpoint.
+            /// Names and Role Provisioning Service endpoints.
             /// </summary>
-            public const string AgsLineItemsService = "lineitems";
-
-            /// <summary>
-            /// Assignment and Grade Services results endpoint.
-            /// </summary>
-            public const string AgsResultsService = "results";
-
-            /// <summary>
-            /// Assignment and Grade Services score endpoint.
-            /// </summary>
-            public const string AgsScoreService = "score";
-
-            /// <summary>
-            /// Assignment and Grade Services scores endpoint.
-            /// </summary>
-            public const string AgsScoresService = "scores";
-
-            /// <summary>
-            /// Names and Role Provisioning Service membership endpoint.
-            /// </summary>
-            public const string NrpsMembershipService = "membership";
+            public static class Nrps
+            {
+                /// <summary>
+                /// Membership endpoint.
+                /// </summary>
+                public const string MembershipService = "membership";
+            }
         }
     }
 }

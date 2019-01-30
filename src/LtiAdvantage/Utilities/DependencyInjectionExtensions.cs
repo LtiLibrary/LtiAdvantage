@@ -3,6 +3,7 @@ using LtiAdvantage.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 
+// ReSharper disable UnusedMethodReturnValue.Global
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
 {

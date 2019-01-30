@@ -51,10 +51,10 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, 
-            Policy = Constants.LtiScopes.NrpsMembershipReadonly)]
-        [Route("context/{contextId}/membership", Name = Constants.ServiceEndpoints.NrpsMembershipService)]
+            Policy = Constants.LtiScopes.Nrps.MembershipReadonly)]
+        [Route("context/{contextId}/membership", Name = Constants.ServiceEndpoints.Nrps.MembershipService)]
         [Route("context/{contextId}/membership.{format}")]
-        public virtual async Task<ActionResult<MembershipContainer>> GetMembershipAsync([Required] string contextId, 
+        public async Task<ActionResult<MembershipContainer>> GetMembershipAsync([Required] string contextId, 
             int? limit = null, string rlid = null, Role? role = null)
         {
             try

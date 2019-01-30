@@ -822,32 +822,42 @@
             LTI Advantage API scopes.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.Constants.LtiScopes.AgsLineItem">
+        <member name="T:LtiAdvantage.Constants.LtiScopes.Ags">
+            <summary>
+            Assignment and Grade Services scopes
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiScopes.Ags.LineItem">
             <summary>
             Assignment and Grade Service lineitem read/write scope.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.Constants.LtiScopes.AgsLineItemReadonly">
+        <member name="F:LtiAdvantage.Constants.LtiScopes.Ags.LineItemReadonly">
             <summary>
             Assignment and Grade Service lineitem readonly scope.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.Constants.LtiScopes.AgsResultReadonly">
+        <member name="F:LtiAdvantage.Constants.LtiScopes.Ags.ResultReadonly">
             <summary>
             Assignment and Grade Service result readonly scope.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.Constants.LtiScopes.AgsScore">
+        <member name="F:LtiAdvantage.Constants.LtiScopes.Ags.Score">
             <summary>
             Assignment and Grade Service score read/write scope.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.Constants.LtiScopes.AgsScoreReadonly">
+        <member name="F:LtiAdvantage.Constants.LtiScopes.Ags.ScoreReadonly">
             <summary>
             Custom Assignment and Grade Service score readonly scope.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.Constants.LtiScopes.NrpsMembershipReadonly">
+        <member name="T:LtiAdvantage.Constants.LtiScopes.Nrps">
+            <summary>
+            Names and Role Provisioning Service scopes.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiScopes.Nrps.MembershipReadonly">
             <summary>
             Names and Role Service readonly scope.
             </summary>
@@ -953,34 +963,44 @@
             LTI Advantage service endpoints.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.AgsLineItemService">
+        <member name="T:LtiAdvantage.Constants.ServiceEndpoints.Ags">
             <summary>
-            Assignment and Grade Services line item endpoint.
+            Assignment and Grade Services endpoints.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.AgsLineItemsService">
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Ags.LineItemService">
             <summary>
-            Assignment and Grade Services line items endpoint.
+            Line item endpoint.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.AgsResultsService">
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Ags.LineItemsService">
             <summary>
-            Assignment and Grade Services results endpoint.
+            Line items endpoint.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.AgsScoreService">
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Ags.ResultsService">
             <summary>
-            Assignment and Grade Services score endpoint.
+            Results endpoint.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.AgsScoresService">
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Ags.ScoreService">
             <summary>
-            Assignment and Grade Services scores endpoint.
+            Score endpoint.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.NrpsMembershipService">
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Ags.ScoresService">
             <summary>
-            Names and Role Provisioning Service membership endpoint.
+            Scores endpoint.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Constants.ServiceEndpoints.Nrps">
+            <summary>
+            Names and Role Provisioning Service endpoints.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Nrps.MembershipService">
+            <summary>
+            Membership endpoint.
             </summary>
         </member>
         <member name="T:LtiAdvantage.DeepLinking.ContentItem">

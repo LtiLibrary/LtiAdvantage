@@ -58,8 +58,8 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsScore)]
-        [Route("context/{contextId}/lineitems/{lineItemId}/scores", Name = Constants.ServiceEndpoints.AgsScoresService)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.Ags.Score)]
+        [Route("context/{contextId}/lineitems/{lineItemId}/scores", Name = Constants.ServiceEndpoints.Ags.ScoresService)]
         [Route("context/{contextId}/lineitems/{lineItemId}/scores.{format}")]
         public async Task<ActionResult<Score>> AddScoreAsync(string contextId, string lineItemId, [Required] [FromBody] Score score)
         {
@@ -108,8 +108,8 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, 
-            Policy = Constants.LtiScopes.AgsScoreReadonly + " " + Constants.LtiScopes.AgsScore)]
-        [Route("context/{contextId}/lineitems/{lineItemId}/scores/{scoreId}", Name = Constants.ServiceEndpoints.AgsScoreService)]
+            Policy = Constants.LtiScopes.Ags.ScoreReadonly + " " + Constants.LtiScopes.Ags.Score)]
+        [Route("context/{contextId}/lineitems/{lineItemId}/scores/{scoreId}", Name = Constants.ServiceEndpoints.Ags.ScoreService)]
         [Route("context/{contextId}/lineitems/{lineItemId}/scores/{scoreId}.{format}")]
         public async Task<ActionResult<Score>> GetScoreAsync([Required] string contextId, 
             [Required] string lineItemId, [Required] string scoreId)

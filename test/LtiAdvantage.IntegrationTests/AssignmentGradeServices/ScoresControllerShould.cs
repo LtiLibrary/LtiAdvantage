@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -37,8 +36,8 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         /// Check the return status code and content-type.
         /// </summary>
         [Theory]
-        [InlineData(Constants.LtiScopes.AgsScore, HttpStatusCode.OK, Constants.MediaTypes.Score)]
-        [InlineData(Constants.LtiScopes.AgsScoreReadonly, HttpStatusCode.Forbidden, "")]
+        [InlineData(Constants.LtiScopes.Ags.Score, HttpStatusCode.OK, Constants.MediaTypes.Score)]
+        [InlineData(Constants.LtiScopes.Ags.ScoreReadonly, HttpStatusCode.Forbidden, "")]
         public async void AddScore_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
             var scoreContent = new StringContent(JsonConvert.SerializeObject(new Score()),
@@ -57,9 +56,9 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         /// Check the return status code and content-type.
         /// </summary>
         [Theory]
-        [InlineData(Constants.LtiScopes.AgsScore, HttpStatusCode.OK, Constants.MediaTypes.Score)]
-        [InlineData(Constants.LtiScopes.AgsScoreReadonly, HttpStatusCode.OK, Constants.MediaTypes.Score)]
-        [InlineData(Constants.LtiScopes.NrpsMembershipReadonly, HttpStatusCode.Forbidden, "")]
+        [InlineData(Constants.LtiScopes.Ags.Score, HttpStatusCode.OK, Constants.MediaTypes.Score)]
+        [InlineData(Constants.LtiScopes.Ags.ScoreReadonly, HttpStatusCode.OK, Constants.MediaTypes.Score)]
+        [InlineData(Constants.LtiScopes.Nrps.MembershipReadonly, HttpStatusCode.Forbidden, "")]
         public async void ReturnScore_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);

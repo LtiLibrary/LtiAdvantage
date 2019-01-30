@@ -32,8 +32,8 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         /// Check the return status code and content-type.
         /// </summary>
         [Theory]
-        [InlineData(Constants.LtiScopes.AgsResultReadonly, HttpStatusCode.OK, Constants.MediaTypes.ResultContainer)]
-        [InlineData(Constants.LtiScopes.AgsLineItemReadonly, HttpStatusCode.Forbidden, "")]
+        [InlineData(Constants.LtiScopes.Ags.ResultReadonly, HttpStatusCode.OK, Constants.MediaTypes.ResultContainer)]
+        [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.Forbidden, "")]
         public async void ReturnResult_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);

@@ -51,8 +51,8 @@ namespace LtiAdvantage.AssignmentGradeServices
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.AgsResultReadonly)]
-        [Route("context/{contextId}/lineitems/{lineItemId}/results", Name = Constants.ServiceEndpoints.AgsResultsService)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Constants.LtiScopes.Ags.ResultReadonly)]
+        [Route("context/{contextId}/lineitems/{lineItemId}/results", Name = Constants.ServiceEndpoints.Ags.ResultsService)]
         [Route("context/{contextId}/lineitems/{lineItemId}/results.{format}")]
         public async Task<ActionResult<ResultContainer>> GetResultsAsync([Required] string contextId, [Required] string lineItemId, 
             [FromQuery(Name = "userId")] string userId = null, 

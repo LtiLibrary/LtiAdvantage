@@ -3331,6 +3331,13 @@
             Corresponds to the "sub" claim.
             </summary>
         </member>
+        <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.Lti11LegacyUserId">
+            <summary>
+            If the user id is changing with the migration to LTI 1.3, a platform should include the lti11_legacy_user_id
+            as an additional member attribute. It should contain the userId value from LTI 1.1 Names and Roles Provisioning
+            Service 1.0 for that same user.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.NamesRoleProvisioningService.MembershipContainer">
             <summary>
             Represents the results returned by the Membership service.

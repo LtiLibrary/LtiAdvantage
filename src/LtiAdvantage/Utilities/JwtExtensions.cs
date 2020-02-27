@@ -45,7 +45,7 @@ namespace LtiAdvantage.Utilities
                     : JsonConvert.DeserializeObject<T>(value.ToString());
             }
 
-            return default(T);
+            return default;
         }
 
         private static T GetClaimValues<T>(this JwtPayload payload, string type)
@@ -54,8 +54,11 @@ namespace LtiAdvantage.Utilities
                 .Where(c => c.Type == type)
                 .Select(c => c.Value).ToArray();
 
+            if (0 == values.Length)
+                return default;
+
             var elementType = typeof(T).GetElementType();
-            if (elementType != null && elementType.IsClass)
+            if (elementType != null && elementType.IsClass && !elementType.IsEquivalentTo(typeof(string)))
             {
                 return JsonConvert.DeserializeObject<T>("[" + string.Join(",", values) + "]");
             }

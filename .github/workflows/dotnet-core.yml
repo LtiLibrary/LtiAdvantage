@@ -16,10 +16,8 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 2.2
-    - name: Install dependencies
-      run: dotnet restore
+        dotnet-version: 2.2.402
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Release
     - name: Test
       run: dotnet test --configuration Release --results-directory artifacts --no-build

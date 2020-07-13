@@ -92,5 +92,13 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// </summary>
         [JsonProperty("user_id")]
         public string UserId { get; set; }
+
+        /// <summary>
+        /// If the user id is changing with the migration to LTI 1.3, a platform should include the lti11_legacy_user_id
+        /// as an additional member attribute. It should contain the userId value from LTI 1.1 Names and Roles Provisioning
+        /// Service 1.0 for that same user.
+        /// </summary>
+        [JsonProperty("lti11_legacy_user_id")]
+        public string Lti11LegacyUserId { get; set; }
     }
 }

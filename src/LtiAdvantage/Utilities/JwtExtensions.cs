@@ -54,8 +54,11 @@ namespace LtiAdvantage.Utilities
                 .Where(c => c.Type == type)
                 .Select(c => c.Value).ToArray();
 
+            if (0 == values.Length)
+                return default(T);
+
             var elementType = typeof(T).GetElementType();
-            if (elementType != null && elementType.IsClass)
+            if (elementType != null && elementType.IsClass && !elementType.IsEquivalentTo(typeof(string)))
             {
                 return JsonConvert.DeserializeObject<T>("[" + string.Join(",", values) + "]");
             }

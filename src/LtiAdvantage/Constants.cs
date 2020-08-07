@@ -248,7 +248,7 @@
             /// <summary>
             /// https://www.imsglobal.org/spec/lti-nrps/v2p0#membership-container-media-type
             /// </summary>
-            public const string MembershipContainer = "application/vnd.ims.lis.v2.membershipcontainer+json";
+            public const string MembershipContainer = "application/vnd.ims.lti-nrps.v2.membershipcontainer+json";
 
             /// <summary>
             /// https://www.imsglobal.org/spec/lti-ags/v2p0/#media-types-and-schemas

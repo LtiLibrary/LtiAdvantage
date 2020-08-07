@@ -25,7 +25,7 @@ jobs:
         dotnet-version: 2.2.402
         source-url: https://nuget.pkg.github.com/LtiLibrary/index.json
       env:
-        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        NUGET_AUTH_TOKEN: ${{secrets.NUGET_TOKEN}}
     - name: Build
       run: dotnet build --configuration Release
     - name: Test

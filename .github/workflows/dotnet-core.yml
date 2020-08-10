@@ -20,6 +20,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.2.402
+        source-url: https://nuget.pkg.github.com/LtiLibrary/index.json
     - name: Build
       run: dotnet build --configuration Release
     - name: Test

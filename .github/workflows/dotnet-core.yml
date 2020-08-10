@@ -24,6 +24,11 @@ jobs:
       run: dotnet build --configuration Release
     - name: Test
       run: dotnet test --configuration Release --results-directory artifacts --no-build  
+    - name: debug
+      run: | 
+        pwd
+        ls
+        ls src
     - name: Package
       if: github.event_name != 'pull_request'
       run: dotnet pack --configuration Release --no-build

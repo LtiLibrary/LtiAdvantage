@@ -6,6 +6,13 @@
 - [LtiAdvantage.IntegrationTests](https://github.com/andyfmiller/LtiAdvantage/tree/master/test/LtiAdvantage.IntegrationTests) integration tests.
 - [LtiAdvantage.UnitTests](https://github.com/andyfmiller/LtiAdvantage/tree/master/test/LtiAdvantage.UnitTests) unit tests.
 
+## NuGet
+| Library | Release | Prerelease |
+| --- | --- | --- |
+| LtiAdvantage | ![Nuget](https://img.shields.io/nuget/v/LtiAdvantage) | ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/LtiAdvantage) |
+| LtiAdvantage.IdentityModel | ![Nuget](https://img.shields.io/nuget/v/LtiAdvantage.IdentityModel) | ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/LtiAdvantage.IdentityModel) |
+| LtiAdvantage.IdentityServer4 | ![Nuget](https://img.shields.io/nuget/v/LtiAdvantage.IdentityServer4) |  ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/LtiAdvantage.IdentityServer4) |
+
 ## Build Status
 
 | CI | Env | Status |

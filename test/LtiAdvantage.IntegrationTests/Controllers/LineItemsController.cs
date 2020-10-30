@@ -8,7 +8,7 @@ namespace LtiAdvantage.IntegrationTests.Controllers
 {
     public class LineItemsController : LineItemsControllerBase
     {
-        public LineItemsController(IHostingEnvironment env, ILogger<LineItemsControllerBase> logger) : base(env, logger)
+        public LineItemsController(IWebHostEnvironment env, ILogger<LineItemsControllerBase> logger) : base(env, logger)
         {
         }
 

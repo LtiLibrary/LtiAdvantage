@@ -13,7 +13,7 @@ namespace LtiAdvantage.IntegrationTests
         {
             services.AddMvc()
                 .AddApplicationPart(typeof(LineItemsController).Assembly)
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                .AddNewtonsoftJson();
 
             services.AddAuthentication()
                 .AddScheme<TestAuthOptions, TestAuthHandler>(JwtBearerDefaults.AuthenticationScheme, options => { });
@@ -21,10 +21,17 @@ namespace LtiAdvantage.IntegrationTests
             services.AddLtiAdvantagePolicies();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseStaticFiles();
-            app.UseMvc();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    "default",
+                    "{controller}/{action=Index}/{id?}");
+            });
         }
     }
 }

@@ -45,6 +45,7 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
 
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);
             var response = await _client.PostAsync(ScoresUrl, scoreContent);
+            var responseContent = await response.Content.ReadAsStringAsync();
             Assert.Equal(statusCode, response.StatusCode);
             if (response.IsSuccessStatusCode)
             {

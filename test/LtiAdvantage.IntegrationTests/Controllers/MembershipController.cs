@@ -8,7 +8,7 @@ namespace LtiAdvantage.IntegrationTests.Controllers
 {
     public class MembershipController : MembershipControllerBase
     {
-        public MembershipController(IHostingEnvironment env, ILogger<MembershipControllerBase> logger) : base(env, logger)
+        public MembershipController(IWebHostEnvironment env, ILogger<MembershipControllerBase> logger) : base(env, logger)
         {
         }
 

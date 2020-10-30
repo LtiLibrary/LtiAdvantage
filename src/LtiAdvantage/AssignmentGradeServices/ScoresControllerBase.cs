@@ -1,11 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace LtiAdvantage.AssignmentGradeServices
@@ -19,12 +21,12 @@ namespace LtiAdvantage.AssignmentGradeServices
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public abstract class ScoresControllerBase : ControllerBase, IScoresController
     {
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
         private readonly ILogger<ScoresControllerBase> _logger;
 
         /// <summary>
         /// </summary>
-        protected ScoresControllerBase(IHostingEnvironment env, ILogger<ScoresControllerBase> logger)
+        protected ScoresControllerBase(IWebHostEnvironment env, ILogger<ScoresControllerBase> logger)
         {
             _env = env;
             _logger = logger;

@@ -8,7 +8,7 @@ namespace LtiAdvantage.IntegrationTests.Controllers
 {
     public class ScoresController : ScoresControllerBase
     {
-        public ScoresController(IHostingEnvironment env, ILogger<ScoresControllerBase> logger) : base(env, logger)
+        public ScoresController(IWebHostEnvironment env, ILogger<ScoresControllerBase> logger) : base(env, logger)
         {
         }
 

@@ -3,6 +3,9 @@ using LtiAdvantage.NamesRoleProvisioningService;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+#if NETCOREAPP2_1
+using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+#endif
 
 namespace LtiAdvantage.IntegrationTests.Controllers
 {

@@ -1,4 +1,4 @@
-﻿namespace LtiAdvantage.AssignmentGradeServices
+﻿namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
 {
     /// <summary>
     /// Represents a Get Score request.

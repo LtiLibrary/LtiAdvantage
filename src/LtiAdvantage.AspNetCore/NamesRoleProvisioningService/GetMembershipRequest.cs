@@ -1,7 +1,7 @@
 ﻿using System;
 using LtiAdvantage.Lti;
 
-namespace LtiAdvantage.NamesRoleProvisioningService
+namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
 {
     /// <summary>
     /// Represents a GetMembership request.

@@ -1,4 +1,4 @@
-﻿namespace LtiAdvantage.NamesRoleProvisioningService
+﻿namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
 {
     /// <summary>
     /// Marker for ILogger dependency injection.

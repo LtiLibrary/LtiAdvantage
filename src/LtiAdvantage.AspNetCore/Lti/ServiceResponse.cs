@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace LtiAdvantage.Lti
+namespace LtiAdvantage.AspNetCore.Lti
 {
     /// <summary>
     /// Represents an LTI service response.

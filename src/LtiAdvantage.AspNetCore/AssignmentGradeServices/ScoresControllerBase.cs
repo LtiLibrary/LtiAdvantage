@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using LtiAdvantage.AssignmentGradeServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -13,7 +14,7 @@ using Microsoft.Extensions.Logging;
 using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 #endif
 
-namespace LtiAdvantage.AssignmentGradeServices
+namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
 {
     /// <inheritdoc cref="ControllerBase" />
     /// <summary>

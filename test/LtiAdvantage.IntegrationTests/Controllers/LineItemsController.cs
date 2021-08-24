@@ -3,12 +3,15 @@ using LtiAdvantage.AssignmentGradeServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+#if NETCOREAPP2_1
+using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+#endif
 
 namespace LtiAdvantage.IntegrationTests.Controllers
 {
     public class LineItemsController : LineItemsControllerBase
     {
-        public LineItemsController(IHostingEnvironment env, ILogger<LineItemsControllerBase> logger) : base(env, logger)
+        public LineItemsController(IWebHostEnvironment env, ILogger<LineItemsControllerBase> logger) : base(env, logger)
         {
         }
 

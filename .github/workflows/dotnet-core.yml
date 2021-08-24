@@ -14,10 +14,14 @@ jobs:
         git fetch --prune --unshallow
     - name: Build Reason
       run: "echo ref: ${{github.ref}} event: ${{github.event_name}}"
+    - name: Setup .NET Core 2.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.1.811
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 2.2.402
+        dotnet-version: 3.1.403
         source-url: https://nuget.pkg.github.com/LtiLibrary/index.json
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

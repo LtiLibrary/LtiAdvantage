@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
+#if NETSTANDARD2_0
+using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+#endif
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
@@ -19,12 +23,12 @@ namespace LtiAdvantage.AssignmentGradeServices
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public abstract class LineItemsControllerBase : ControllerBase, ILineItemsController
     {
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
         private readonly ILogger<LineItemsControllerBase> _logger;
 
         /// <summary>
         /// </summary>
-        protected LineItemsControllerBase(IHostingEnvironment env, ILogger<LineItemsControllerBase> logger)
+        protected LineItemsControllerBase(IWebHostEnvironment env, ILogger<LineItemsControllerBase> logger)
         {
             _env = env;
             _logger = logger;

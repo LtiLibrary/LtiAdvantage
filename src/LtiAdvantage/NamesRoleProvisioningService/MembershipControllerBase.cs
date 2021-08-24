@@ -8,6 +8,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
+#if NETSTANDARD2_0
+using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+#endif
 
 namespace LtiAdvantage.NamesRoleProvisioningService
 {
@@ -20,12 +24,12 @@ namespace LtiAdvantage.NamesRoleProvisioningService
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public abstract class MembershipControllerBase : ControllerBase, IMembershipController
     {
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
         private readonly ILogger<MembershipControllerBase> _logger;
 
         /// <summary>
         /// </summary>
-        protected MembershipControllerBase(IHostingEnvironment env, ILogger<MembershipControllerBase> logger)
+        protected MembershipControllerBase(IWebHostEnvironment env, ILogger<MembershipControllerBase> logger)
         {
             _env = env;
             _logger = logger;

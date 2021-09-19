@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C53CA168-7453-4035-8AB3-79781B00A4A4}"
 	ProjectSection(SolutionItems) = preProject
@@ -20,6 +20,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage.UnitTests", "test\LtiAdvantage.UnitTests\LtiAdvantage.UnitTests.csproj", "{02187DC7-C6DD-4ACF-AFE0-45C4AAD6E1E0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage.IntegrationTests", "test\LtiAdvantage.IntegrationTests\LtiAdvantage.IntegrationTests.csproj", "{E882044C-C801-4F6F-8D2F-5E32693A8816}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage.AspNetCore", "src\LtiAdvantage.AspNetCore\LtiAdvantage.AspNetCore.csproj", "{112A459B-1848-4BE3-B113-6CE22C38CC7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{E882044C-C801-4F6F-8D2F-5E32693A8816}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E882044C-C801-4F6F-8D2F-5E32693A8816}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E882044C-C801-4F6F-8D2F-5E32693A8816}.Release|Any CPU.Build.0 = Release|Any CPU
+		{112A459B-1848-4BE3-B113-6CE22C38CC7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{112A459B-1848-4BE3-B113-6CE22C38CC7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{112A459B-1848-4BE3-B113-6CE22C38CC7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{112A459B-1848-4BE3-B113-6CE22C38CC7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

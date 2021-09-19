@@ -1,18 +1,17 @@
-﻿namespace LtiAdvantage.AssignmentGradeServices
+﻿namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
 {
     /// <summary>
-    /// Represents a create score request.
+    /// Represents a GetLineItem request.
     /// </summary>
-    public class AddScoreRequest
+    public class GetLineItemRequest
     {
         /// <summary>
         /// Initialize a new instance of the class.
         /// </summary>
-        public AddScoreRequest(string contextId, string lineItemId, Score score)
+        public GetLineItemRequest(string contextId, string lineItemId)
         {
             ContextId = contextId;
             LineItemId = lineItemId;
-            Score = score;
         }
 
         /// <summary>
@@ -24,10 +23,5 @@
         /// Get or set the line item Id.
         /// </summary>
         public string LineItemId { get; }
-
-        /// <summary>
-        /// The score.
-        /// </summary>
-        public Score Score { get; set; }
     }
 }

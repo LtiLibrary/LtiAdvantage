@@ -1,5 +1,5 @@
 ﻿using System;
-using LtiAdvantage.Utilities;
+using LtiAdvantage.AspNetCore.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 

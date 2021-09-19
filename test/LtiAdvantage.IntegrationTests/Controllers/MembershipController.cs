@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using LtiAdvantage.AspNetCore.NamesRoleProvisioningService;
 using LtiAdvantage.NamesRoleProvisioningService;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;

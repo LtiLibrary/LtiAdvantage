@@ -1,4 +1,6 @@
-﻿namespace LtiAdvantage.AssignmentGradeServices
+﻿using LtiAdvantage.AssignmentGradeServices;
+
+namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
 {
     /// <summary>
     /// Represents an update line item request.

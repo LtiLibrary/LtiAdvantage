@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>.NET Core library with IMS LTIAdvantage support for Tool Consumer and Tool Provider applications.</Description>
-    <AssemblyTitle>LtiAdvantage</AssemblyTitle>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>LtiAdvantage</AssemblyName>
-    <PackageId>LtiAdvantage</PackageId>
+    <Description>ASP.NET Core library with IMS LTIAdvantage support for Tool Consumer and Tool Provider applications.</Description>
+    <AssemblyTitle>LtiAdvantage.AspNetCore</AssemblyTitle>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
+    <AssemblyName>LtiAdvantage.AspNetCore</AssemblyName>
+    <PackageId>LtiAdvantage.AspNetCore</PackageId>
     <PackageTags>IMS;LTI;LTIAdvantage;.NET Core</PackageTags>
     <PackageProjectUrl>https://github.com/LtiLibrary/LtiAdvantage</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/LtiLibrary/LtiAdvantage/blob/master/LICENSE</PackageLicenseUrl>
@@ -15,20 +15,18 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)LtiAdvantage.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)LtiAdvantage.AspNetCore.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)LtiAdvantage.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)LtiAdvantage.AspNetCore.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BouncyCastle.NetCore" Version="1.8.3" />
     <PackageReference Include="MinVer" Version="2.3.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
@@ -39,12 +37,14 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.3.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.19" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LtiAdvantage\LtiAdvantage.csproj" />
   </ItemGroup>
 
 </Project>

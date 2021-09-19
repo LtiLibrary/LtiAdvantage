@@ -160,6 +160,95 @@
             </summary>
             <param name="lineItems"></param>
         </member>
+        <member name="T:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase">
+            <inheritdoc cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
+            <summary>
+            Implements the Assignment and Grade Services line items endpoint.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase})">
+            <summary>
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.OnAddLineItemAsync(LtiAdvantage.AssignmentGradeServices.AddLineItemRequest)">
+            <summary>
+            Add a line item to the context.
+            </summary>
+            <param name="request">The request parameters.</param>
+            <returns>The line item.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.OnDeleteLineItemAsync(LtiAdvantage.AssignmentGradeServices.DeleteLineItemRequest)">
+            <summary>
+            Deletes a line item.
+            </summary>
+            <param name="request">The request parameters.</param>
+            <returns>The result.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.OnGetLineItemAsync(LtiAdvantage.AssignmentGradeServices.GetLineItemRequest)">
+            <summary>
+            Get a line item.
+            </summary>
+            <param name="request">The request parameters.</param>
+            <returns>The line item.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.OnGetLineItemsAsync(LtiAdvantage.AssignmentGradeServices.GetLineItemsRequest)">
+            <summary>
+            Get the line items for a context.
+            </summary>
+            <param name="request">The request parameters.</param>
+            <returns>The line items.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.OnUpdateLineItemAsync(LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest)">
+            <summary>
+            Updates a line item.
+            </summary>
+            <param name="request">The request parameters.</param>
+            <returns>The result.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.AddLineItemAsync(System.String,LtiAdvantage.AssignmentGradeServices.LineItem)">
+            <summary>
+            Adds a line item to a context.
+            </summary>
+            <param name="contextId">The context id.</param>
+            <param name="lineItem">The line item to add.</param>
+            <returns>The line item added.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.DeleteLineItemAsync(System.String,System.String)">
+            <summary>
+            Deletes a line item.
+            </summary>
+            <param name="contextId">The context id.</param>
+            <param name="lineItemId">The line item id.</param>
+            <returns>The result.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.GetLineItemAsync(System.String,System.String)">
+            <summary>
+            Returns a line item.
+            </summary>
+            <param name="contextId">The context id.</param>
+            <param name="lineItemId">The line item id.</param>
+            <returns>The line item.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.GetLineItemsAsync(System.String,System.String,System.String,System.String,System.Nullable{System.Int32})">
+            <summary>
+            Returns the line items in a context.
+            </summary>
+            <param name="contextId">The context id.</param>
+            <param name="resourceLinkId">Optional resource link id filter.</param>
+            <param name="resourceId">Optional resource id filter.</param>
+            <param name="tag">Optional tag filter.</param>
+            <param name="limit">Optional limit on number of line items to return.</param>
+            <returns>The line items.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.LineItemsControllerBase.UpdateLineItemAsync(System.String,System.String,LtiAdvantage.AssignmentGradeServices.LineItem)">
+            <summary>
+            Updates a line item.
+            </summary>
+            <param name="contextId">The context id.</param>
+            <param name="lineItemId">The line item id.</param>
+            <param name="lineItem">The updated line item.</param>
+            <returns>The result.</returns>
+        </member>
         <member name="T:LtiAdvantage.AssignmentGradeServices.Result">
             <summary>
             The score result for a single line item and user.
@@ -219,6 +308,33 @@
             </summary>
             <param name="results"></param>
         </member>
+        <member name="T:LtiAdvantage.AssignmentGradeServices.ResultsControllerBase">
+            <inheritdoc cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
+            <summary>
+            Implements the Assignment and Grade Services results endpoint.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ResultsControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AssignmentGradeServices.ResultsControllerBase})">
+            <summary>
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ResultsControllerBase.OnGetResultsAsync(LtiAdvantage.AssignmentGradeServices.GetResultsRequest)">
+            <summary>
+            Returns the results for a line item.
+            </summary>
+            <param name="request">The request parameters.</param>
+            <returns>The results.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ResultsControllerBase.GetResultsAsync(System.String,System.String,System.String,System.Nullable{System.Int32})">
+            <summary>
+            Returns the results for a lineitem.
+            </summary>
+            <param name="contextId">The context id.</param>
+            <param name="lineItemId">The line item id.</param>
+            <param name="userId">Optional user id filter.</param>
+            <param name="limit">Optional limit to the number of results returned.</param>
+            <returns>The results.</returns>
+        </member>
         <member name="T:LtiAdvantage.AssignmentGradeServices.Score">
             <summary>
             Represents a score.
@@ -257,6 +373,76 @@
         <member name="P:LtiAdvantage.AssignmentGradeServices.Score.UserId">
             <summary>
             The user id.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase">
+            <inheritdoc cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
+            <summary>
+            Implements the Assignment and Grade Services score publish service endpoint.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AssignmentGradeServices.ScoresControllerBase})">
+            <summary>
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase.OnAddScoreAsync(LtiAdvantage.AssignmentGradeServices.AddScoreRequest)">
+            <summary>
+            Add a score to the line item.
+            </summary>
+            <param name="request">The request parameters.</param>
+            <returns></returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase.OnGetScoreAsync(LtiAdvantage.AssignmentGradeServices.GetScoreRequest)">
+            <summary>
+            Returns a score.
+            </summary>
+            <param name="request">The request parameters.</param>
+            <returns></returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase.AddScoreAsync(System.String,System.String,LtiAdvantage.AssignmentGradeServices.Score)">
+            <summary>
+            Adds a score to a line item.
+            </summary>
+            <param name="contextId">The context id.</param>
+            <param name="lineItemId">The line item id.</param>
+            <param name="score">The score to add.</param>
+            <returns>The new score.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.ScoresControllerBase.GetScoreAsync(System.String,System.String,System.String)">
+            <summary>
+            Returns a score.
+            </summary>
+            <remarks>
+            This is not part of the Assignment and Grades Services spec.
+            </remarks>
+            <param name="contextId">The context id.</param>
+            <param name="lineItemId">The line item id.</param>
+            <param name="scoreId">The score id.</param>
+            <returns>The score.</returns>
+        </member>
+        <member name="T:LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest">
+            <summary>
+            Represents an update line item request.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest.#ctor(System.String,System.String,LtiAdvantage.AssignmentGradeServices.LineItem)">
+            <summary>
+            Initialize a new instance of the class.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest.ContextId">
+            <summary>
+            Get or set the context id.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest.LineItem">
+            <summary>
+            Get or set the line item.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.AssignmentGradeServices.UpdateLineItemRequest.LineItemId">
+            <summary>
+            Get or set the line item id.
             </summary>
         </member>
         <member name="T:LtiAdvantage.Constants">
@@ -2893,6 +3079,31 @@
             <summary>
             The list of members in the specified context.
             </summary>
+        </member>
+        <member name="T:LtiAdvantage.NamesRoleProvisioningService.MembershipControllerBase">
+            <inheritdoc cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
+            <summary>
+            Implements the Names and Role Provisioning Service membership endpoint.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.NamesRoleProvisioningService.MembershipControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.NamesRoleProvisioningService.MembershipControllerBase})">
+            <summary>
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.NamesRoleProvisioningService.MembershipControllerBase.OnGetMembershipAsync(LtiAdvantage.NamesRoleProvisioningService.GetMembershipRequest)">
+            <summary>
+            Returns the membership.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.NamesRoleProvisioningService.MembershipControllerBase.GetMembershipAsync(System.String,System.Nullable{System.Int32},System.String,System.Nullable{LtiAdvantage.Lti.Role})">
+            <summary>
+            Returns the membership of a context.
+            </summary>
+            <param name="contextId">The context id.</param>
+            <param name="limit">Optional limit to the number of members to return.</param>
+            <param name="rlid">Optional resource link filter for members with access to resource link.</param>
+            <param name="role">Optional role filter for members that have the specified role.</param>
+            <returns>The members.</returns>
         </member>
         <member name="T:LtiAdvantage.NamesRoleProvisioningService.MemberStatus">
             <summary>

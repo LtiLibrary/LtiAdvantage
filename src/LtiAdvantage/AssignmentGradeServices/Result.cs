@@ -34,7 +34,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// The line item result.
         /// </summary>
         [JsonProperty("resultScore")]
-        public double ResultScore { get; set; }
+        public double? ResultScore { get; set; }
 
         /// <summary>
         /// The line item.

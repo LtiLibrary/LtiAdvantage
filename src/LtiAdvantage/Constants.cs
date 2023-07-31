@@ -132,10 +132,15 @@
             public const string Log = "https://purl.imsglobal.org/spec/lti-dl/claim/log";
 
             /// <summary>
-            /// User ID as defined in LTI 1.1.
+            /// Obsolete: LTI 1.1 migration mapping.
             /// </summary>
             public const string Lti11LegacyUserId = "https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id";
-            
+
+            /// <summary>
+            /// Optional LTI 1.1 migration mapping.
+            /// </summary>
+            public const string LtiMigration = "https://purl.imsglobal.org/spec/lti/claim/lti1p1";
+
             /// <summary>
             /// Optional plain text message.
             /// </summary>

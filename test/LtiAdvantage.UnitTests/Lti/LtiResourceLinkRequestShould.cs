@@ -23,7 +23,6 @@ namespace LtiAdvantage.UnitTests.Lti
                     Id = "12345"
                 },
                 UserId = "12345",
-                Lti11LegacyUserId = "12345",
                 Roles = new[]{Role.ContextInstructor, Role.InstitutionInstructor}
             };
 
@@ -46,9 +45,6 @@ namespace LtiAdvantage.UnitTests.Lti
 
             Assert.True(request.TryGetValue("sub", out var sub));
             Assert.Equal("12345", sub);
-
-            Assert.True(request.TryGetValue("https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id", out var legacyUserId));
-            Assert.Equal("12345", legacyUserId);
 
             Assert.True(request.TryGetValue("https://purl.imsglobal.org/spec/lti/claim/roles", out var rolesJson));
             var roles = ((JArray) rolesJson).ToObject<string[]>();

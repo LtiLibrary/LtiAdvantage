@@ -14,7 +14,6 @@
   "email": "jane@platform.example.edu",
   "locale": "en-US",
   "https://purl.imsglobal.org/spec/lti/claim/deployment_id": "07940580-b309-415e-a37c-914d387c1150",
-  "https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id": "a6d5c443-1f51-4783-ba1a-7686ffe3b54a",
   "https://purl.imsglobal.org/spec/lti/claim/message_type": "LtiResourceLinkRequest",
   "https://purl.imsglobal.org/spec/lti/claim/version": "1.3.0",
   "https://purl.imsglobal.org/spec/lti/claim/roles": [
@@ -39,7 +38,7 @@
     "title": "Introduction Assignment"
   },
   "https://purl.imsglobal.org/spec/lti/claim/tool_platform": {
-    "guid": "https://platform.example.edu",
+    "guid": "ex/48bbb541-ce55-456e-8b7d-ebc59a38d435",
     "contact_email": "support@platform.example.edu",
     "description": "An Example Tool Platform",
     "name": "Example Tool Platform",
@@ -47,6 +46,7 @@
     "product_family_code": "ExamplePlatformVendor-Product",
     "version": "1.0"
   },
+  "https://purl.imsglobal.org/spec/lti/claim/target_link_uri": "https://tool.example.com/lti/48320/ruix8782rs",
   "https://purl.imsglobal.org/spec/lti/claim/launch_presentation": {
     "document_target": "iframe",
     "height": 320,

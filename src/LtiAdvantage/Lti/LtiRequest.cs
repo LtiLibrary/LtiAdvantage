@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using LtiAdvantage.Utilities;
@@ -57,7 +58,7 @@ namespace LtiAdvantage.Lti
         public string[] Audiences
         {
             get { return this.GetClaimValue<string[]>(JwtRegisteredClaimNames.Aud); }
-            set { this.SetClaimValue(JwtRegisteredClaimNames.Aud, value);}
+            set { this.SetClaimValue(JwtRegisteredClaimNames.Aud, value); }
         }
 
         /// <summary>
@@ -71,8 +72,9 @@ namespace LtiAdvantage.Lti
         }
 
         /// <summary>
-        /// User ID as defined in LTI 1.1.
+        /// Obsolete: User ID as defined in LTI 1.1.
         /// </summary>
+        [Obsolete("This claim has been removed from the current LTI spec. Use Lti11 migration claim instead.", false)]
         public string Lti11LegacyUserId
         {
             get { return this.GetClaimValue(Constants.LtiClaims.Lti11LegacyUserId); }
@@ -113,12 +115,12 @@ namespace LtiAdvantage.Lti
         }
 
         /// <summary>
-        /// The tool's url.
+        /// The tool's URL.
         /// </summary>
         public string TargetLinkUri
         {
             get { return this.GetClaimValue(Constants.LtiClaims.TargetLinkUri); }
-            set { this.SetClaimValue(Constants.LtiClaims.TargetLinkUri, value);}
+            set { this.SetClaimValue(Constants.LtiClaims.TargetLinkUri, value); }
         }
 
         /// <summary>
@@ -179,7 +181,16 @@ namespace LtiAdvantage.Lti
         public LisClaimValueType Lis
         {
             get { return this.GetClaimValue<LisClaimValueType>(Constants.LtiClaims.Lis); }
-            set { this.SetClaimValue(Constants.LtiClaims.Lis, value);}
+            set { this.SetClaimValue(Constants.LtiClaims.Lis, value); }
+        }
+
+        /// <summary>
+        /// A mapping of ids that have shifted with the transition to LTI 1.3.
+        /// </summary>
+        public LtiMigrationClaimValueType Lti11
+        {
+            get { return this.GetClaimValue<LtiMigrationClaimValueType>(Constants.LtiClaims.LtiMigration); }
+            set { this.SetClaimValue(Constants.LtiClaims.LtiMigration, value); }
         }
 
         /// <summary>

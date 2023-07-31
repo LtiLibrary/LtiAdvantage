@@ -388,9 +388,9 @@
             Optional plain text message.
             </summary>
         </member>
-        <member name="F:LtiAdvantage.Constants.LtiClaims.Lti11LegacyUserId">
+        <member name="F:LtiAdvantage.Constants.LtiClaims.LtiMigration">
             <summary>
-            User ID as defined in LTI 1.1.
+            Optional LTI 1.1 migration mapping.
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.Message">
@@ -2357,6 +2357,43 @@
             <summary>
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Lti.LtiMigrationClaimValueType">
+            <summary>
+            A mapping of ids that have shifted with the transition to LTI 1.3, 
+            allowing the tool to associate existing records to new LTI 1.3 identifiers.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiMigrationClaimValueType.OAuthConsumerKey">
+            <summary>
+            LTI 1.1 OAuth consumer key.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiMigrationClaimValueType.OAuthConsumerKeySignature">
+            <summary>
+            A signature for validating the <see cref="P:LtiAdvantage.Lti.LtiMigrationClaimValueType.OAuthConsumerKey"/> to allow
+            the tool to automate a migration.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiMigrationClaimValueType.UserId">
+            <summary>
+            LTI 1.1 user ID value associated with the end-user.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiMigrationClaimValueType.ContextId">
+            <summary>
+            LTI 1.1 context ID.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiMigrationClaimValueType.ToolConsumerInstanceGuid">
+            <summary>
+            LTI 1.1 tool consumer instance GUID.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiMigrationClaimValueType.ResourceLinkId">
+            <summary>
+            LTI 1.1 resource link ID.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.Lti.LtiRequest">
             <inheritdoc />
             <summary>
@@ -2398,11 +2435,6 @@
             contains a string that identifies the platform-tool integration governing the message.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.Lti.LtiRequest.Lti11LegacyUserId">
-            <summary>
-            User ID as defined in LTI 1.1.
-            </summary>
-        </member>
         <member name="P:LtiAdvantage.Lti.LtiRequest.MessageType">
             <summary>
             The type of LTI message.
@@ -2426,7 +2458,7 @@
         </member>
         <member name="P:LtiAdvantage.Lti.LtiRequest.TargetLinkUri">
             <summary>
-            The tool's url.
+            The tool's URL.
             </summary>
         </member>
         <member name="P:LtiAdvantage.Lti.LtiRequest.UserId">
@@ -2460,6 +2492,11 @@
             <summary>
             Properties about available Learning Information Services (LIS),
             usually originating from the Student Information System.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiRequest.Lti11">
+            <summary>
+            A mapping of ids that have shifted with the transition to LTI 1.3.
             </summary>
         </member>
         <member name="P:LtiAdvantage.Lti.LtiRequest.Platform">

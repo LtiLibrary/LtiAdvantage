@@ -30,6 +30,8 @@ jobs:
         source-url: ${{ env.NUGET_SOURCE_URL }}
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    - name: Restore
+      run: dotnet restore --configuration Release --framework net${{ matrix.dotnet-version }}
     - name: Build
       run: dotnet build --configuration Release --framework net${{ matrix.dotnet-version }}
     - name: Test

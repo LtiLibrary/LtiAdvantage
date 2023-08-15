@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        dotnet-version: ['6.0', '7.0']
+        dotnet-version: ['7.0']
     env:
       NUGET_SOURCE_URL: https://nuget.pkg.github.com/LtiLibrary/index.json
     steps:
@@ -30,12 +30,10 @@ jobs:
         source-url: ${{ env.NUGET_SOURCE_URL }}
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-    - name: Restore
-      run: dotnet restore --framework net${{ matrix.dotnet-version }}
     - name: Build
-      run: dotnet build --configuration Release --framework net${{ matrix.dotnet-version }}
+      run: dotnet build --configuration Release
     - name: Test
-      run: dotnet test --configuration Release --results-directory artifacts --no-build --framework net${{ matrix.dotnet-version }}
+      run: dotnet test --configuration Release --results-directory artifacts --no-build
     - name: Package
       if: github.event_name != 'pull_request'
       run: dotnet pack --configuration Release --no-build

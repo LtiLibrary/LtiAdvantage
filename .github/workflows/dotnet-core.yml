@@ -31,9 +31,9 @@ jobs:
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
     - name: Build
-      run: dotnet build --configuration Release
+      run: dotnet build --configuration Release --framework net${{ matrix.dotnet-version }}
     - name: Test
-      run: dotnet test --configuration Release --results-directory artifacts --no-build  
+      run: dotnet test --configuration Release --results-directory artifacts --no-build --framework net${{ matrix.dotnet-version }}
     - name: Package
       if: github.event_name != 'pull_request'
       run: dotnet pack --configuration Release --no-build

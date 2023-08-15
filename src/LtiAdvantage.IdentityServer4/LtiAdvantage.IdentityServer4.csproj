@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>.NET Core library with IMS LTIAdvantage support for Tool Consumer and Tool Provider applications.</Description>
@@ -15,9 +15,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BouncyCastle.NetCore" Version="1.8.3" />
+    <PackageReference Include="BouncyCastle.NetCore" Version="1.9.0" />
     <PackageReference Include="IdentityServer4" Version="2.3.2" />
-    <PackageReference Include="MinVer" Version="2.3.0">
+    <PackageReference Include="MinVer" Version="4.3.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

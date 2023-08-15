@@ -31,7 +31,7 @@ jobs:
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
     - name: Restore
-      run: dotnet restore --configuration Release --framework net${{ matrix.dotnet-version }}
+      run: dotnet restore --framework net${{ matrix.dotnet-version }}
     - name: Build
       run: dotnet build --configuration Release --framework net${{ matrix.dotnet-version }}
     - name: Test

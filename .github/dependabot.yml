@@ -4,23 +4,15 @@ updates:
     directory: "/src/LtiAdvantage.AspNetCore"
     schedule:
       interval: "weekly"
-    group:
-      name: "all"
   - package-ecosystem: "nuget"
     directory: "/src/LtiAdvantage.IdentityModel"
     schedule:
       interval: "weekly"
-    group:
-      name: "all"
   - package-ecosystem: "nuget"
     directory: "/src/LtiAdvantage.IdentityServer4"
     schedule:
       interval: "weekly"
-    group:
-      name: "all"
   - package-ecosystem: "nuget"
     directory: "/src/LtiAdvantage"
     schedule:
       interval: "weekly"
-    group:
-      name: "all"

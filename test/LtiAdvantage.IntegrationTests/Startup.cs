@@ -27,7 +27,7 @@ namespace LtiAdvantage.IntegrationTests
             services.AddLtiAdvantagePolicies();
         }
 
-#if NET6_0
+#if NET6_0_OR_GREATER
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseStaticFiles();

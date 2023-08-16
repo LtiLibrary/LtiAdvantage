@@ -203,7 +203,7 @@
             Implements the Assignment and Grade Services line items endpoint.
             </summary>
         </member>
-        <member name="M:LtiAdvantage.AspNetCore.AssignmentGradeServices.LineItemsControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.AssignmentGradeServices.LineItemsControllerBase})">
+        <member name="M:LtiAdvantage.AspNetCore.AssignmentGradeServices.LineItemsControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.AssignmentGradeServices.LineItemsControllerBase})">
             <summary>
             </summary>
         </member>
@@ -292,7 +292,7 @@
             Implements the Assignment and Grade Services results endpoint.
             </summary>
         </member>
-        <member name="M:LtiAdvantage.AspNetCore.AssignmentGradeServices.ResultsControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.AssignmentGradeServices.ResultsControllerBase})">
+        <member name="M:LtiAdvantage.AspNetCore.AssignmentGradeServices.ResultsControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.AssignmentGradeServices.ResultsControllerBase})">
             <summary>
             </summary>
         </member>
@@ -319,7 +319,7 @@
             Implements the Assignment and Grade Services score publish service endpoint.
             </summary>
         </member>
-        <member name="M:LtiAdvantage.AspNetCore.AssignmentGradeServices.ScoresControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.AssignmentGradeServices.ScoresControllerBase})">
+        <member name="M:LtiAdvantage.AspNetCore.AssignmentGradeServices.ScoresControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.AssignmentGradeServices.ScoresControllerBase})">
             <summary>
             </summary>
         </member>
@@ -475,7 +475,7 @@
             Implements the Names and Role Provisioning Service membership endpoint.
             </summary>
         </member>
-        <member name="M:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.MembershipControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.NamesRoleProvisioningService.MembershipControllerBase})">
+        <member name="M:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.MembershipControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.NamesRoleProvisioningService.MembershipControllerBase})">
             <summary>
             </summary>
         </member>

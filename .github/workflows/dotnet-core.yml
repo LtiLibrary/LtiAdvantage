@@ -15,7 +15,7 @@ jobs:
       GITHUB_NUGET_SOURCE_URL: https://nuget.pkg.github.com/LtiLibrary/index.json
       NUGET_SOURCE_URL: https://api.nuget.org/v3/index.json
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Fetch tags
       run: |
         git fetch origin +refs/tags/*:refs/tags/*
@@ -23,11 +23,11 @@ jobs:
     - name: Build Reason
       run: "echo ref: ${{github.ref}} event: ${{github.event_name}}"
     - name: Setup .NET 6.0
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '6.0'
     - name: Setup .NET 7.0
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '7.0'
     - name: Build

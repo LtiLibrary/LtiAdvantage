@@ -33,7 +33,8 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release
     - name: Test
-      run: 'dotnet test --configuration Release --results-directory artifacts --no-build --logger "trx;LogFileName=test-results.trx"'
+      run: |
+        dotnet test --configuration Release --results-directory artifacts --no-build --logger "trx;LogFileName=test-results.trx"
     - uses: actions/upload-artifact@v2  # upload test results
         if: success() || failure()        # run this step even if previous step failed
         with:

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
@@ -34,7 +35,7 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         [Theory]
         [InlineData(Constants.LtiScopes.Ags.ResultReadonly, HttpStatusCode.OK, Constants.MediaTypes.ResultContainer)]
         [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.Forbidden, "")]
-        public async void ReturnResult_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
+        public async Task ReturnResult_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);
             var response = await _client.GetAsync(ResultsUrl);

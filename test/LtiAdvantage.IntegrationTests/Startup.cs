@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-#if NET6_0
+#if NET6_0_OR_GREATER
 using Microsoft.Extensions.Hosting;
 #endif
 
@@ -16,7 +16,7 @@ namespace LtiAdvantage.IntegrationTests
         {
             services.AddMvc()
                 .AddApplicationPart(typeof(LineItemsController).Assembly)
-#if NET6_0
+#if NET6_0_OR_GREATER
                 .AddNewtonsoftJson();
 #else
                 ;

@@ -39,7 +39,7 @@ jobs:
       if: success() || failure()        # run this step even if previous step failed
       with:
         name: test-results
-        path: '*.trx'
+        path: 'test/**/*.trx'
     - name: Package
       if: github.event_name != 'pull_request'
       run: dotnet pack --configuration Release --no-build

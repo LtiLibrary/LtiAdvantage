@@ -388,6 +388,11 @@
             Optional plain text message.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.Lti11LegacyUserId">
+            <summary>
+            Obsolete: LTI 1.1 migration mapping.
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.LtiMigration">
             <summary>
             Optional LTI 1.1 migration mapping.
@@ -2433,6 +2438,11 @@
             <summary>
             The required https://purl.imsglobal.org/spec/lti/claim/deployment_id claim's value
             contains a string that identifies the platform-tool integration governing the message.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiRequest.Lti11LegacyUserId">
+            <summary>
+            Obsolete: User ID as defined in LTI 1.1.
             </summary>
         </member>
         <member name="P:LtiAdvantage.Lti.LtiRequest.MessageType">

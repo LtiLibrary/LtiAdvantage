@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using LtiAdvantage.AssignmentGradeServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -38,7 +39,7 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         [Theory]
         [InlineData(Constants.LtiScopes.Ags.Score, HttpStatusCode.OK, Constants.MediaTypes.Score)]
         [InlineData(Constants.LtiScopes.Ags.ScoreReadonly, HttpStatusCode.Forbidden, "")]
-        public async void AddScore_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
+        public async Task AddScore_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
             var scoreContent = new StringContent(JsonConvert.SerializeObject(new Score()),
                 Encoding.UTF8, Constants.MediaTypes.Score);
@@ -59,7 +60,7 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         [InlineData(Constants.LtiScopes.Ags.Score, HttpStatusCode.OK, Constants.MediaTypes.Score)]
         [InlineData(Constants.LtiScopes.Ags.ScoreReadonly, HttpStatusCode.OK, Constants.MediaTypes.Score)]
         [InlineData(Constants.LtiScopes.Nrps.MembershipReadonly, HttpStatusCode.Forbidden, "")]
-        public async void ReturnScore_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
+        public async Task ReturnScore_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);
             var response = await _client.GetAsync(ScoreUrl);

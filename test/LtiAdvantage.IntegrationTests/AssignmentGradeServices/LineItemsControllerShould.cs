@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using LtiAdvantage.AssignmentGradeServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -38,7 +39,7 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         [Theory]
         [InlineData(Constants.LtiScopes.Ags.LineItem, HttpStatusCode.OK, Constants.MediaTypes.LineItem)]
         [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.Forbidden, "")]
-        public async void AddLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
+        public async Task AddLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
             var lineItemContent = new StringContent(JsonConvert.SerializeObject(new LineItem()),
                 Encoding.UTF8, Constants.MediaTypes.LineItem);
@@ -58,7 +59,7 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         [Theory]
         [InlineData(Constants.LtiScopes.Ags.LineItem, HttpStatusCode.OK)]
         [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.Forbidden)]
-        public async void DeleteLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode)
+        public async Task DeleteLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode)
         {
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);
             var response = await _client.DeleteAsync(LineItemUrl);
@@ -72,7 +73,7 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         [InlineData(Constants.LtiScopes.Ags.LineItem, HttpStatusCode.OK, Constants.MediaTypes.LineItem)]
         [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.OK, Constants.MediaTypes.LineItem)]
         [InlineData(Constants.LtiScopes.Nrps.MembershipReadonly, HttpStatusCode.Forbidden, "")]
-        public async void ReturnLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
+        public async Task ReturnLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);
             var response = await _client.GetAsync(LineItemUrl);
@@ -90,7 +91,7 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         [InlineData(Constants.LtiScopes.Ags.LineItem, HttpStatusCode.OK, Constants.MediaTypes.LineItemContainer)]
         [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.OK, Constants.MediaTypes.LineItemContainer)]
         [InlineData(Constants.LtiScopes.Nrps.MembershipReadonly, HttpStatusCode.Forbidden, "")]
-        public async void ReturnLineItems_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
+        public async Task ReturnLineItems_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);
             var response = await _client.GetAsync(LineItemsUrl);
@@ -107,7 +108,7 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         [Theory]
         [InlineData(Constants.LtiScopes.Ags.LineItem, HttpStatusCode.OK)]
         [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.Forbidden)]
-        public async void UpdateLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode)
+        public async Task UpdateLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode)
         {
             var lineItemContent = new StringContent(JsonConvert.SerializeObject(new LineItem()),
                 Encoding.UTF8, Constants.MediaTypes.LineItem);

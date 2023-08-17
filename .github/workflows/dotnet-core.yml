@@ -35,11 +35,14 @@ jobs:
     - name: Test
       run: |
         dotnet test --configuration Release --results-directory artifacts --no-build --logger 'trx;LogFileName=test-results.trx'
+    - name: debug
+      run: |
+        dir artifacts
     - uses: actions/upload-artifact@v2  # upload test results
       if: success() || failure()        # run this step even if previous step failed
       with:
         name: test-results
-        path: 'test/**/*.trx'
+        path: 'artifacts/*.trx'
     - name: Package
       if: github.event_name != 'pull_request'
       run: dotnet pack --configuration Release --no-build

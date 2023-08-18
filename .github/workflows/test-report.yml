@@ -14,4 +14,6 @@ jobs:
         artifact: test-results            # artifact name
         name: XUnit Tests                  # Name of the check run which will be created
         path: '*.trx'                     # Path to test results (inside artifact .zip)
-        reporter: jest-junit              # Format of test results
+        reporter: dotnet-trx              # Format of test results
+        list-suites: all
+        list-tests: all

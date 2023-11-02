@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.Lti
 {
@@ -10,17 +10,17 @@ namespace LtiAdvantage.Lti
     {
         /// <summary>
         /// </summary>
-        [JsonProperty("course_offering_sourcedid")]
+        [JsonPropertyName("course_offering_sourcedid")]
         public string CourseOfferingSourcedId { get; set; }
 
         /// <summary>
         /// </summary>
-        [JsonProperty("course_section_sourcedid")]
+        [JsonPropertyName("course_section_sourcedid")]
         public string CourseSectionSourcedId { get; set; }
 
         /// <summary>
         /// </summary>
-        [JsonProperty("person_sourcedid")]
+        [JsonPropertyName("person_sourcedid")]
         public string PersonSourcedId { get; set; }
     }
 }

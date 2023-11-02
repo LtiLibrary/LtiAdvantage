@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿
+using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.Lti
 {
@@ -11,14 +12,14 @@ namespace LtiAdvantage.Lti
         /// The type of 'browsing context' the launch occurred in. See
         /// https://www.w3.org/TR/html51/browsers.html#sec-browsing-contexts.
         /// </summary>
-        [JsonProperty("document_target")]
+        [JsonPropertyName("document_target")]
         public DocumentTarget? DocumentTarget { get; set; }
 
         /// <summary>
         /// The height in pixels of the window or frame where the content from the tool
         /// will be displayed.
         /// </summary>
-        [JsonProperty("height")]
+        [JsonPropertyName("height")]
         public int? Height { get; set; }
         
         /// <summary>
@@ -31,7 +32,7 @@ namespace LtiAdvantage.Lti
         /// en-US
         /// </example>
         /// </summary>
-        [JsonProperty("locale")]
+        [JsonPropertyName("locale")]
         public string Locale { get; set; }
 
         /// <summary>
@@ -39,14 +40,14 @@ namespace LtiAdvantage.Lti
         /// redirect the user when it's done. An lti_log or lti_errormsg parameter may be
         /// added as a query parameter.
         /// </summary>
-        [JsonProperty("return_url")]
+        [JsonPropertyName("return_url")]
         public string ReturnUrl { get; set; }
 
         /// <summary>
         /// The width in pixels of the window or frame where the content from the tool
         /// will be displayed.
         /// </summary>
-        [JsonProperty("width")]
+        [JsonPropertyName("width")]
         public int? Width { get; set; }
     }
 }

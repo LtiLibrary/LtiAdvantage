@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Text.Json;
 using LtiAdvantage.AssignmentGradeServices;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace LtiAdvantage.UnitTests.AssignmentGradeServices
@@ -15,7 +15,7 @@ namespace LtiAdvantage.UnitTests.AssignmentGradeServices
         public void DeserializeFromValidJson()
         {
             var referenceJson = TestUtils.LoadReferenceJsonFile("Score");
-            var score = JsonConvert.DeserializeObject<Score>(referenceJson);
+            var score = JsonSerializer.Deserialize<Score>(referenceJson);
 
             Assert.Equal(DateTime.Parse("2017-04-16T18:54:36.736+00:00"), score.TimeStamp);
             Assert.Equal(83, score.ScoreGiven);
@@ -34,10 +34,10 @@ namespace LtiAdvantage.UnitTests.AssignmentGradeServices
         public void SerializeToValidJson()
         {
             var referenceJson = TestUtils.LoadReferenceJsonFile("Score");
-            var score = JsonConvert.DeserializeObject<Score>(referenceJson);
-            var scoreJson = JsonConvert.SerializeObject(score);
+            var score = JsonSerializer.Deserialize<Score>(referenceJson);
+            var scoreJson = JsonSerializer.Serialize(score);
 
-            JsonAssertions.Equal(referenceJson, scoreJson);
+            JsonAssert.Equal(referenceJson, scoreJson);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.DeepLinking
 {
@@ -11,13 +11,13 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// Optional end date and time.
         /// </summary>
-        [JsonProperty("endDateTime")]
+        [JsonPropertyName("endDateTime")]
         public DateTime? EndDateTime { get; set; }
         
         /// <summary>
         /// Optional start date and time.
         /// </summary>
-        [JsonProperty("startDateTime")]
+        [JsonPropertyName("startDateTime")]
         public DateTime? StartDateTime { get; set; }
     }
 }

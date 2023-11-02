@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using IdentityModel;
 using Microsoft.IdentityModel.Tokens;
@@ -25,7 +26,7 @@ namespace LtiAdvantage.IdentityModel.Client
         {
             public RsaKeyPair()
             {
-                KeyId = CryptoRandom.CreateRandomKeyString(8);
+                KeyId = Convert.ToBase64String(CryptoRandom.CreateRandomKey(8));
             }
 
             /// <summary>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using System.Text.Json;
 using LtiAdvantage.AssignmentGradeServices;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace LtiAdvantage.UnitTests.AssignmentGradeServices
@@ -16,7 +16,7 @@ namespace LtiAdvantage.UnitTests.AssignmentGradeServices
         public void DeserializeFromValidJson()
         {
             var referenceJson = TestUtils.LoadReferenceJsonFile("LineItem");
-            var lineitem = JsonConvert.DeserializeObject<LineItem>(referenceJson);
+            var lineitem = JsonSerializer.Deserialize<LineItem>(referenceJson);
 
             Assert.Equal("https://lms.example.com/context/2923/lineitems/1", lineitem.Id);
             Assert.Equal(60.0, lineitem.ScoreMaximum);
@@ -36,10 +36,10 @@ namespace LtiAdvantage.UnitTests.AssignmentGradeServices
         public void SerializeToValidJson()
         {
             var referenceJson = TestUtils.LoadReferenceJsonFile("LineItem");
-            var lineItem = JsonConvert.DeserializeObject<LineItem>(referenceJson);
-            var lineItemJson = JsonConvert.SerializeObject(lineItem);
+            var lineItem = JsonSerializer.Deserialize<LineItem>(referenceJson);
+            var lineItemJson = JsonSerializer.Serialize(lineItem);
 
-            JsonAssertions.Equal(referenceJson, lineItemJson);
+            JsonAssert.Equal(referenceJson, lineItemJson);
         }
     }
 }

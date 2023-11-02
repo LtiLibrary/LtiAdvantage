@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.DeepLinking
 {
@@ -10,25 +10,25 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// Height in pixels.
         /// </summary>
-        [JsonProperty("height")]
+        [JsonPropertyName("height")]
         public int? Height { get; set; }
 
         /// <summary>
         /// Name of the window to open.
         /// </summary>
-        [JsonProperty("targetName")]
+        [JsonPropertyName("targetName")]
         public string TargetName { get; set; }
 
         /// <summary>
         /// Width in pixels.
         /// </summary>
-        [JsonProperty("width")]
+        [JsonPropertyName("width")]
         public int? Width { get; set; }
 
         /// <summary>
         /// Comma-separate list of features for window.open().
         /// </summary>
-        [JsonProperty("windowFeatures")]
+        [JsonPropertyName("windowFeatures")]
         public string WindowFeatures { get; set; }
     }
 }

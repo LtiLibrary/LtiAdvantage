@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿
+using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.DeepLinking
 {
@@ -10,25 +11,25 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// Optional label.
         /// </summary>
-        [JsonProperty("label")]
+        [JsonPropertyName("label")]
         public string Label { get; set; }
 
         /// <summary>
         /// Optional resource id.
         /// </summary>
-        [JsonProperty("resourceId")]
+        [JsonPropertyName("resourceId")]
         public string ResourceId { get; set; }
 
         /// <summary>
         /// Maximum score possible.
         /// </summary>
-        [JsonProperty("scoreMaximum")]
+        [JsonPropertyName("scoreMaximum")]
         public float? ScoreMaximum { get; set; }
 
         /// <summary>
         /// Optional tag.
         /// </summary>
-        [JsonProperty("tag")]
+        [JsonPropertyName("tag")]
         public string Tag { get; set; }
     }
 }

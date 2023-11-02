@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.Lti
 {
@@ -12,38 +13,39 @@ namespace LtiAdvantage.Lti
         /// <summary>
         /// LTI 1.1 OAuth consumer key.
         /// </summary>
-        [JsonProperty("oauth_consumer_key", Required = Required.Always)]
+        [JsonPropertyName("oauth_consumer_key")]
+        [Required]
         public string OAuthConsumerKey { get; set; }
 
         /// <summary>
         /// A signature for validating the <see cref="OAuthConsumerKey"/> to allow
         /// the tool to automate a migration.
         /// </summary>
-        [JsonProperty("oauth_consumer_key_sign")]
+        [JsonPropertyName("oauth_consumer_key_sign")]
         public string OAuthConsumerKeySignature { get; set; }
 
         /// <summary>
         /// LTI 1.1 user ID value associated with the end-user.
         /// </summary>
-        [JsonProperty("user_id")]
+        [JsonPropertyName("user_id")]
         public string UserId { get; set; }
 
         /// <summary>
         /// LTI 1.1 context ID.
         /// </summary>
-        [JsonProperty("context_id")]
+        [JsonPropertyName("context_id")]
         public string ContextId { get; set; }
 
         /// <summary>
         /// LTI 1.1 tool consumer instance GUID.
         /// </summary>
-        [JsonProperty("tool_consumer_instance_guid")]
+        [JsonPropertyName("tool_consumer_instance_guid")]
         public string ToolConsumerInstanceGuid { get; set; }
 
         /// <summary>
         /// LTI 1.1 resource link ID.
         /// </summary>
-        [JsonProperty("resource_link_id")]
+        [JsonPropertyName("resource_link_id")]
         public string ResourceLinkId { get; set; }
     }
 }

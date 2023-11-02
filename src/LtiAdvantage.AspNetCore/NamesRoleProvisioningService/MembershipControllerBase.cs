@@ -10,9 +10,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
-#if NETSTANDARD2_0
-using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
-#endif
 
 namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
 {

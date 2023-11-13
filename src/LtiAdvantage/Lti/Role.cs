@@ -189,5 +189,14 @@ namespace LtiAdvantage.Lti
         SystemUser,
 
         #endregion
+
+        #region LTI System Roles
+
+        /// <summary>
+        /// </summary>
+        [Uri("http://purl.imsglobal.org/vocab/lti/system/person#TestUser")]
+        LtiSystemTestUser,
+
+        #endregion
     }
 }

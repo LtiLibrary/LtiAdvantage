@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿
+using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.DeepLinking
 {
@@ -15,7 +16,7 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// Url to the image.
         /// </summary>
-        [JsonProperty("url")]
+        [JsonPropertyName("url")]
         public string Url { get; set; }
 
         /// <summary>

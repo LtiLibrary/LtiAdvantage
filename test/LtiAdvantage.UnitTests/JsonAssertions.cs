@@ -1,356 +1,121 @@
-﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using Xunit;
 
 namespace LtiAdvantage.UnitTests
 {
-    internal static class JsonAssertions
+    public static class JsonAssert
     {
         public static void Equal(string expectedJson, string actualJson)
         {
-            try
+            using (JsonDocument expectedDoc = JsonDocument.Parse(expectedJson))
+            using (JsonDocument actualDoc = JsonDocument.Parse(actualJson))
             {
-                var actualJObject = JObject.Parse(actualJson);
-                var expectedJObject = JObject.Parse(expectedJson);
+                JsonElement expectedRootElement = expectedDoc.RootElement;
+                JsonElement actualRootElement = actualDoc.RootElement;
 
-                AssertSameObject(expectedJObject, actualJObject);
-            }
-            catch (JsonReaderException)
-            {
-                var actualJArray = JArray.Parse(actualJson);
-                var expectedJArray = JArray.Parse(expectedJson);
-
-                AssertSameArray(expectedJArray, actualJArray);
+                CompareJson(expectedRootElement, actualRootElement, "$");
             }
         }
 
-        private static void AssertSameArray(JArray expected, JArray actual)
+        private static void CompareJson(JsonElement expected, JsonElement actual, string path)
         {
-            var diff = ObjectDiffPatch.GenerateDiff(expected, actual);
-            Assert.True(diff.ActualValues == null && diff.ExpectedValues == null, "Expected:\n" + diff.ExpectedValues + "\nActual:\n" + diff.ActualValues);
-        }
-
-        private static void AssertSameObject(JObject expected, JObject actual)
-        {
-            var diff = ObjectDiffPatch.GenerateDiff(expected, actual);
-            Assert.True(diff.ActualValues == null && diff.ExpectedValues == null, "Expected:\n" + diff.ExpectedValues + "\nActual:\n" + diff.ActualValues);
-        }
-
-        private static class ObjectDiffPatch
-        {
-            private const string PrefixArraySize = "@@ Count";
-            private const string PrefixNullObject = "@@ Null";
-            private const string PrefixRemovedFields = "@@ Removed";
-
-            /// <summary>
-            /// Compares two objects and generates the differences between them.
-            /// </summary>
-            /// <typeparam name="T">The type of the T.</typeparam>
-            /// <param name="expected">The expected object.</param>
-            /// <param name="actual">The actual object.</param>
-            /// <returns></returns>
-            public static ObjectDiffPatchResult GenerateDiff<T>(T expected, T actual) where T : class
+            if (expected.ValueKind != actual.ValueKind)
             {
-                if (typeof(JObject).IsAssignableFrom(typeof(T)))
-                {
-                    var expectedJson = expected as JObject;
-                    var actualJson = actual as JObject;
-                    return Diff(expectedJson, actualJson);
-                }
+                Assert.Fail(GetMessage(path, expected, actual));
+            }
 
-                if (typeof(JArray).IsAssignableFrom(typeof(T)))
-                {
-                    var expectedJson = expected as JArray;
-                    var actualJson = actual as JArray;
-                    var diff = new ObjectDiffPatchResult();
-
-                    if (expectedJson == null && actualJson == null)
+            switch (expected.ValueKind)
+            {
+                case JsonValueKind.Object:
+                    foreach (JsonProperty expectedProperty in expected.EnumerateObject())
                     {
-                        return diff;
-                    }
+                        JsonElement actualProperty;
 
-                    if (expectedJson == null || actualJson == null)
-                    {
-                        diff.ExpectedValues = new JObject {{PrefixNullObject, expectedJson == null ? "null" : "not null"}};
-                        diff.ActualValues = new JObject {{PrefixNullObject, actualJson == null ? "null" : "not null" }};
-                        return diff;
-                    }
-
-                    if (expectedJson.Count != actualJson.Count)
-                    {
-                        diff.ExpectedValues = new JObject {{PrefixArraySize, expectedJson.Count}};
-                        diff.ActualValues = new JObject {{PrefixArraySize, actualJson.Count}};
-                        return diff;
-                    }
-
-                    for (var index = 0; index < expectedJson.Count; index++)
-                    {
-                        var expectedJObject = expectedJson[index] as JObject;
-                        var actualJObject = actualJson[index] as JObject;
-
-                        var result = Diff(expectedJObject, actualJObject);
-                        if (result.ExpectedValues != null)
+                        if (!actual.TryGetProperty(expectedProperty.Name, out actualProperty))
                         {
-                            foreach (var pair in result.ExpectedValues)
-                            {
-                                if (diff.ExpectedValues == null)
-                                {
-                                    diff.ExpectedValues = new JObject();
-                                }
-
-                                diff.ExpectedValues.Add($"{pair.Key}[{index}]", pair.Value);
-                            }
+                            Assert.Fail(GetMessage(path, expectedProperty, "Property not found"));
                         }
 
-                        if (result.ActualValues != null)
-                        {
-                            foreach (var pair in result.ActualValues)
-                            {
-                                if (diff.ActualValues == null)
-                                {
-                                    diff.ActualValues = new JObject();
-                                }
-
-                                diff.ActualValues.Add($"{pair.Key}[{index}]", pair.Value);
-                            }
-                        }
+                        CompareJson(expectedProperty.Value, actualProperty, $"{path}.{expectedProperty.Name}");
                     }
+                    break;
 
-                    return diff;
-                }
-                else
-                {
-                    // not a JObject or a JArray
-                    // ensure the serializer will not ignore null values
-                    var writer = GetJsonSerializer();
-                    var expectedJson = expected != null ? JObject.FromObject(expected, writer) : null;
-                    var actualJson = actual != null ? JObject.FromObject(actual, writer) : null;
-                    return Diff(expectedJson, actualJson);
-                }
-            }
+                case JsonValueKind.Array:
+                    JsonElement[] expectedArray = expected.EnumerateArray().ToArray();
+                    JsonElement[] actualArray = actual.EnumerateArray().ToArray();
 
-            private static ObjectDiffPatchResult Diff(JObject expected, JObject actual)
-            {
-                var result = new ObjectDiffPatchResult();
-                // check for null values
-                if (expected == null && actual == null)
-                {
-                    return result;
-                }
-                if (expected == null || actual == null)
-                {
-                    result.ExpectedValues = expected;
-                    result.ActualValues = actual;
-                    return result;
-                }
-
-                // compare internal fields           
-                var removedNew = new JArray();
-                var removedOld = new JArray();
-                JToken token;
-                // start by iterating in source fields
-                foreach (var pair in expected)
-                {
-                    // ignore null values (i.e. null values = missing value)
-                    if (pair.Value.Type == JTokenType.Null)
-                        continue;
-
-                    // check if field exists
-                    if (!actual.TryGetValue(pair.Key, out token))
+                    if (expectedArray.Length != actualArray.Length)
                     {
-                        AddExpectedToken(result, pair.Value, pair.Key);
-                        removedNew.Add(pair.Key);
+                        Assert.Fail(GetMessage(path, $"Array length {expectedArray.Length}", $"Array length {actualArray.Length}"));
                     }
-                    // compare field values
-                    else
+
+                    for (int i = 0; i < expectedArray.Length; i++)
                     {
-                        DiffField(pair.Key, pair.Value, token, result);
+                        CompareJson(expectedArray[i], actualArray[i], $"{path}[{i}]");
                     }
-                }
-                // then iterate in target fields that are not present in source
-                foreach (var pair in actual)
-                {
-                    // ignore null values (i.e. null values = missing value)
-                    if (pair.Value.Type == JTokenType.Null)
-                        continue;
-                    // ignore already compared values
-                    if (expected.TryGetValue(pair.Key, out token))
-                        continue;
-                    // add missing tokens
-                    removedOld.Add(pair.Key);
-                    AddActualToken(result, pair.Value, pair.Key);
-                }
+                    break;
 
-                if (removedOld.Count > 0)
-                    AddExpectedToken(result, removedOld, PrefixRemovedFields);
-                if (removedNew.Count > 0)
-                    AddActualToken(result, removedNew, PrefixRemovedFields);
-
-                return result;
-            }
-
-            private static void DiffField(string fieldName, JToken source, JToken target, ObjectDiffPatchResult result = null)
-            {
-                if (result == null)
-                    result = new ObjectDiffPatchResult();
-                if (source == null)
-                {
-                    if (target != null)
+                default:
+                    if (!JsonElementEqualityComparer.Instance.Equals(expected, actual))
                     {
-                        AddToken(result, fieldName, null, target);
+                        Assert.Fail(GetMessage(path, expected, actual));
                     }
-                }
-                else if (target == null)
-                {
-                    AddToken(result, fieldName, source, null);
-                }
-                else if (source.Type == JTokenType.Object)
-                {
-                    var v = target as JObject;
-                    var r = Diff(source as JObject, v);
-                    if (!r.AreEqual)
-                        AddToken(result, fieldName, r);
-                }
-                else
-                {
-                    var aT = target as JArray;
-                    var aS = source as JArray;
-                    // ReSharper disable once SwitchStatementMissingSomeCases
-                    switch (source.Type)
-                    {
-                        case JTokenType.Array when aS == null || aT == null:
-                        case JTokenType.Array when (aS.Count == 0 || aT.Count == 0) && aS.Count != aT.Count:
-                            AddToken(result, fieldName, source, target);
-                            break;
-                        case JTokenType.Array:
-                        {
-                            var arrayDiff = new ObjectDiffPatchResult();
-                            var minCount = Math.Min(aS.Count, aT.Count);
-                            for (var i = 0; i < Math.Max(aS.Count, aT.Count); i++)
-                            {
-                                if (i < minCount)
-                                {
-                                    DiffField(i.ToString(), aS[i], aT[i], arrayDiff);
-                                }
-                                else if (i >= aS.Count)
-                                {
-                                    AddActualToken(arrayDiff, aT[i], i.ToString());
-                                }
-                                else
-                                {
-                                    AddExpectedToken(arrayDiff, aS[i], i.ToString());
-                                }
-                            }
-
-                            if (arrayDiff.AreEqual) return;
-
-                            if (aS.Count != aT.Count)
-                                AddToken(arrayDiff, PrefixArraySize, aS.Count, aT.Count);
-                            AddToken(result, fieldName, arrayDiff);
-                            break;
-                        }
-                        case JTokenType.Integer when target.Type != JTokenType.Integer:
-                        {
-                            var sourceValue = (JValue) source;
-                            if (target is JValue targetValue)
-                            {
-                                try
-                                {
-                                    var objA = Convert.ChangeType(sourceValue.Value, targetValue.Value.GetType());
-                                    if (!objA.Equals(targetValue.Value))
-                                    {
-                                        AddToken(result, fieldName, source, target);
-                                    }
-                                }
-                                catch
-                                {
-                                    AddToken(result, fieldName, source, target);
-                                }
-                            }
-                            else if (!JToken.DeepEquals(source, target))
-                            {
-                                AddToken(result, fieldName, source, target);
-                            }
-
-                            break;
-                        }
-                        default:
-                        {
-                            if (!JToken.DeepEquals(source, target))
-                            {
-                                AddToken(result, fieldName, source, target);
-                            }
-
-                            break;
-                        }
-                    }
-                }
-            }
-
-            private static JsonSerializer GetJsonSerializer()
-            {
-                // ensure the serializer will not ignore null values
-                var settings = JsonConvert.DefaultSettings != null ? JsonConvert.DefaultSettings() : new JsonSerializerSettings();
-                settings.NullValueHandling = NullValueHandling.Include;
-                settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                settings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
-                settings.Formatting = Formatting.None;
-                settings.MissingMemberHandling = MissingMemberHandling.Ignore;
-                settings.ObjectCreationHandling = ObjectCreationHandling.Replace;
-
-                // create our custom serializer
-                var writer = JsonSerializer.Create(settings);
-                return writer;
-            }
-
-            private static void AddActualToken(ObjectDiffPatchResult item, JToken actualToken, string fieldName)
-            {
-                if (item.ActualValues == null)
-                    item.ActualValues = new JObject();
-                item.ActualValues[fieldName] = actualToken;
-            }
-
-            private static void AddExpectedToken(ObjectDiffPatchResult item, JToken expectedToken, string fieldName)
-            {
-                if (item.ExpectedValues == null)
-                    item.ExpectedValues = new JObject();
-                item.ExpectedValues[fieldName] = expectedToken;
-            }
-
-            private static void AddToken(ObjectDiffPatchResult item, string fieldName, JToken expectedToken, JToken actualToken)
-            {
-                AddExpectedToken(item, expectedToken, fieldName);
-
-                AddActualToken(item, actualToken, fieldName);
-            }
-
-            private static void AddToken(ObjectDiffPatchResult item, string fieldName, ObjectDiffPatchResult diff)
-            {
-                AddToken(item, fieldName, diff.ExpectedValues, diff.ActualValues);
+                    break;
             }
         }
 
-        /// <summary>
-        /// Result of a diff operation between two objects
-        /// </summary>
-        private class ObjectDiffPatchResult
+        private static string GetMessage(string path, object expected, object actual)
         {
-            /// <summary>
-            /// If the compared objects are equal.
-            /// </summary>
-            /// <value>true if the obects are equal; otherwise, false.</value>
-            public bool AreEqual => ExpectedValues == null && ActualValues == null;
+            return $"JSON did not match at path '{path}'. Expected: {expected}, Actual: {actual}";
+        }
 
-            /// <summary>
-            /// The values that are different in the expected object.
-            /// </summary>
-            public JObject ExpectedValues { get; set; }
+        // A custom JsonElementEqualityComparer is needed because JsonElement's default equality comparer
+        // does not consider structural equality.
+        private class JsonElementEqualityComparer : IEqualityComparer<JsonElement>
+        {
+            public static JsonElementEqualityComparer Instance { get; } = new JsonElementEqualityComparer();
 
-            /// <summary>
-            /// The values that are different in the actual object.
-            /// </summary>
-            public JObject ActualValues { get; set; }
+            public bool Equals(JsonElement x, JsonElement y)
+            {
+                if (x.ValueKind != y.ValueKind)
+                    return false;
+
+                switch (x.ValueKind)
+                {
+                    case JsonValueKind.Object:
+                    case JsonValueKind.Array:
+                        // We already handle structural comparisons for objects and arrays
+                        // in the CompareJson method.
+                        return true;
+                    case JsonValueKind.String:
+                        var xString = x.GetString();
+                        var yString = y.GetString();
+
+                        if (DateTime.TryParse(xString, out var xDate) && DateTime.TryParse(yString, out var yDate))
+                            return xDate == yDate;
+
+                        return xString == yString;
+                    case JsonValueKind.Number:
+                        return x.GetRawText() == y.GetRawText(); // Raw text comparison is more precise for numbers
+                    case JsonValueKind.True:
+                    case JsonValueKind.False:
+                        return x.GetBoolean() == y.GetBoolean();
+                    case JsonValueKind.Null:
+                        return true; // If both are null, they are equal
+                    default:
+                        throw new InvalidOperationException($"Unsupported JsonValueKind: {x.ValueKind}");
+                }
+            }
+
+            public int GetHashCode(JsonElement obj)
+            {
+                // This is not used in the context of JSON comparison here, so leaving unimplemented.
+                return obj.GetHashCode();
+            }
         }
     }
 }

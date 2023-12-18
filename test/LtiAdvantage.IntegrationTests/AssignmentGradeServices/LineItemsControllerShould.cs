@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using LtiAdvantage.AssignmentGradeServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
@@ -41,8 +42,13 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.Forbidden, "")]
         public async Task AddLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
-            var lineItemContent = new StringContent(JsonConvert.SerializeObject(new LineItem()),
+#if NET7_0_OR_GREATER
+            var lineItemContent = new StringContent(JsonSerializer.Serialize(new LineItem()),
+                Encoding.UTF8, new MediaTypeHeaderValue(Constants.MediaTypes.LineItem));
+#else
+            var lineItemContent = new StringContent(JsonSerializer.Serialize(new LineItem()),
                 Encoding.UTF8, Constants.MediaTypes.LineItem);
+#endif
 
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);
             var response = await _client.PostAsync(LineItemsUrl, lineItemContent);
@@ -110,7 +116,7 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         [InlineData(Constants.LtiScopes.Ags.LineItemReadonly, HttpStatusCode.Forbidden)]
         public async Task UpdateLineItem_WhenScopeAllows(string scope, HttpStatusCode statusCode)
         {
-            var lineItemContent = new StringContent(JsonConvert.SerializeObject(new LineItem()),
+            var lineItemContent = new StringContent(JsonSerializer.Serialize(new LineItem()),
                 Encoding.UTF8, Constants.MediaTypes.LineItem);
 
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);

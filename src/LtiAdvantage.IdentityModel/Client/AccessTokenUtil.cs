@@ -30,27 +30,27 @@ namespace LtiAdvantage.IdentityModel.Client
         {
             if (issuer.IsMissing())
             {
-                return new TokenResponse(new ArgumentNullException(nameof(issuer)));
+                return ProtocolResponse.FromException<TokenResponse>(new ArgumentNullException(nameof(issuer)));
             }
 
             if (scopes == null)
             {
-                return new TokenResponse(new ArgumentNullException(nameof(scopes)));
+                return ProtocolResponse.FromException<TokenResponse>(new ArgumentNullException(nameof(scopes)));
             }
 
             if (clientId.IsMissing())
             {
-                return new TokenResponse(new ArgumentNullException(nameof(clientId)));
+                return ProtocolResponse.FromException<TokenResponse>(new ArgumentNullException(nameof(clientId)));
             }
 
             if (accessTokenUrl.IsMissing())
             {
-                return new TokenResponse(new ArgumentNullException(nameof(accessTokenUrl)));
+                return ProtocolResponse.FromException<TokenResponse>(new ArgumentNullException(nameof(accessTokenUrl)));
             }
 
             if (privateKey.IsMissing())
             {
-                return new TokenResponse(new ArgumentNullException(nameof(privateKey)));
+                return ProtocolResponse.FromException<TokenResponse>(new ArgumentNullException(nameof(privateKey)));
             }
 
             // Use a signed JWT as client credentials.
@@ -63,7 +63,7 @@ namespace LtiAdvantage.IdentityModel.Client
                 EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString(), ClaimValueTypes.Integer64));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp,
                 EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString(), ClaimValueTypes.Integer64));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, CryptoRandom.CreateRandomKeyString(32)));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, Convert.ToBase64String(CryptoRandom.CreateRandomKey(32))));
 
             var handler = new JwtSecurityTokenHandler();
             var credentials = PemHelper.SigningCredentialsFromPemString(privateKey);

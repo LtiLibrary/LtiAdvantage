@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿
+using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.DeepLinking
 {
@@ -10,19 +11,19 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// Height in pixels.
         /// </summary>
-        [JsonProperty("height")]
+        [JsonPropertyName("height")]
         public int? Height { get; set; }
 
         /// <summary>
         /// URL to use as src of the iframe.
         /// </summary>
-        [JsonProperty("src")]
+        [JsonPropertyName("src")]
         public string Src { get; set; }
 
         /// <summary>
         /// Width in pixels.
         /// </summary>
-        [JsonProperty("width")]
+        [JsonPropertyName("width")]
         public int? Width { get; set; }
     }
 }

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using LtiAdvantage.AssignmentGradeServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
@@ -41,9 +42,13 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         [InlineData(Constants.LtiScopes.Ags.ScoreReadonly, HttpStatusCode.Forbidden, "")]
         public async Task AddScore_WhenScopeAllows(string scope, HttpStatusCode statusCode, string contentType)
         {
-            var scoreContent = new StringContent(JsonConvert.SerializeObject(new Score()),
+#if NET7_0_OR_GREATER
+            var scoreContent = new StringContent(JsonSerializer.Serialize(new Score()),
+                Encoding.UTF8, new MediaTypeHeaderValue(Constants.MediaTypes.Score));
+#else
+            var scoreContent = new StringContent(JsonSerializer.Serialize(new Score()),
                 Encoding.UTF8, Constants.MediaTypes.Score);
-
+#endif
             _client.DefaultRequestHeaders.Add("x-test-scope", scope);
             var response = await _client.PostAsync(ScoresUrl, scoreContent);
             Assert.Equal(statusCode, response.StatusCode);

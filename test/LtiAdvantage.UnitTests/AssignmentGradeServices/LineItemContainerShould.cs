@@ -1,5 +1,6 @@
 ﻿using LtiAdvantage.AssignmentGradeServices;
-using Newtonsoft.Json;
+using LtiAdvantage.Utilities;
+using System.Text.Json;
 using Xunit;
 
 namespace LtiAdvantage.UnitTests.AssignmentGradeServices
@@ -14,7 +15,7 @@ namespace LtiAdvantage.UnitTests.AssignmentGradeServices
         public void DeserializeFromValidJson()
         {
             var referenceJson = TestUtils.LoadReferenceJsonFile("LineItemContainer");
-            var container = JsonConvert.DeserializeObject<LineItemContainer>(referenceJson);
+            var container = JsonSerializer.Deserialize<LineItemContainer>(referenceJson);
 
             Assert.Equal(3, container.Count);
         }
@@ -27,10 +28,10 @@ namespace LtiAdvantage.UnitTests.AssignmentGradeServices
         public void SerializeToValidJson()
         {
             var referenceJson = TestUtils.LoadReferenceJsonFile("LineItemContainer");
-            var container = JsonConvert.DeserializeObject<LineItemContainer>(referenceJson);
-            var containerJson = JsonConvert.SerializeObject(container);
+            var container = JsonSerializer.Deserialize<LineItemContainer>(referenceJson);
+            var containerJson = JsonSerializer.Serialize(container);
 
-            JsonAssertions.Equal(referenceJson, containerJson);
+            JsonAssert.Equal(referenceJson, containerJson);
         }
     }
 }

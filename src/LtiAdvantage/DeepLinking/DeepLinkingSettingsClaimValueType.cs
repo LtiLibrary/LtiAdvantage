@@ -1,5 +1,5 @@
 ﻿using LtiAdvantage.Lti;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.DeepLinking
 {
@@ -11,55 +11,55 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// The file media types supported.
         /// </summary>
-        [JsonProperty("accept_media_types")]
+        [JsonPropertyName("accept_media_types")]
         public string AcceptMediaTypes { get; set; }
 
         /// <summary>
         /// True if the platform accepts multiple items.
         /// </summary>
-        [JsonProperty("accept_multiple")]
+        [JsonPropertyName("accept_multiple")]
         public bool AcceptMultiple { get; set; }
 
         /// <summary>
         /// The document targets supported.
         /// </summary>
-        [JsonProperty("accept_presentation_document_targets")]
+        [JsonPropertyName("accept_presentation_document_targets")]
         public DocumentTarget[] AcceptPresentationDocumentTargets { get; set; }
 
         /// <summary>
         /// The content types supported.
         /// </summary>
-        [JsonProperty("accept_types")]
+        [JsonPropertyName("accept_types")]
         public string[] AcceptTypes { get; set; }
 
         /// <summary>
         /// True if the items are automatically created without confirmation.
         /// </summary>
-        [JsonProperty("auto_create")]
+        [JsonPropertyName("auto_create")]
         public bool AutoCreate { get; set; }
 
         /// <summary>
         /// An opaque value which will be returned by the tool.
         /// </summary>
-        [JsonProperty("data")]
+        [JsonPropertyName("data")]
         public string Data { get; set; }
 
         /// <summary>
         /// URL to send the deep linking response.
         /// </summary>
-        [JsonProperty("deep_link_return_url")]
+        [JsonPropertyName("deep_link_return_url")]
         public string DeepLinkReturnUrl { get; set; }
 
         /// <summary>
         /// Default text for items returned.
         /// </summary>
-        [JsonProperty("text")]
+        [JsonPropertyName("text")]
         public string Text { get; set; }
 
         /// <summary>
         /// Default title or alt text for items returned.
         /// </summary>
-        [JsonProperty("title")]
+        [JsonPropertyName("title")]
         public string Title { get; set; }
     }
 }

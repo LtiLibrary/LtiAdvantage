@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿
+using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.NamesRoleProvisioningService
 {
     /// <summary>
     /// Names and Role Service member status values.
     /// </summary>
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum MemberStatus
     {
         /// <summary>

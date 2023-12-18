@@ -1,86 +1,67 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using LtiAdvantage.Utilities;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace LtiAdvantage.Lti
 {
-    internal class ContextTypeConverter : StringEnumConverter
+    internal class ContextTypeConverter : JsonConverter<ContextType>
     {
-        private static readonly Hashtable Uris;
+        private static readonly Dictionary<string, ContextType> UriToContextTypeMap = new();
+
         static ContextTypeConverter()
         {
-            Uris = GetUris(typeof(ContextType));
+            // Building the mapping between the URI strings and ContextType enum values
+            foreach (var field in typeof(ContextType).GetFields(BindingFlags.Public | BindingFlags.Static))
+            {
+                var attrs = field.GetCustomAttributes<UriAttribute>();
+                foreach (var attr in attrs)
+                {
+                    UriToContextTypeMap[attr.Uri] = (ContextType)field.GetValue(null);
+                }
+            }
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override ContextType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            if (reader.TokenType == JsonToken.Null)
+            if (reader.TokenType == JsonTokenType.Null)
             {
-                return base.ReadJson(reader, objectType, existingValue, serializer);
+                return ContextType.Unknown; // Assuming default is equivalent to ContextType.Unknown
             }
 
-            if (!objectType.GetTypeInfo().IsAssignableFrom(typeof(ContextType)))
+            if (reader.TokenType != JsonTokenType.String)
             {
-                return base.ReadJson(reader, objectType, existingValue, serializer);
+                throw new JsonException("Expected a string value for the enum deserialization.");
             }
 
-            if (reader.TokenType != JsonToken.String)
+            var value = reader.GetString();
+            if (value != null && UriToContextTypeMap.TryGetValue(value, out var contextType))
             {
-                return base.ReadJson(reader, objectType, existingValue, serializer);
-            }
-
-            var value = reader.Value.ToString();
-            if (Uris.ContainsKey(value))
-            {
-                var contextType = (ContextType) Uris[value];
                 return contextType;
             }
 
-            return ContextType.Unknown;
+            return ContextType.Unknown; // Assuming Unknown is a defined enum value for invalid/missing cases
         }
 
-        private static Hashtable GetUris(Type type)
+        public override void Write(Utf8JsonWriter writer, ContextType value, JsonSerializerOptions options)
         {
-            var roles = new Hashtable();
-            foreach (Enum value in Enum.GetValues(type))
-            {
-                var uris = value.GetUris();
-                if (uris != null && uris.Length > 0)
-                {
-                    foreach (var uri in uris)
-                    {
-                        roles.Add(uri, value);
-                        // Only map the Enum back to the full URI
-                        if (uri.StartsWith("http"))
-                        {
-                            roles.Add(value, uri);
-                        }
-                    }
-                }
-            }
+            var type = value.GetType();
+            var name = Enum.GetName(type, value);
+            var member = type.GetMember(name)[0];
+            var attrs = member.GetCustomAttributes<UriAttribute>();
 
-            return roles;
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            if (value == null)
+            if (attrs.Any())
             {
-                base.WriteJson(writer, null, serializer);
+                var uri = attrs.First().Uri; // Assuming you want to use the first Uri if there are multiple
+                writer.WriteStringValue(uri);
                 return;
             }
 
-            if (Uris.ContainsKey(value))
-            {
-                var uri = Uris[value];
-                writer.WriteValue(uri);
-                return;
-            }
-
-            base.WriteJson(writer, value, serializer);
+            writer.WriteStringValue(name); // Fallback to the enum name if no Uri is found
         }
     }
 }

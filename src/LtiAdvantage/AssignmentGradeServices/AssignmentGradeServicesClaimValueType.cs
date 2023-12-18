@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
@@ -12,19 +12,19 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <summary>
         /// The list of scopes the tool may ask for when requesting the access token.
         /// </summary>
-        [JsonProperty("scope")]
+        [JsonPropertyName("scope")]
         public IList<string> Scope { get; set; }
 
         /// <summary>
         /// The fully resolved URL to the line item endpoint associated with the resource link.
         /// </summary>
-        [JsonProperty("lineitem")]
+        [JsonPropertyName("lineitem")]
         public string LineItemUrl { get; set; }
 
         /// <summary>
         /// The fully resolved URL to the line items endpoint associated with the context.
         /// </summary>
-        [JsonProperty("lineitems")]
+        [JsonPropertyName("lineitems")]
         public string LineItemsUrl { get; set; }
     }
 }

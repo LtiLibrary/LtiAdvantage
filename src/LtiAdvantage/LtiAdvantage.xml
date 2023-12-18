@@ -2997,6 +2997,27 @@
             Return the URI associated with this Enum value.
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Utilities.JsonElementExtensions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Utilities.JsonElementExtensions.TryGetString(System.Text.Json.JsonElement,System.String,System.String@)">
+            <summary>
+            
+            </summary>
+            <param name="source"></param>
+            <param name="propertyName"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:LtiAdvantage.Utilities.JsonElementExtensions.ToStringList(System.Text.Json.JsonElement)">
+            <summary>
+            
+            </summary>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
         <member name="T:LtiAdvantage.Utilities.JwtExtensions">
             <summary>
             Extensions to make working with JWT Tokens easier.

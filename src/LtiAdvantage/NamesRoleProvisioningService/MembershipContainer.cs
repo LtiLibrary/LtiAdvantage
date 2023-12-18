@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.NamesRoleProvisioningService
 {
@@ -12,19 +12,19 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// <summary>
         /// The ID of these results. Typically the request URL to Membership service.
         /// </summary>
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
 
         /// <summary>
         /// Context information for the list of members.
         /// </summary>
-        [JsonProperty("context")]
+        [JsonPropertyName("context")]
         public Context Context { get; set; }
 
         /// <summary>
         /// The list of members in the specified context.
         /// </summary>
-        [JsonProperty("members")]
+        [JsonPropertyName("members")]
         public ICollection<Member> Members { get; set; }
     }
 }

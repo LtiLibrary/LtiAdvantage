@@ -1,45 +1,45 @@
 ﻿using System;
-using System.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace LtiAdvantage.Lti
 {
-    internal class DocumentTargetConverter : StringEnumConverter
+    internal class DocumentTargetConverter : JsonConverter<DocumentTarget>
     {
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override DocumentTarget Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            if (reader.TokenType == JsonToken.Null)
+            if (reader.TokenType == JsonTokenType.Null)
             {
-                return base.ReadJson(reader, objectType, existingValue, serializer);
+                return DocumentTarget.None;
             }
 
-            if (!objectType.GetTypeInfo().IsAssignableFrom(typeof(DocumentTarget)))
+            if (reader.TokenType != JsonTokenType.String)
             {
-                return base.ReadJson(reader, objectType, existingValue, serializer);
+                throw new JsonException();
             }
 
-            if (reader.TokenType != JsonToken.String)
+            var value = reader.GetString();
+
+            if (string.IsNullOrEmpty(value))
             {
-                return base.ReadJson(reader, objectType, existingValue, serializer);
+                return DocumentTarget.None;
             }
 
-            var value = reader.Value.ToString();
-
-            return Enum.TryParse<DocumentTarget>(value, true, out var target) 
-                ? target 
+            return Enum.TryParse<DocumentTarget>(value, true, out var target)
+                ? target
                 : DocumentTarget.None;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, DocumentTarget value, JsonSerializerOptions options)
         {
-            if (value == null)
+            if (value == DocumentTarget.None)
             {
-                writer.WriteNull();
-                return;
+                writer.WriteNullValue();
             }
-
-            writer.WriteValue(value.ToString().ToLowerInvariant());
+            else
+            {
+                writer.WriteStringValue(value.ToString().ToLowerInvariant());
+            }
         }
     }
 }

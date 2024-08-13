@@ -25,7 +25,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// The status of the grading process.
         /// </summary>
         [JsonPropertyName("gradingProgress")]
-        public GradingProgess GradingProgress { get; set; }
+        public GradingProgress GradingProgress { get; set; }
 
         /// <summary>
         /// The score.

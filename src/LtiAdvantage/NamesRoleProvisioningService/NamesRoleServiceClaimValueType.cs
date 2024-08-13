@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.NamesRoleProvisioningService
 {
@@ -23,13 +23,13 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// <summary>
         /// Fully resolved URL to service.
         /// </summary>
-        [JsonProperty("context_memberships_url")]
+        [JsonPropertyName("context_memberships_url")]
         public string ContextMembershipUrl { get; set; }
 
         /// <summary>
         /// Service version. Default is <see cref="Version"/>.
         /// </summary>
-        [JsonProperty("service_versions")]
+        [JsonPropertyName("service_versions")]
         public string[] ServiceVersions { get; set; }
     }
 }

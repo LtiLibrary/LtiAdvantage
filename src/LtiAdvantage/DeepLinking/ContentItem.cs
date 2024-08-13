@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.DeepLinking
 {
@@ -19,21 +19,21 @@ namespace LtiAdvantage.DeepLinking
         /// Indicates the initial start and end time this activity should be made
         /// available to learners.
         /// </summary>
-        [JsonProperty("available")]
+        [JsonPropertyName("available")]
         public StartEndProperty Available { get; set; }
 
         /// <inheritdoc />
         /// <summary>
         /// Key/value custom parameters.
         /// </summary>
-        [JsonProperty("custom")]
+        [JsonPropertyName("custom")]
         public Dictionary<string, string> Custom { get; set; }
 
         /// <inheritdoc />
         /// <summary>
         /// HTML embed code.
         /// </summary>
-        [JsonProperty("embed")]
+        [JsonPropertyName("embed")]
         public string Embed { get; set; }
 
         /// <inheritdoc />
@@ -52,7 +52,7 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// HTML fragment to embed.
         /// </summary>
-        [JsonProperty("html")]
+        [JsonPropertyName("html")]
         public string Html { get; set; }
 
         /// <inheritdoc cref="IFileItem" />
@@ -62,7 +62,7 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// URL of an icon image.
         /// </summary>
-        [JsonProperty("icon")]
+        [JsonPropertyName("icon")]
         public ImageProperty Icon { get; set; }
 
         /// <inheritdoc cref="ILinkItem" />
@@ -70,21 +70,21 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// iframe properties for embedding the item.
         /// </summary>
-        [JsonProperty("iframe")]
+        [JsonPropertyName("iframe")]
         public IframeProperty Iframe { get; set; }
         
         /// <inheritdoc />
         /// <summary>
         /// Indicates this item is expected to receive scores.
         /// </summary>
-        [JsonProperty("lineItem")]
+        [JsonPropertyName("lineItem")]
         public LineItemProperty LineItem { get; set; }
 
         /// <inheritdoc />
         /// <summary>
         /// Start and end date and time for submissions.
         /// </summary>
-        [JsonProperty("submission")]
+        [JsonPropertyName("submission")]
         public StartEndProperty Submission { get; set; }
 
         /// <inheritdoc cref="IFileItem"/>
@@ -95,7 +95,7 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// Plain text description.
         /// </summary>
-        [JsonProperty("text")]
+        [JsonPropertyName("text")]
         public string Text { get; set; }
 
         /// <inheritdoc cref="IFileItem" />
@@ -105,7 +105,7 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// URL of a thumbnail image.
         /// </summary>
-        [JsonProperty("thumbnail")]
+        [JsonPropertyName("thumbnail")]
         public ImageProperty Thumbnail { get; set; }
         
         /// <inheritdoc cref="IFileItem" />
@@ -115,13 +115,13 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// Plain text title.
         /// </summary>
-        [JsonProperty("title")]
+        [JsonPropertyName("title")]
         public string Title { get; set; }
 
         /// <summary>
         /// The item type.
         /// </summary>
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public string Type { get; set; }
 
         /// <inheritdoc cref="IFileItem" />
@@ -131,7 +131,7 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// URL of the resource.
         /// </summary>
-        [JsonProperty("url")]
+        [JsonPropertyName("url")]
         public string Url { get; set; }
 
         /// <inheritdoc />
@@ -145,7 +145,7 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// Window properties for a new window/tab.
         /// </summary>
-        [JsonProperty("window")]
+        [JsonPropertyName("window")]
         public WindowProperty Window { get; set; }
     }
 }

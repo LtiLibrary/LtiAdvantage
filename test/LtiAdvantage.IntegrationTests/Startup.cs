@@ -2,11 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-#if NET6_0_OR_GREATER
-using Microsoft.Extensions.Hosting;
-#endif
 
 namespace LtiAdvantage.IntegrationTests
 {
@@ -15,19 +11,14 @@ namespace LtiAdvantage.IntegrationTests
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc()
-                .AddApplicationPart(typeof(LineItemsController).Assembly)
-#if NET6_0_OR_GREATER
-                .AddNewtonsoftJson();
-#else
-                ;
-#endif
+                .AddApplicationPart(typeof(LineItemsController).Assembly);
+
             services.AddAuthentication()
                 .AddScheme<TestAuthOptions, TestAuthHandler>(JwtBearerDefaults.AuthenticationScheme, options => { });
 
             services.AddLtiAdvantagePolicies();
         }
 
-#if NET6_0_OR_GREATER
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseStaticFiles();
@@ -40,6 +31,5 @@ namespace LtiAdvantage.IntegrationTests
                     "{controller}/{action=Index}/{id?}");
             });
         }
-#endif
     }
 }

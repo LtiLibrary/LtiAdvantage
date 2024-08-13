@@ -1,45 +1,56 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using LtiAdvantage.Utilities;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace LtiAdvantage.Lti
 {
-    internal class RoleConverter : StringEnumConverter
+    internal class RoleConverter : JsonConverter<Role>
     {
-        private static readonly Hashtable Roles;
-        static RoleConverter()
+        private static readonly Hashtable Roles = GetUris(typeof(Role));
+
+        public override Role Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            Roles = GetUris(typeof(Role));
+            if (reader.TokenType == JsonTokenType.Null)
+            {
+                return default; // or Role.Unknown depending on how you want to handle nulls
+            }
+
+            if (reader.TokenType != JsonTokenType.String)
+            {
+                throw new JsonException("Expected a string value.");
+            }
+
+            string value = reader.GetString();
+            if (value != null && Roles.ContainsKey(value))
+            {
+                return (Role)Roles[value];
+            }
+
+            return Role.Unknown; // or another default value for unknown role strings
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, Role value, JsonSerializerOptions options)
         {
-            if (reader.TokenType == JsonToken.Null)
+            if (value == Role.Unknown)
             {
-                return base.ReadJson(reader, objectType, existingValue, serializer);
+                writer.WriteNullValue();
+                return;
             }
 
-            if (!objectType.GetTypeInfo().IsAssignableFrom(typeof(Role)))
-            {
-                return base.ReadJson(reader, objectType, existingValue, serializer);
-            }
-
-            if (reader.TokenType != JsonToken.String)
-            {
-                return base.ReadJson(reader, objectType, existingValue, serializer);
-            }
-
-            var value = reader.Value.ToString();
             if (Roles.ContainsKey(value))
             {
-                var role = (Role) Roles[value];
-                return role;
+                string uri = (string)Roles[value];
+                writer.WriteStringValue(uri);
             }
-
-            return Role.Unknown;
+            else
+            {
+                // If there's no URI representation, write the enum as string
+                writer.WriteStringValue(value.ToString());
+            }
         }
 
         private static Hashtable GetUris(Type type)
@@ -47,40 +58,25 @@ namespace LtiAdvantage.Lti
             var roles = new Hashtable();
             foreach (Enum value in Enum.GetValues(type))
             {
-                var uris = value.GetUris();
-                if (uris != null && uris.Length > 0)
+                var uriAttributes = value.GetType().GetField(value.ToString())
+                                        .GetCustomAttributes<UriAttribute>()
+                                        .ToArray();
+
+                if (uriAttributes.Length > 0)
                 {
-                    foreach (var uri in uris)
+                    foreach (var uriAttribute in uriAttributes)
                     {
-                        roles.Add(uri, value);
+                        roles.Add(uriAttribute.Uri, value);
                         // Only map the Enum back to the full URI
-                        if (uri.StartsWith("http"))
+                        if (uriAttribute.Uri.StartsWith("http"))
                         {
-                            roles.Add(value, uri);
+                            roles.Add(value, uriAttribute.Uri);
                         }
                     }
                 }
             }
 
             return roles;
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            if (value == null)
-            {
-                base.WriteJson(writer, null, serializer);
-                return;
-            }
-
-            if (Roles.ContainsKey(value))
-            {
-                var uri = Roles[value];
-                writer.WriteValue(uri);
-                return;
-            }
-
-            base.WriteJson(writer, value, serializer);
         }
     }
 }

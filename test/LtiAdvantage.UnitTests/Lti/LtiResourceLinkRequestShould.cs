@@ -1,6 +1,6 @@
 ﻿using LtiAdvantage.Lti;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using LtiAdvantage.Utilities;
+using System.Text.Json;
 using Xunit;
 
 namespace LtiAdvantage.UnitTests.Lti
@@ -39,15 +39,15 @@ namespace LtiAdvantage.UnitTests.Lti
             Assert.Equal("https://www.example.edu", targetLinkUri);
 
             Assert.True(request.TryGetValue("https://purl.imsglobal.org/spec/lti/claim/resource_link", out var resourceLinkJson));
-            var resourceLink = (JObject) resourceLinkJson;
-            Assert.True(resourceLink.TryGetValue("id", out var id));
+            var resourceLink = (JsonElement) resourceLinkJson;
+            Assert.True(resourceLink.TryGetString("id", out var id));
             Assert.Equal("12345", id);
 
             Assert.True(request.TryGetValue("sub", out var sub));
             Assert.Equal("12345", sub);
 
             Assert.True(request.TryGetValue("https://purl.imsglobal.org/spec/lti/claim/roles", out var rolesJson));
-            var roles = ((JArray) rolesJson).ToObject<string[]>();
+            var roles = ((JsonElement)rolesJson).ToStringList();
             Assert.Contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor", roles);
             Assert.Contains("http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor", roles);
         }
@@ -61,10 +61,10 @@ namespace LtiAdvantage.UnitTests.Lti
         {
             var referenceJson = TestUtils.LoadReferenceJsonFile("LtiResourceLinkRequest");
 
-            var request = JsonConvert.DeserializeObject<LtiResourceLinkRequest>(referenceJson);
-            var requestJson = JsonConvert.SerializeObject(request);
+            var request = JsonSerializer.Deserialize<LtiResourceLinkRequest>(referenceJson);
+            var requestJson = JsonSerializer.Serialize(request);
 
-            JsonAssertions.Equal(referenceJson, requestJson);
+            JsonAssert.Equal(referenceJson, requestJson);
         }
     }
 }

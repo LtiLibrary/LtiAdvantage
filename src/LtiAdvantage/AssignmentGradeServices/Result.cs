@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿
+using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
@@ -15,37 +16,37 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// <summary>
         /// The endpoint url for this result.
         /// </summary>
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
 
         /// <summary>
         /// A comment associated with this result.
         /// </summary>
-        [JsonProperty("comment")]
+        [JsonPropertyName("comment")]
         public string Comment { get; set; }
 
         /// <summary>
         /// Maximum result score.
         /// </summary>
-        [JsonProperty("resultMaximum")]
+        [JsonPropertyName("resultMaximum")]
         public double ResultMaximum { get; set; }
 
         /// <summary>
         /// The line item result.
         /// </summary>
-        [JsonProperty("resultScore")]
+        [JsonPropertyName("resultScore")]
         public double? ResultScore { get; set; }
 
         /// <summary>
         /// The line item.
         /// </summary>
-        [JsonProperty("scoreOf")]
+        [JsonPropertyName("scoreOf")]
         public string ScoreOf { get; set; }
 
         /// <summary>
         /// The user id.
         /// </summary>
-        [JsonProperty("userId")]
+        [JsonPropertyName("userId")]
         public string UserId { get; set; }
     }
 }

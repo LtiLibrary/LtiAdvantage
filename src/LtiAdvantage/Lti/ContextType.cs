@@ -1,5 +1,5 @@
 ﻿using LtiAdvantage.Utilities;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.Lti
 {

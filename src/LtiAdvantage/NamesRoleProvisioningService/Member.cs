@@ -1,7 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Text.Json.Serialization;
 using LtiAdvantage.Lti;
-using Newtonsoft.Json;
+
 
 namespace LtiAdvantage.NamesRoleProvisioningService
 {
@@ -20,21 +21,21 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// The primary email address for the person.
         /// Not specified if not included in a basic launch from same context.
         /// </summary>
-        [JsonProperty("email")]
+        [JsonPropertyName("email")]
         public string Email { get; set; }
 
         /// <summary>
         /// The person's assigned family name.
         /// Not specified  if not included in a basic launch from same context. 
         /// </summary>
-        [JsonProperty("family_name")]
+        [JsonPropertyName("family_name")]
         public string FamilyName { get; set; }
 
         /// <summary>
         /// The person's assigned first name.
         /// Not specified  if not included in a basic launch from same context. 
         /// </summary>
-        [JsonProperty("given_name")]
+        [JsonPropertyName("given_name")]
         public string GivenName { get; set; }
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// users who can access a specific resource link.
         /// See https://www.imsglobal.org/spec/lti-nrps/v2p0#membership-container-media-type.
         /// </remarks>
-        [JsonProperty("message")]
+        [JsonPropertyName("message")]
         public LtiResourceLinkRequest[] Message { get; set; }
 
         /// <summary>
@@ -53,26 +54,26 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// by their family name separated with a space).
         /// Not specified  if not included in a basic launch from same context. 
         /// </summary>
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
         /// <summary>
         /// A URL to an image for the person.
         /// Not specified  if not included in a basic launch from same context. 
         /// </summary>
-        [JsonProperty("picture")]
+        [JsonPropertyName("picture")]
         public Uri Picture { get; set; }
 
         /// <summary>
         /// The role/s this member has in the context. Does not include non-context roles.
         /// </summary>
-        [JsonProperty("roles")]
+        [JsonPropertyName("roles")]
         public Role[] Roles { get; set; }
 
         /// <summary>
         /// A unique identifier for the person as provisioned by an external system such as an SIS.
         /// </summary>
-        [JsonProperty("lis_person_sourcedid")]
+        [JsonPropertyName("lis_person_sourcedid")]
         public string LisPersonSourcedId { get; set; }
 
         /// <summary>
@@ -82,15 +83,19 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// Use Deleted when reporting differences if membership no longer exists.
         /// See https://www.imsglobal.org/spec/lti-nrps/v2p0#membership-status.
         /// </remarks>
-        [JsonProperty("status", DefaultValueHandling = DefaultValueHandling.Populate)]
-        [DefaultValue(MemberStatus.Active)]
-        public MemberStatus? Status { get; set; }
+        [JsonPropertyName("status")]
+        public MemberStatus? Status
+        {
+            get => _status;
+            set => _status = value ?? MemberStatus.Active;
+        }
+        private MemberStatus? _status = MemberStatus.Active;
 
         /// <summary>
         /// A unique identifier for the person.
         /// Corresponds to the "sub" claim.
         /// </summary>
-        [JsonProperty("user_id")]
+        [JsonPropertyName("user_id")]
         public string UserId { get; set; }
 
         /// <summary>
@@ -98,7 +103,7 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// as an additional member attribute. It should contain the userId value from LTI 1.1 Names and Roles Provisioning
         /// Service 1.0 for that same user.
         /// </summary>
-        [JsonProperty("lti11_legacy_user_id")]
+        [JsonPropertyName("lti11_legacy_user_id")]
         public string Lti11LegacyUserId { get; set; }
     }
 }

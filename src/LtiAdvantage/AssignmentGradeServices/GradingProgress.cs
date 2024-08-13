@@ -6,7 +6,7 @@ namespace LtiAdvantage.AssignmentGradeServices
     /// The grading progress.
     /// </summary>
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum GradingProgess
+    public enum GradingProgress
     {
         /// <summary>
         /// Unknown grading progress.

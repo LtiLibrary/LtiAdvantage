@@ -22,7 +22,7 @@ namespace LtiAdvantage.UnitTests.AssignmentGradeServices
             Assert.Equal(100, score.ScoreMaximum);
             Assert.Equal("This is exceptional work.", score.Comment);
             Assert.Equal(ActivityProgress.Completed, score.ActivityProgress);
-            Assert.Equal(GradingProgess.FullyGraded, score.GradingProgress);
+            Assert.Equal(GradingProgress.FullyGraded, score.GradingProgress);
             Assert.Equal("5323497", score.UserId);
         }
 

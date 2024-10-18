@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>.NET Core library with IMS LTIAdvantage support for Tool Consumer and Tool Provider applications.</Description>
     <AssemblyTitle>LtiAdvantage.IdentityModel</AssemblyTitle>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>LtiAdvantage.IdentityModel</AssemblyName>
     <PackageId>LtiAdvantage.IdentityModel</PackageId>
     <PackageTags>IMS;LTI;LTIAdvantage;.NET Core</PackageTags>
@@ -17,11 +17,11 @@
   <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
     <PackageReference Include="IdentityModel" Version="7.0.0" />
-    <PackageReference Include="MinVer" Version="4.3.0">
+    <PackageReference Include="MinVer" Version="6.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.2" />
   </ItemGroup>
 
 </Project>

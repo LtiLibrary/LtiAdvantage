@@ -5,6 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.Utilities
 {
+    /// <summary>
+    /// Converts an ISO DateTime to/from JSON.
+    /// </summary>
     public class IsoDateTimeConverter : JsonConverter<DateTime>
     {
         private const string Iso8601Format = "yyyy-MM-ddTHH:mm:ss.fffZ";
@@ -19,6 +22,7 @@ namespace LtiAdvantage.Utilities
             // Add more formats to handle here if needed
         };
 
+        /// <inheritdoc />
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var dateString = reader.GetString();
@@ -41,6 +45,7 @@ namespace LtiAdvantage.Utilities
             throw new JsonException("Unable to parse date time value.");
         }
 
+        /// <inheritdoc />
         public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         {
             writer.WriteStringValue(value.ToUniversalTime().ToString(Iso8601Format, CultureInfo.InvariantCulture));

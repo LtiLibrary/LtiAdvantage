@@ -13,7 +13,7 @@ namespace LtiAdvantage.Utilities
         /// </summary>
         /// <param name="source"></param>
         /// <param name="propertyName"></param>
-        /// <param name="id"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
         public static bool TryGetString(this JsonElement source, string propertyName, out string item)
         {

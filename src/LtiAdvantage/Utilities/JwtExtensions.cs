@@ -1,9 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+[assembly: InternalsVisibleTo("LtiAdvantage.UnitTests")]
 namespace LtiAdvantage.Utilities
 {
     /// <summary>
@@ -41,9 +43,7 @@ namespace LtiAdvantage.Utilities
 
             if (payload.TryGetValue(type, out var value))
             {
-                return typeof(T) == typeof(string)
-                    ? JsonSerializer.Deserialize<T>($"\"{value}\"")
-                    : JsonSerializer.Deserialize<T>(value.ToString());
+                return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value));
             }
 
             return default(T);
@@ -58,12 +58,7 @@ namespace LtiAdvantage.Utilities
             if (0 == values.Length)
                 return default(T);
 
-            var elementType = typeof(T).GetElementType();
-            if (elementType != null && elementType.IsClass && !elementType.IsEquivalentTo(typeof(string)))
-            {
-                return JsonSerializer.Deserialize<T>("[" + string.Join(",", values) + "]");
-            }
-            return JsonSerializer.Deserialize<T>("[\"" + string.Join("\",\"", values) + "\"]");
+            return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(values));
         }
 
         public static void SetClaimValue<T>(this JwtPayload payload, string type, T value)

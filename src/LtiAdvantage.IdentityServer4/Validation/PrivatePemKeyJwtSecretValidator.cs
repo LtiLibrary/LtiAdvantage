@@ -5,124 +5,130 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using IdentityServer4;
-using IdentityServer4.Extensions;
-using IdentityServer4.Models;
-using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using OpenIddict.Abstractions;
+using OpenIddict.Server;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 
-namespace LtiAdvantage.IdentityServer4.Validation
+namespace LtiAdvantage.OpenIddict.Validation
 {
-    /// <inheritdoc />
     /// <summary>
     /// Authenticates a client using public key JWT client secrets.
     /// </summary>
     /// <remarks>
     /// See https://tools.ietf.org/html/rfc7523 and the IMS application profile
     /// https://www.imsglobal.org/spec/security/v1p0#using-json-web-tokens-with-oauth-2-0-client-credentials-grant).
-    /// This similar to <see cref="PrivateKeyJwtSecretValidator"/> with these differences:
-    /// <list type="bullet">
-    /// <item>
-    /// <description>
-    /// Does not require that iss=sub. The IMS application profile does not require this.
-    /// </description>        
-    /// </item>
-    /// <item>
-    /// <description>
-    /// Accepts either the token endpoint or that base url of the authentication server per
-    /// the IMS application profile.
-    /// </description>
-    /// </item>
-    /// <item>
-    /// <description>
-    /// Uses serialized JSON Web Keys or PEM format keys instead of the full (leaf)
-    /// certificate as base64.
-    /// </description>
-    /// </item>
-    /// </list>
     /// </remarks>
-    public class PrivatePemKeyJwtSecretValidator : ISecretValidator
+    public class PrivatePemKeyJwtSecretValidator : IOpenIddictServerHandler<OpenIddictServerEvents.ValidateTokenRequestContext>
     {
         private readonly ILogger<PrivatePemKeyJwtSecretValidator> _logger;
-        private readonly string _audienceUri;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IOpenIddictApplicationManager _applicationManager;
 
         /// <summary>
         /// Instantiates an instance of Signed JWT secret validator.
         /// </summary>
-        public PrivatePemKeyJwtSecretValidator(IHttpContextAccessor contextAccessor, 
-            ILogger<PrivatePemKeyJwtSecretValidator> logger)
+        public PrivatePemKeyJwtSecretValidator(
+            IHttpContextAccessor httpContextAccessor, 
+            ILogger<PrivatePemKeyJwtSecretValidator> logger,
+            IOpenIddictApplicationManager applicationManager)
         {
-            _audienceUri = contextAccessor.HttpContext.GetIdentityServerIssuerUri();
+            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
+            _applicationManager = applicationManager;
         }
 
-        /// <inheritdoc />
-        /// <summary>
-        /// Validates the signed JWT.
-        /// </summary>
-        /// <param name="secrets">The stored secrets.</param>
-        /// <param name="parsedSecret">The received secret.</param>
-        /// <returns>
-        /// A validation result
-        /// </returns>
-        /// <exception cref="T:System.ArgumentException">ParsedSecret.Credential is not a JWT token</exception>
-        public Task<SecretValidationResult> ValidateAsync(IEnumerable<Secret> secrets, ParsedSecret parsedSecret)
+        public async ValueTask HandleAsync(OpenIddictServerEvents.ValidateTokenRequestContext context)
         {
-            var fail = Task.FromResult(new SecretValidationResult { Success = false });
-            var success = Task.FromResult(new SecretValidationResult { Success = true });
-
-            if (parsedSecret.Type != IdentityServerConstants.ParsedSecretTypes.JwtBearer)
+            // Skip validation if the client_assertion_type is not supported
+            if (string.IsNullOrEmpty(context.Request.ClientAssertionType) ||
+                context.Request.ClientAssertionType != OpenIddictConstants.ClientAssertionTypes.JwtBearer)
             {
-                return fail;
+                return;
             }
 
-            if (!(parsedSecret.Credential is string token))
+            // Skip validation if the client_assertion is not present
+            if (string.IsNullOrEmpty(context.Request.ClientAssertion))
             {
-                _logger.LogError("ParsedSecret.Credential is not a string.");
-                return fail;
+                context.Reject(
+                    error: OpenIddictConstants.Errors.InvalidClient,
+                    description: "The client assertion cannot be null or empty.");
+
+                return;
             }
 
+            var token = context.Request.ClientAssertion;
             var handler = new JwtSecurityTokenHandler();
+            
             if (!handler.CanReadToken(token))
             {
-                _logger.LogError("ParsedSecret.Credential is not a well formed JWT.");
-                return fail;
+                _logger.LogError("Client assertion is not a well-formed JWT.");
+                context.Reject(
+                    error: OpenIddictConstants.Errors.InvalidClient,
+                    description: "Client assertion is not a well-formed JWT.");
+                return;
             }
 
-            // Collect the potential public keys from the client secrets
-            var secretArray = secrets as Secret[] ?? secrets.ToArray();
-            var pemKeys = GetPemKeys(secretArray);
+            // Extract claims from the token
+            var jwtToken = handler.ReadJwtToken(token);
+            var clientId = jwtToken.Subject;
+
+            if (string.IsNullOrEmpty(clientId))
+            {
+                context.Reject(
+                    error: OpenIddictConstants.Errors.InvalidClient,
+                    description: "The client identifier cannot be extracted from the client assertion.");
+                return;
+            }
+
+            // Get the client application
+            var application = await _applicationManager.FindByClientIdAsync(clientId);
+            if (application == null)
+            {
+                context.Reject(
+                    error: OpenIddictConstants.Errors.InvalidClient,
+                    description: "The client application cannot be found.");
+                return;
+            }
+
+            // Collect PEM keys from client secrets
+            var pemKeys = new List<string>();
+            var properties = await _applicationManager.GetPropertiesAsync(application);
+            foreach (var secret in properties)
+            {
+                if (secret.Key == Constants.SecretTypes.PublicPemKey)
+                {
+                    pemKeys.Add(secret.Value.ToString());
+                }
+            }
 
             if (!pemKeys.Any())
             {
                 _logger.LogError("There are no keys available to validate the client assertion.");
-                return fail;
+                context.Reject(
+                    error: OpenIddictConstants.Errors.InvalidClient,
+                    description: "There are no keys available to validate the client assertion.");
+                return;
             }
+
+            var rsaSecurityKeys = GetRsaSecurityKeys(pemKeys);
+            var audienceUri = _httpContextAccessor.HttpContext.Request.Scheme + "://" + 
+                _httpContextAccessor.HttpContext.Request.Host.Value;
 
             var tokenValidationParameters = new TokenValidationParameters
             {
-                // The token must be signed to prove the client credentials.
                 RequireSignedTokens = true,
                 RequireExpirationTime = true,
-
-                IssuerSigningKeys = pemKeys,
+                IssuerSigningKeys = rsaSecurityKeys,
                 ValidateIssuerSigningKey = true,
-
-                // IMS recommendation is to send any unique name as Issuer. The IMS reference 
-                // implementation sends the tool name. The tool's own name for this client
-                // is not known by the platform and cannot be validated.
                 ValidateIssuer = false,
-
-                // IMS recommendation is to send the base url of the authentication server
-                // or the token URL.
-                ValidAudiences = new []
+                ValidAudiences = new[]
                 {
-                    _audienceUri, 
-                    string.Concat(_audienceUri.EnsureTrailingSlash(), "connect/token")
+                    audienceUri,
+                    string.Concat(audienceUri.TrimEnd('/'), "/connect/token")
                 },
                 ValidateAudience = true
             };
@@ -130,28 +136,29 @@ namespace LtiAdvantage.IdentityServer4.Validation
             try
             {
                 handler.ValidateToken(token, tokenValidationParameters, out _);
-
-                return success;
+                
+                // Set the validated client ID in the context
+                context.Request.ClientId = clientId;
+                
+                // Mark the request as validated to prevent other validators from running
+                context.HandleRequest();
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "JWT token validation error");
-                return fail;
+                context.Reject(
+                    error: OpenIddictConstants.Errors.InvalidClient,
+                    description: "JWT token validation failed.");
             }
         }
 
         /// <summary>
         /// Get the PEM format secrets.
         /// </summary>
-        /// <param name="secrets">The secrets to examine.</param>
+        /// <param name="pemKeys">The PEM key strings.</param>
         /// <returns>The PEM secrets converted into <see cref="RsaSecurityKey"/>'s.</returns>
-        private static List<RsaSecurityKey> GetPemKeys(IEnumerable<Secret> secrets)
+        private static List<RsaSecurityKey> GetRsaSecurityKeys(IEnumerable<string> pemKeys)
         {
-            var pemKeys = secrets
-                .Where(s => s.Type == Constants.SecretTypes.PublicPemKey)
-                .Select(s => s.Value)
-                .ToList();
-
             var rsaSecurityKeys = new List<RsaSecurityKey>();
 
             foreach (var pemKey in pemKeys)
@@ -168,7 +175,6 @@ namespace LtiAdvantage.IdentityServer4.Validation
                         };
 
                         var rsaSecurityKey = new RsaSecurityKey(rsaParameters);
-
                         rsaSecurityKeys.Add(rsaSecurityKey);
                     }
                 }

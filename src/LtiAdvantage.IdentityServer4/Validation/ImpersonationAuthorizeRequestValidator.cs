@@ -1,49 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using IdentityModel;
-using IdentityServer4.Validation;
 using Microsoft.Extensions.Logging;
+using OpenIddict.Abstractions;
+using OpenIddict.Server;
 
-namespace LtiAdvantage.IdentityServer4.Validation
+namespace LtiAdvantage.OpenIddict.Validation
 {
-    /// <inheritdoc />
     /// <summary>
     /// Replace the subject in the authorize request, with a <see cref="T:System.Security.Claims.ClaimsPrincipal" />
     /// for the person being impersonated. For example a student in a course.
     /// </summary>
-    public class ImpersonationAuthorizeRequestValidator : ICustomAuthorizeRequestValidator
+    public class ImpersonationAuthorizeRequestValidator(ILogger<ImpersonationAuthorizeRequestValidator> logger)
+        : IOpenIddictServerHandler<OpenIddictServerEvents.ProcessSignInContext>
     {
-        private readonly ILogger<ImpersonationAuthorizeRequestValidator> _logger;
-
         public const string AuthenticationType = @"Impersonation";
 
-        public ImpersonationAuthorizeRequestValidator(ILogger<ImpersonationAuthorizeRequestValidator> logger)
+        public ValueTask HandleAsync(OpenIddictServerEvents.ProcessSignInContext context)
         {
-            _logger = logger;
-        }
-
-        public Task ValidateAsync(CustomAuthorizeRequestValidationContext context)
-        {
-            var subject = context.Result.ValidatedRequest.Subject.Claims.SingleOrDefault(c => c.Type == "sub")?.Value;
-            var loginHint = context.Result.ValidatedRequest.LoginHint;
-
-            if (loginHint.IsPresent() && subject != loginHint)
+            // Continue with the next validator if there is no principal
+            if (context.Principal == null)
             {
-                _logger.LogInformation($"Impersonating subject {loginHint}.");
-
-                // Replace the subject with the person being impersonated in login_hint
-                context.Result.ValidatedRequest.Subject = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
-                {
-                    new Claim("sub", loginHint),
-                    new Claim("auth_time", DateTime.UtcNow.ToEpochTime().ToString()),
-                    new Claim("idp", "local")
-                }, AuthenticationType));
+                context.HandleRequest();
+                return ValueTask.CompletedTask;
             }
 
-            return Task.CompletedTask;
+            var subject = context.Principal.FindFirstValue(OpenIddictConstants.Claims.Subject);
+            var loginHint = context.Request.LoginHint;
+
+            if (!string.IsNullOrEmpty(loginHint) && subject != loginHint)
+            {
+                logger.LogInformation($"Impersonating subject {loginHint}.");
+
+                // Replace the subject with the person being impersonated in login_hint
+                var identity = new ClaimsIdentity(new List<Claim>
+                {
+                    new Claim(OpenIddictConstants.Claims.Subject, loginHint),
+                    new Claim("auth_time", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
+                    new Claim("idp", "local")
+                }, AuthenticationType);
+
+                context.Principal = new ClaimsPrincipal(identity);
+            }
+
+            context.HandleRequest();
+            return ValueTask.CompletedTask;
         }
     }
 }

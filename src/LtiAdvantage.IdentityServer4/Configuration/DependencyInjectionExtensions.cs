@@ -1,5 +1,7 @@
-﻿using IdentityServer4.Validation;
-using LtiAdvantage.IdentityServer4.Validation;
+﻿using LtiAdvantage.OpenIddict.Validation;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using OpenIddict.Abstractions;
+using OpenIddict.Server;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -15,11 +17,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <remarks>
         /// Allows the application user to impersonate another user type.
         /// </remarks>
-        public static IIdentityServerBuilder AddImpersonationSupport(this IIdentityServerBuilder builder)
+        public static OpenIddictServerBuilder AddImpersonationSupport(this OpenIddictServerBuilder builder)
         {
             builder.Services.AddLogging();
-
-            builder.AddCustomAuthorizeRequestValidator<ImpersonationAuthorizeRequestValidator>();
+            builder.Services.TryAddSingleton<ImpersonationAuthorizeRequestValidator>();
+            builder.AddEventHandler<OpenIddictServerEvents.ProcessSignInContext>(
+                provider => provider.UseScopedHandler<ImpersonationAuthorizeRequestValidator>()
+            );
 
             return builder;
         }
@@ -28,16 +32,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds support for client authentication using JWT bearer assertions signed
         /// with client private key stored in PEM format rather than X509Certificate2 format.
         /// </summary>
-        /// <remarks>
-        /// See <see cref="IdentityServerBuilderExtensionsAdditional.AddJwtBearerClientAuthentication"/>
-        /// for X509Certificate2 version.
-        /// </remarks>
-        public static IIdentityServerBuilder AddLtiJwtBearerClientAuthentication(this IIdentityServerBuilder builder)
+        public static OpenIddictServerBuilder AddLtiJwtBearerClientAuthentication(this OpenIddictServerBuilder builder)
         {
             builder.Services.AddLogging();
-
-            builder.AddSecretParser<JwtBearerClientAssertionSecretParser>();
-            builder.AddSecretValidator<PrivatePemKeyJwtSecretValidator>();
+            builder.Services.AddSingleton<PrivatePemKeyJwtSecretValidator>();
+            builder.AddEventHandler<OpenIddict.Server.OpenIddictServerEvents.ValidateTokenRequestContext>(
+                provider => provider.UseScopedHandler<PrivatePemKeyJwtSecretValidator>()
+            );
 
             return builder;
         }

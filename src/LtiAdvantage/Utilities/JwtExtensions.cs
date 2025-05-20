@@ -15,7 +15,7 @@ namespace LtiAdvantage.Utilities
     {
         private static readonly JsonSerializerOptions Settings = new JsonSerializerOptions
         {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
 
         /// <summary>

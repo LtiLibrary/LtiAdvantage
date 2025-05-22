@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text.Json;
 using LtiAdvantage.Utilities;
+using JsonClaimValueTypes = System.IdentityModel.Tokens.Jwt.JsonClaimValueTypes;
+using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 
 namespace LtiAdvantage.Lti
 {
@@ -41,6 +45,84 @@ namespace LtiAdvantage.Lti
         }
 
         #endregion
+
+        public IEnumerable<Claim> IssuedClaims
+        {
+            get
+            {
+                List<Claim> claims = new List<Claim>();
+                string issuer = Iss ?? ClaimsIdentity.DefaultIssuer;
+
+                foreach (KeyValuePair<string, object> keyValuePair in this)
+                {
+                    if (keyValuePair.Value == null)
+                        claims.Add(new Claim(keyValuePair.Key, string.Empty, JsonClaimValueTypes.JsonNull, issuer, issuer));
+
+                    else if (keyValuePair.Value is string str)
+                        claims.Add(new Claim(keyValuePair.Key, str, GetClaimValueType(keyValuePair.Key, str), issuer, issuer));
+
+                    else if (keyValuePair.Value is IDictionary<string, object> dictionary)
+                    {
+                        foreach (var item in dictionary)
+                            if (item.Value != null)
+                                claims.Add(new Claim(keyValuePair.Key, "{" + item.Key + ":" + item.Value.ToString() + "}", GetClaimValueType(item.Key, item.Value), issuer, issuer));
+                    }
+                    else if (keyValuePair.Value is DateTime dateTime)
+                        claims.Add(new Claim(keyValuePair.Key, dateTime.ToString("o", CultureInfo.InvariantCulture), ClaimValueTypes.DateTime, issuer, issuer));
+                    else if (keyValuePair.Value is bool boolValue)
+                    {
+                        // Can't just use ToString or bools will get encoded as True/False instead of true/false.
+                        if (boolValue)
+                            claims.Add(new Claim(keyValuePair.Key, "true", ClaimValueTypes.Boolean, issuer, issuer));
+                        else
+                            claims.Add(new Claim(keyValuePair.Key, "false", ClaimValueTypes.Boolean, issuer, issuer));
+                    }
+                    else if (keyValuePair.Value != null)
+                    {
+                        var value = keyValuePair.Value;
+                        var claimValueType = GetClaimValueType(keyValuePair.Key, value);
+                        if (value is IFormattable formattable)
+                            claims.Add(new Claim(keyValuePair.Key, formattable.ToString(null, CultureInfo.InvariantCulture), claimValueType, issuer, issuer));
+                        else
+                            claims.Add(new Claim(keyValuePair.Key, value.ToString(), claimValueType, issuer, issuer));
+                    }
+                }
+                return claims;
+            }
+        }
+        
+        private static string GetClaimValueType(string claimType, object value)
+        {
+            if (value == null)
+                return JsonClaimValueTypes.JsonNull;
+
+            Type objType = value.GetType();
+
+            if (value is string str)
+                return ClaimValueTypes.String;
+            else if (objType == typeof(int))
+                return ClaimValueTypes.Integer32;
+            else if (objType == typeof(long))
+                return ClaimValueTypes.Integer64;
+            else if (objType == typeof(bool))
+                return ClaimValueTypes.Boolean;
+            else if (objType == typeof(double))
+                return ClaimValueTypes.Double;
+            else if (objType == typeof(DateTime))
+                return ClaimValueTypes.DateTime;
+            else if (objType == typeof(float))
+                return ClaimValueTypes.Double;
+            else if (objType == typeof(decimal))
+                return ClaimValueTypes.Double;
+            else if (value is JsonElement jsonElement)
+            {
+                if (jsonElement.ValueKind == JsonValueKind.Array)
+                    return JsonClaimValueTypes.JsonArray;
+                return JsonClaimValueTypes.Json;
+            }
+
+            return objType.ToString();
+        }
 
         #region Required Message Claims
 

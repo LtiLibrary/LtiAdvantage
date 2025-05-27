@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace LtiAdvantage.IdentityServer4
+namespace LtiAdvantage.Oidc
 {
     /// <summary>
     /// Local version of Identity Server 4 internal static class StringExtensions

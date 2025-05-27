@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -57,8 +58,25 @@ namespace LtiAdvantage.AspNetCore.Utilities
             {
                 _logger.LogInformation($"Adding required scope {policyName}.");
 
+                var requiredScopes = policyName.Split(' ');
                 policy = new AuthorizationPolicyBuilder().AddRequirements()
-                    .RequireClaim("scope", policyName.Split(' '))
+                    .RequireAssertion(context =>
+                    {
+                        // Get the scope claim from the user's principal
+                        var scopeClaim = context.User.FindFirst("scope");
+
+                        // If there's no scope claim, the assertion fails
+                        if (scopeClaim == null)
+                        {
+                            return false;
+                        }
+
+                        // Split the scope claim value into individual scopes
+                        var userScopes = scopeClaim.Value.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
+
+                        // Check if any of the required scopes are present in the user's scopes
+                        return requiredScopes.Any(requiredScope => userScopes.Contains(requiredScope));
+                    })
                     .Build();
 
                 // Add policy to the AuthorizationOptions, so we don't have to re-create it each time

@@ -27,20 +27,5 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder;
         }
-
-        /// <summary>
-        /// Adds support for client authentication using JWT bearer assertions signed
-        /// with client private key stored in PEM format rather than X509Certificate2 format.
-        /// </summary>
-        public static OpenIddictServerBuilder AddLtiJwtBearerClientAuthentication(this OpenIddictServerBuilder builder)
-        {
-            builder.Services.AddLogging();
-            builder.Services.AddSingleton<PrivatePemKeyJwtSecretValidator>();
-            builder.AddEventHandler<OpenIddict.Server.OpenIddictServerEvents.ValidateTokenRequestContext>(
-                provider => provider.UseScopedHandler<PrivatePemKeyJwtSecretValidator>()
-            );
-
-            return builder;
-        }
     }
 }

@@ -6,12 +6,15 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C53CA168-7453-4035-8AB3-79781B00A4A4}"
 	ProjectSection(SolutionItems) = preProject
 		.travis.yml = .travis.yml
+		dependabot.yml = .github/dependabot.yml
+		dotnet-core.yml = .github/workflows/dotnet-core.yml
+		test-report.yml = .github/workflow/test-report.yml
 		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage.IdentityServer4", "src\LtiAdvantage.IdentityServer4\LtiAdvantage.IdentityServer4.csproj", "{B1B5BE67-85D7-4320-9221-D906AFF1806F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage.Oidc", "src\LtiAdvantage.Oidc\LtiAdvantage.Oidc.csproj", "{B1B5BE67-85D7-4320-9221-D906AFF1806F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage", "src\LtiAdvantage\LtiAdvantage.csproj", "{43D22F50-460B-485D-9979-05DEB3DA6A87}"
 EndProject

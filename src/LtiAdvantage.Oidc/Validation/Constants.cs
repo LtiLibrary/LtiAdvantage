@@ -1,4 +1,4 @@
-﻿namespace LtiAdvantage.IdentityServer4.Validation
+﻿namespace LtiAdvantage.OpenIddict.Validation
 {
     /// <summary>
     /// Identity Server constants used by <see cref="PrivatePemKeyJwtSecretValidator"/>.

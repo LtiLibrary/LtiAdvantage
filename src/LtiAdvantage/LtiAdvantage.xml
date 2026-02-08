@@ -2986,6 +2986,13 @@
             Fully resolved URL to service.
             </summary>
         </member>
+        <member name="P:LtiAdvantage.NamesRoleProvisioningService.NamesRoleServiceClaimValueType.Scope">
+            <summary>
+            The scope to request to access this service.
+            It's optional and not provided from every platform.
+            If not provided, the default scope is "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly".
+            </summary>
+        </member>
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.NamesRoleServiceClaimValueType.ServiceVersions">
             <summary>
             Service version. Default is <see cref="F:LtiAdvantage.NamesRoleProvisioningService.NamesRoleServiceClaimValueType.Version"/>.

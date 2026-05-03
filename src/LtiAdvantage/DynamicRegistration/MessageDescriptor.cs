@@ -6,7 +6,7 @@ namespace LtiAdvantage.DynamicRegistration
     /// <summary>
     /// Describes a supported LTI message type. Used in both
     /// <see cref="LtiPlatformConfiguration"/> (what the platform launches)
-    /// and <c>LtiToolConfiguration</c> (what the tool can receive).
+    /// and <see cref="LtiToolConfiguration"/> (what the tool can receive).
     /// </summary>
     public class MessageDescriptor
     {

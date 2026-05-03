@@ -15,6 +15,7 @@
     <None Remove="ReferenceJson\Result.json" />
     <None Remove="ReferenceJson\ResultContainer.json" />
     <None Remove="ReferenceJson\Score.json" />
+    <None Remove="ReferenceJson\ToolConfiguration.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +41,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ReferenceJson\Score.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ReferenceJson\ToolConfiguration.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

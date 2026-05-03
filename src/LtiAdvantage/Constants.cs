@@ -60,6 +60,11 @@
             public const string LtiResourceLinkRequestMessageType = "LtiResourceLinkRequest";
 
             /// <summary>
+            /// The message type of an LtiSubmissionReviewRequest.
+            /// </summary>
+            public const string LtiSubmissionReviewRequestMessageType = "LtiSubmissionReviewRequest";
+
+            /// <summary>
             /// LTI version.
             /// </summary>
             public const string Version = "1.3.0";
@@ -114,6 +119,11 @@
             /// Optional plain text message.
             /// </summary>
             public const string ErrorMessage = "https://purl.imsglobal.org/spec/lti-dl/claim/errormsg";
+
+            /// <summary>
+            /// The user whose submission is being reviewed (Submission Review 1.0 §3.2).
+            /// </summary>
+            public const string ForUser = "https://purl.imsglobal.org/spec/lti-sr/claim/for_user";
 
             /// <summary>
             /// Information to help the Tool present itself appropriately.

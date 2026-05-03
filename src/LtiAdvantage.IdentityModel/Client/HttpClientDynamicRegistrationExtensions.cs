@@ -28,8 +28,13 @@ namespace LtiAdvantage.IdentityModel.Client
                 throw new ArgumentException("URL is required", nameof(openIdConfigurationUrl));
 
             using var response = await client.GetAsync(openIdConfigurationUrl, cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-            var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                throw new HttpRequestException(
+                    $"Dynamic Registration failed: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {errorBody}");
+            }
+            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<PlatformOpenIdConfiguration>(body);
         }
 
@@ -65,8 +70,13 @@ namespace LtiAdvantage.IdentityModel.Client
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", registrationAccessToken);
 
             using var response = await client.SendAsync(request, cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-            var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                throw new HttpRequestException(
+                    $"Dynamic Registration failed: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {errorBody}");
+            }
+            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<ToolConfiguration>(body);
         }
     }

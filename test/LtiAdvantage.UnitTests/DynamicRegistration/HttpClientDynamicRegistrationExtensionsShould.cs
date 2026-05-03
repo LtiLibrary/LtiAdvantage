@@ -69,6 +69,27 @@ namespace LtiAdvantage.UnitTests.DynamicRegistration
             Assert.Equal("application/json", capturedRequest.Content.Headers.ContentType.MediaType);
         }
 
+        [Fact]
+        public async Task SurfaceErrorBody_OnRegistrationFailure()
+        {
+            const string errorBody = """{"error":"invalid_redirect_uri","error_description":"bad uri"}""";
+            var handler = new StubHandler((req, ct) =>
+                new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent(errorBody, Encoding.UTF8, "application/json")
+                });
+            using var client = new HttpClient(handler);
+
+            var ex = await Assert.ThrowsAsync<HttpRequestException>(() =>
+                client.RegisterToolAsync(
+                    "https://platform.example.com/lti/register",
+                    "tok",
+                    new ToolConfiguration()));
+
+            Assert.Contains("400", ex.Message);
+            Assert.Contains("invalid_redirect_uri", ex.Message);
+        }
+
         private sealed class StubHandler : HttpMessageHandler
         {
             private readonly Func<HttpRequestMessage, CancellationToken, HttpResponseMessage> _fn;

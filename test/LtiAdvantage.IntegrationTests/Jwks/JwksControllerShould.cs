@@ -41,6 +41,19 @@ namespace LtiAdvantage.IntegrationTests.Jwks
             Assert.Equal("test-kid-1", first.GetProperty("kid").GetString());
             Assert.Equal("sig", first.GetProperty("use").GetString());
             Assert.Equal("RSA", first.GetProperty("kty").GetString());
+
+            // Public key parameters MUST be present.
+            Assert.False(string.IsNullOrEmpty(first.GetProperty("n").GetString()), "modulus n missing");
+            Assert.False(string.IsNullOrEmpty(first.GetProperty("e").GetString()), "exponent e missing");
+            Assert.Equal("RS256", first.GetProperty("alg").GetString());
+
+            // Private RSA parameters MUST NOT be present.
+            Assert.False(first.TryGetProperty("d",  out _), "private exponent d must not be published");
+            Assert.False(first.TryGetProperty("p",  out _), "private prime p must not be published");
+            Assert.False(first.TryGetProperty("q",  out _), "private prime q must not be published");
+            Assert.False(first.TryGetProperty("dp", out _), "dp must not be published");
+            Assert.False(first.TryGetProperty("dq", out _), "dq must not be published");
+            Assert.False(first.TryGetProperty("qi", out _), "qi must not be published");
         }
 
         public void Dispose() { _client?.Dispose(); _server?.Dispose(); }

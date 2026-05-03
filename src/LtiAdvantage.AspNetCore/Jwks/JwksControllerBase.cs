@@ -38,10 +38,18 @@ namespace LtiAdvantage.AspNetCore.Jwks
         [Route(".well-known/jwks.json", Name = Constants.ServiceEndpoints.Jwks.JwksService)]
         public async Task<ActionResult<JsonWebKeySet>> GetJwksAsync()
         {
-            var keys = await _keyStore.GetPublicKeysAsync().ConfigureAwait(false);
-            var set = new JsonWebKeySet();
-            foreach (var k in keys) set.Keys.Add(k);
-            return set;
+            _logger.LogDebug($"Entering {nameof(GetJwksAsync)}.");
+            try
+            {
+                var keys = await _keyStore.GetPublicKeysAsync().ConfigureAwait(false);
+                var set = new JsonWebKeySet();
+                foreach (var k in keys) set.Keys.Add(k);
+                return set;
+            }
+            finally
+            {
+                _logger.LogDebug($"Exiting {nameof(GetJwksAsync)}.");
+            }
         }
     }
 }

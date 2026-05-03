@@ -63,6 +63,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\LtiAdvantage\LtiAdvantage.csproj" />
+    <ProjectReference Include="..\..\src\LtiAdvantage.IdentityModel\LtiAdvantage.IdentityModel.csproj" />
   </ItemGroup>
 
 </Project>

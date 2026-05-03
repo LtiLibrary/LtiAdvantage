@@ -151,6 +151,12 @@
             /// </summary>
             public const string LtiMigration = "https://purl.imsglobal.org/spec/lti/claim/lti1p1";
 
+            /// <summary>The LTI Platform Configuration claim on an OpenID configuration document (Dynamic Registration §3.5).</summary>
+            public const string LtiPlatformConfiguration = "https://purl.imsglobal.org/spec/lti-platform-configuration";
+
+            /// <summary>The LTI Tool Configuration claim on a registration request body (Dynamic Registration §3.6).</summary>
+            public const string LtiToolConfiguration = "https://purl.imsglobal.org/spec/lti-tool-configuration";
+
             /// <summary>
             /// Optional plain text message.
             /// </summary>
@@ -231,6 +237,13 @@
                 /// Custom Assignment and Grade Service score readonly scope.
                 /// </summary>
                 public const string ScoreReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/score.readonly";
+            }
+
+            /// <summary>LTI Dynamic Registration scopes (Dynamic Registration §4.4).</summary>
+            public static class DynamicRegistration
+            {
+                /// <summary>Scope required on the registration access token.</summary>
+                public const string Scope = "https://purl.imsglobal.org/spec/lti-reg/scope/registration";
             }
 
             /// <summary>

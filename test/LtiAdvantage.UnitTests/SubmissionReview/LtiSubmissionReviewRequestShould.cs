@@ -1,3 +1,4 @@
+using System.Text.Json;
 using LtiAdvantage.Lti;
 using LtiAdvantage.SubmissionReview;
 using Xunit;
@@ -35,6 +36,15 @@ namespace LtiAdvantage.UnitTests.SubmissionReview
 
             Assert.Equal("abc-123", request.ForUser.UserId);
             Assert.Equal("Jane Doe", request.ForUser.Name);
+        }
+
+        [Fact]
+        public void ParseValidLtiSubmissionReviewRequest()
+        {
+            var referenceJson = TestUtils.LoadReferenceJsonFile("LtiSubmissionReviewRequest");
+            var request = JsonSerializer.Deserialize<LtiSubmissionReviewRequest>(referenceJson);
+            var requestJson = JsonSerializer.Serialize(request);
+            JsonAssert.Equal(referenceJson, requestJson);
         }
     }
 }

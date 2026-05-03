@@ -251,6 +251,11 @@
         public static class MediaTypes
         {
             /// <summary>
+            /// JSON Web Key Set media type (RFC 7517 §6).
+            /// </summary>
+            public const string Jwks = "application/jwk-set+json";
+
+            /// <summary>
             /// https://www.imsglobal.org/spec/lti-ags/v2p0/#media-types-and-schemas
             /// </summary>
             public const string LineItem = "application/vnd.ims.lis.v2.lineitem+json";
@@ -377,6 +382,15 @@
                 /// Scores endpoint.
                 /// </summary>
                 public const string ScoresService = "scores";
+            }
+
+            /// <summary>
+            /// JWKS publication endpoint.
+            /// </summary>
+            public static class Jwks
+            {
+                /// <summary>The well-known JWKS endpoint route name.</summary>
+                public const string JwksService = "jwks";
             }
 
             /// <summary>

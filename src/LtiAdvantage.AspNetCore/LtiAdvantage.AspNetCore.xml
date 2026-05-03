@@ -383,6 +383,65 @@
             Get or set the line item id.
             </summary>
         </member>
+        <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase">
+            <summary>
+            Platform-side endpoint for LTI Dynamic Registration 1.0.
+            See https://www.imsglobal.org/spec/lti-dr/v1p0/#registration-endpoint
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase})">
+            <summary>Initializes the base.</summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.OnRegisterAsync(LtiAdvantage.AspNetCore.DynamicRegistration.RegisterToolRequest)">
+            <summary>
+            Persist the registration. Implementations MUST set <see cref="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.ClientId"/>
+            on <c>request.Tool</c> (or return a new instance) before returning.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.RegisterAsync(LtiAdvantage.DynamicRegistration.ToolConfiguration)">
+            <inheritdoc />
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.IDynamicRegistrationController">
+            <summary>The platform-side LTI Dynamic Registration endpoint.</summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.IDynamicRegistrationController.RegisterAsync(LtiAdvantage.DynamicRegistration.ToolConfiguration)">
+            <summary>Registers a new tool. Returns 201 with the assigned <c>client_id</c> echoed back.</summary>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.RegisterToolRequest">
+            <summary>Request passed to the controller's <c>OnRegisterAsync</c> override.</summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.RegisterToolRequest.#ctor(LtiAdvantage.DynamicRegistration.ToolConfiguration)">
+            <summary>Wraps the submitted tool configuration.</summary>
+            <param name="tool">The submitted tool configuration.</param>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.DynamicRegistration.RegisterToolRequest.Tool">
+            <summary>The submitted tool configuration. The override should populate <see cref="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.ClientId"/>.</summary>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.Jwks.IJwksController">
+            <summary>JWKS publication endpoint.</summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Jwks.IJwksController.GetJwksAsync">
+            <summary>Returns the JSON Web Key Set.</summary>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase">
+            <summary>
+            Publishes the platform's (or tool's) JWKS at a well-known URL so that
+            peers can verify signed JWTs. Anonymous; unauthenticated.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase.#ctor(LtiAdvantage.Jwks.IJwksKeyStore,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.Jwks.JwksControllerBase})">
+            <summary>
+            Constructs a new <see cref="T:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase"/>.
+            </summary>
+            <param name="keyStore">The key store providing public keys to publish.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase.GetJwksAsync">
+            <summary>
+            Returns the JSON Web Key Set containing the public keys used to verify
+            signed JWTs issued by this server.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.Lti.ServiceResponse">
             <summary>
             Represents an LTI service response.

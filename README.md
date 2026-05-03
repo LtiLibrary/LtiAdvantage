@@ -7,6 +7,12 @@
 - [LtiAdvantage.IntegrationTests](https://github.com/LtiLibrary/LtiAdvantage/tree/master/test/LtiAdvantage.IntegrationTests) integration tests.
 - [LtiAdvantage.UnitTests](https://github.com/LtiLibrary/LtiAdvantage/tree/master/test/LtiAdvantage.UnitTests) unit tests.
 
+### What's new
+
+- [LTI Submission Review 1.0](https://www.imsglobal.org/spec/lti-sr/v1p0) (`LtiSubmissionReviewRequest`, `for_user` claim, AGS `submissionReview` extension)
+- [JWKS publishing](https://www.imsglobal.org/spec/security/v1p0#tool-jwk-set-url) (`JwksControllerBase` + `IJwksKeyStore`) for `/.well-known/jwks.json`
+- [LTI Dynamic Registration 1.0](https://www.imsglobal.org/spec/lti-dr/v1p0) — tool-side `HttpClient` extensions and platform-side `DynamicRegistrationControllerBase`
+
 ## NuGet
 | Library | Release | Prerelease |
 | --- | --- | --- |

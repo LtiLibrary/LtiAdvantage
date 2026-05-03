@@ -9,9 +9,9 @@
 
 ### What's new
 
-- LTI Submission Review 1.0 (`LtiSubmissionReviewRequest`, `for_user` claim, AGS `submissionReview` extension)
-- JWKS publishing (`JwksControllerBase` + `IJwksKeyStore`) for `/.well-known/jwks.json`
-- LTI Dynamic Registration 1.0 — tool-side `HttpClient` extensions and platform-side `DynamicRegistrationControllerBase`
+- [LTI Submission Review 1.0](https://www.imsglobal.org/spec/lti-sr/v1p0) (`LtiSubmissionReviewRequest`, `for_user` claim, AGS `submissionReview` extension)
+- [JWKS publishing](https://www.imsglobal.org/spec/security/v1p0#tool-jwk-set-url) (`JwksControllerBase` + `IJwksKeyStore`) for `/.well-known/jwks.json`
+- [LTI Dynamic Registration 1.0](https://www.imsglobal.org/spec/lti-dr/v1p0) — tool-side `HttpClient` extensions and platform-side `DynamicRegistrationControllerBase`
 
 ## NuGet
 | Library | Release | Prerelease |

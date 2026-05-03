@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Text.Json;
 using LtiAdvantage.AssignmentGradeServices;
+using LtiAdvantage.SubmissionReview;
 using Xunit;
 
 namespace LtiAdvantage.UnitTests.AssignmentGradeServices
@@ -40,6 +41,29 @@ namespace LtiAdvantage.UnitTests.AssignmentGradeServices
             var lineItemJson = JsonSerializer.Serialize(lineItem);
 
             JsonAssert.Equal(referenceJson, lineItemJson);
+        }
+
+        [Fact]
+        public void RoundTripSubmissionReviewProperty()
+        {
+            var lineItem = new LineItem
+            {
+                Id = "https://platform.example.com/lineitems/1",
+                Label = "Essay",
+                ScoreMaximum = 10,
+                SubmissionReviewExtension = new SubmissionReviewProperty
+                {
+                    Url = "https://tool.example.com/review",
+                    Custom = new System.Collections.Generic.Dictionary<string, string> { ["a"] = "1" }
+                }
+            };
+
+            var json = JsonSerializer.Serialize(lineItem);
+            var roundTripped = JsonSerializer.Deserialize<LineItem>(json);
+
+            Assert.NotNull(roundTripped.SubmissionReviewExtension);
+            Assert.Equal("https://tool.example.com/review", roundTripped.SubmissionReviewExtension.Url);
+            Assert.Equal("1", roundTripped.SubmissionReviewExtension.Custom["a"]);
         }
     }
 }

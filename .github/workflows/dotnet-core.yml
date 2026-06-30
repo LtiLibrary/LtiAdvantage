@@ -21,7 +21,7 @@ jobs:
       GITHUB_NUGET_SOURCE_URL: https://nuget.pkg.github.com/LtiLibrary/index.json
       NUGET_SOURCE_URL: https://api.nuget.org/v3/index.json
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
     - name: Fetch tags
       run: |
         git fetch origin +refs/tags/*:refs/tags/*
@@ -41,7 +41,7 @@ jobs:
     - name: Test
       run: |
         dotnet test --configuration Release --results-directory artifacts --no-build --logger 'trx;LogFileName=test-results.trx'
-    - uses: actions/upload-artifact@v4  # upload test results
+    - uses: actions/upload-artifact@v7  # upload test results
       if: success() || failure()        # run this step even if previous step failed
       with:
         name: test-results

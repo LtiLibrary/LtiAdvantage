@@ -17,6 +17,8 @@ namespace LtiAdvantage.IntegrationTests
                 .AddScheme<TestAuthOptions, TestAuthHandler>(JwtBearerDefaults.AuthenticationScheme, options => { });
 
             services.AddLtiAdvantagePolicies();
+
+            services.AddSingleton<LtiAdvantage.Jwks.IJwksKeyStore, Controllers.TestJwksKeyStore>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -26,6 +28,7 @@ namespace LtiAdvantage.IntegrationTests
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapControllerRoute(
                     "default",
                     "{controller}/{action=Index}/{id?}");

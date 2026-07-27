@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Json.Serialization;
+using LtiAdvantage.SubmissionReview;
 
 namespace LtiAdvantage.AssignmentGradeServices
 {
@@ -56,5 +57,13 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// </summary>
         [JsonPropertyName("tag")]
         public string Tag { get; set; }
+
+        /// <summary>
+        /// Submission Review extension. When present, the platform uses
+        /// <c>SubmissionReviewExtension.Url</c> for LtiSubmissionReviewRequest
+        /// launches against this line item.
+        /// </summary>
+        [JsonPropertyName("submissionReview")]
+        public SubmissionReviewProperty SubmissionReviewExtension { get; set; }
     }
 }

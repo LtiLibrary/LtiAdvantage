@@ -60,6 +60,11 @@
             public const string LtiResourceLinkRequestMessageType = "LtiResourceLinkRequest";
 
             /// <summary>
+            /// The message type of an LtiSubmissionReviewRequest.
+            /// </summary>
+            public const string LtiSubmissionReviewRequestMessageType = "LtiSubmissionReviewRequest";
+
+            /// <summary>
             /// LTI version.
             /// </summary>
             public const string Version = "1.3.0";
@@ -116,6 +121,11 @@
             public const string ErrorMessage = "https://purl.imsglobal.org/spec/lti-dl/claim/errormsg";
 
             /// <summary>
+            /// The user whose submission is being reviewed (Submission Review 1.0 §3.2).
+            /// </summary>
+            public const string ForUser = "https://purl.imsglobal.org/spec/lti-sr/claim/for_user";
+
+            /// <summary>
             /// Information to help the Tool present itself appropriately.
             /// </summary>
             public const string LaunchPresentation = "https://purl.imsglobal.org/spec/lti/claim/launch_presentation";
@@ -140,6 +150,12 @@
             /// Optional LTI 1.1 migration mapping.
             /// </summary>
             public const string LtiMigration = "https://purl.imsglobal.org/spec/lti/claim/lti1p1";
+
+            /// <summary>The LTI Platform Configuration claim on an OpenID configuration document (Dynamic Registration §3.5).</summary>
+            public const string LtiPlatformConfiguration = "https://purl.imsglobal.org/spec/lti-platform-configuration";
+
+            /// <summary>The LTI Tool Configuration claim on a registration request body (Dynamic Registration §3.6).</summary>
+            public const string LtiToolConfiguration = "https://purl.imsglobal.org/spec/lti-tool-configuration";
 
             /// <summary>
             /// Optional plain text message.
@@ -223,6 +239,13 @@
                 public const string ScoreReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/score.readonly";
             }
 
+            /// <summary>LTI Dynamic Registration scopes (Dynamic Registration §4.4).</summary>
+            public static class DynamicRegistration
+            {
+                /// <summary>Scope required on the registration access token.</summary>
+                public const string Scope = "https://purl.imsglobal.org/spec/lti-reg/scope/registration";
+            }
+
             /// <summary>
             /// Names and Role Provisioning Service scopes.
             /// </summary>
@@ -240,6 +263,11 @@
         /// </summary>
         public static class MediaTypes
         {
+            /// <summary>
+            /// JSON Web Key Set media type (RFC 7517 §6).
+            /// </summary>
+            public const string Jwks = "application/jwk-set+json";
+
             /// <summary>
             /// https://www.imsglobal.org/spec/lti-ags/v2p0/#media-types-and-schemas
             /// </summary>
@@ -367,6 +395,15 @@
                 /// Scores endpoint.
                 /// </summary>
                 public const string ScoresService = "scores";
+            }
+
+            /// <summary>
+            /// JWKS publication endpoint.
+            /// </summary>
+            public static class Jwks
+            {
+                /// <summary>The well-known JWKS endpoint route name.</summary>
+                public const string JwksService = "jwks";
             }
 
             /// <summary>

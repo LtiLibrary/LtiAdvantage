@@ -1,0 +1,28 @@
+{
+  "issuer": "https://platform.example.com",
+  "authorization_endpoint": "https://platform.example.com/auth",
+  "token_endpoint": "https://platform.example.com/token",
+  "token_endpoint_auth_methods_supported": ["private_key_jwt"],
+  "token_endpoint_auth_signing_alg_values_supported": ["RS256"],
+  "jwks_uri": "https://platform.example.com/.well-known/jwks.json",
+  "registration_endpoint": "https://platform.example.com/lti/register",
+  "scopes_supported": [
+    "openid",
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+    "https://purl.imsglobal.org/spec/lti-ags/scope/score",
+    "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"
+  ],
+  "response_types_supported": ["id_token"],
+  "subject_types_supported": ["public"],
+  "id_token_signing_alg_values_supported": ["RS256"],
+  "claims_supported": ["sub", "iss", "name", "email"],
+  "https://purl.imsglobal.org/spec/lti-platform-configuration": {
+    "product_family_code": "ExamplePlatform",
+    "version": "1.0",
+    "messages_supported": [
+      { "type": "LtiResourceLinkRequest" },
+      { "type": "LtiDeepLinkingRequest", "placements": ["ContentArea", "RichTextEditor"] }
+    ],
+    "variables": ["CourseSection.sourcedId", "Person.email.primary"]
+  }
+}

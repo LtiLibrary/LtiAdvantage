@@ -1,0 +1,24 @@
+{
+  "iss": "https://platform.example.com",
+  "aud": ["abcd-1234"],
+  "sub": "instructor-9",
+  "exp": 1933333333,
+  "iat": 1933332433,
+  "nonce": "nonce-1",
+  "https://purl.imsglobal.org/spec/lti/claim/message_type": "LtiSubmissionReviewRequest",
+  "https://purl.imsglobal.org/spec/lti/claim/version": "1.3.0",
+  "https://purl.imsglobal.org/spec/lti/claim/deployment_id": "dep-1",
+  "https://purl.imsglobal.org/spec/lti/claim/target_link_uri": "https://tool.example.com/review",
+  "https://purl.imsglobal.org/spec/lti/claim/resource_link": { "id": "rl-1" },
+  "https://purl.imsglobal.org/spec/lti/claim/roles": [
+    "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"
+  ],
+  "https://purl.imsglobal.org/spec/lti-sr/claim/for_user": {
+    "user_id": "student-7",
+    "name": "Jane Doe",
+    "given_name": "Jane",
+    "family_name": "Doe",
+    "email": "jane@example.edu",
+    "roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"]
+  }
+}

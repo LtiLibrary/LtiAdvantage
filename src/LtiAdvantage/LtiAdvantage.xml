@@ -141,6 +141,13 @@
             Optional tag.
             </summary>
         </member>
+        <member name="P:LtiAdvantage.AssignmentGradeServices.LineItem.SubmissionReviewExtension">
+            <summary>
+            Submission Review extension. When present, the platform uses
+            <c>SubmissionReviewExtension.Url</c> for LtiSubmissionReviewRequest
+            launches against this line item.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AssignmentGradeServices.LineItemContainer">
             <inheritdoc />
             <summary>
@@ -317,6 +324,11 @@
             The message type of an LtiResourceLinkRequest.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.Lti.LtiSubmissionReviewRequestMessageType">
+            <summary>
+            The message type of an LtiSubmissionReviewRequest.
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.Lti.Version">
             <summary>
             LTI version.
@@ -372,6 +384,11 @@
             Optional plain text message.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.ForUser">
+            <summary>
+            The user whose submission is being reviewed (Submission Review 1.0 §3.2).
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.LaunchPresentation">
             <summary>
             Information to help the Tool present itself appropriately.
@@ -397,6 +414,12 @@
             <summary>
             Optional LTI 1.1 migration mapping.
             </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.LtiPlatformConfiguration">
+            <summary>The LTI Platform Configuration claim on an OpenID configuration document (Dynamic Registration §3.5).</summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.LtiToolConfiguration">
+            <summary>The LTI Tool Configuration claim on a registration request body (Dynamic Registration §3.6).</summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.Message">
             <summary>
@@ -478,6 +501,12 @@
             Custom Assignment and Grade Service score readonly scope.
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Constants.LtiScopes.DynamicRegistration">
+            <summary>LTI Dynamic Registration scopes (Dynamic Registration §4.4).</summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiScopes.DynamicRegistration.Scope">
+            <summary>Scope required on the registration access token.</summary>
+        </member>
         <member name="T:LtiAdvantage.Constants.LtiScopes.Nrps">
             <summary>
             Names and Role Provisioning Service scopes.
@@ -491,6 +520,11 @@
         <member name="T:LtiAdvantage.Constants.MediaTypes">
             <summary>
             Service media types.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.MediaTypes.Jwks">
+            <summary>
+            JSON Web Key Set media type (RFC 7517 §6).
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.MediaTypes.LineItem">
@@ -618,6 +652,14 @@
             <summary>
             Scores endpoint.
             </summary>
+        </member>
+        <member name="T:LtiAdvantage.Constants.ServiceEndpoints.Jwks">
+            <summary>
+            JWKS publication endpoint.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Jwks.JwksService">
+            <summary>The well-known JWKS endpoint route name.</summary>
         </member>
         <member name="T:LtiAdvantage.Constants.ServiceEndpoints.Nrps">
             <summary>
@@ -1224,6 +1266,195 @@
             <summary>
             Comma-separate list of features for window.open().
             </summary>
+        </member>
+        <member name="T:LtiAdvantage.DynamicRegistration.LtiPlatformConfiguration">
+            <summary>
+            Value of the LTI extension claim on a platform's OpenID configuration document.
+            See https://www.imsglobal.org/spec/lti-dr/v1p0/#lti-platform-configuration
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.LtiPlatformConfiguration.ProductFamilyCode">
+            <summary>The product family code identifying the platform vendor.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.LtiPlatformConfiguration.Version">
+            <summary>The platform's version string.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.LtiPlatformConfiguration.MessagesSupported">
+            <summary>The set of LTI message types this platform supports launching, plus optional placements.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.LtiPlatformConfiguration.Variables">
+            <summary>Custom variable expansions the platform supports (e.g. <c>"Person.email.primary"</c>).</summary>
+        </member>
+        <member name="T:LtiAdvantage.DynamicRegistration.LtiToolConfiguration">
+            <summary>
+            LTI extension claim on a Dynamic Registration request body.
+            See https://www.imsglobal.org/spec/lti-dr/v1p0/#lti-tool-configuration
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.LtiToolConfiguration.Domain">
+            <summary>The tool's primary domain (without scheme, no path).</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.LtiToolConfiguration.SecondaryDomains">
+            <summary>Additional domains the tool also serves from.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.LtiToolConfiguration.DeploymentId">
+            <summary>Optional deployment id requested by the tool.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.LtiToolConfiguration.TargetLinkUri">
+            <summary>Default target_link_uri for launches.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.LtiToolConfiguration.CustomParameters">
+            <summary>Custom parameters to merge into every launch.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.LtiToolConfiguration.Description">
+            <summary>Human-readable description of the tool.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.LtiToolConfiguration.Claims">
+            <summary>The OpenID claims this tool requests (e.g. <c>"name"</c>, <c>"email"</c>).</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.LtiToolConfiguration.Messages">
+            <summary>The LTI message types this tool supports receiving.</summary>
+        </member>
+        <member name="T:LtiAdvantage.DynamicRegistration.MessageDescriptor">
+            <summary>
+            Describes a supported LTI message type. Used in both
+            <see cref="T:LtiAdvantage.DynamicRegistration.LtiPlatformConfiguration"/> (what the platform launches)
+            and <see cref="T:LtiAdvantage.DynamicRegistration.LtiToolConfiguration"/> (what the tool can receive).
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.MessageDescriptor.Type">
+            <summary>The message type, e.g. <c>"LtiResourceLinkRequest"</c>.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.MessageDescriptor.TargetLinkUri">
+            <summary>Per-message target_link_uri (tool side).</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.MessageDescriptor.Label">
+            <summary>Per-message label shown by the platform (tool side).</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.MessageDescriptor.IconUri">
+            <summary>Per-message icon URI (tool side).</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.MessageDescriptor.CustomParameters">
+            <summary>Custom parameters to merge into this launch (tool side).</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.MessageDescriptor.Placements">
+            <summary>Placements this message is offered for (e.g. <c>"ContentArea"</c>, <c>"RichTextEditor"</c>).</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.MessageDescriptor.Roles">
+            <summary>Roles required for this launch (tool side).</summary>
+        </member>
+        <member name="T:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration">
+            <summary>
+            A platform's OpenID Provider Metadata document (RFC 8414) including
+            the LTI Dynamic Registration extension claim
+            (<c>https://purl.imsglobal.org/spec/lti-platform-configuration</c>).
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.Issuer">
+            <summary>The platform's issuer identifier URL.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.AuthorizationEndpoint">
+            <summary>OAuth 2 authorization endpoint URL.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.TokenEndpoint">
+            <summary>OAuth 2 token endpoint URL.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.TokenEndpointAuthMethodsSupported">
+            <summary>Auth methods supported at the token endpoint (typically <c>private_key_jwt</c>).</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.TokenEndpointAuthSigningAlgValuesSupported">
+            <summary>JWS algorithms supported for client assertions.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.JwksUri">
+            <summary>URL of the platform's public JWKS document.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.RegistrationEndpoint">
+            <summary>URL the tool POSTs its registration request to.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.ScopesSupported">
+            <summary>OAuth 2 scopes the platform supports.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.ResponseTypesSupported">
+            <summary>OAuth 2 response types the platform supports (typically <c>id_token</c>).</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.SubjectTypesSupported">
+            <summary>Subject types supported (typically <c>public</c>).</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.IdTokenSigningAlgValuesSupported">
+            <summary>JWS signing algorithms supported for ID tokens (typically <c>RS256</c>).</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.ClaimsSupported">
+            <summary>Standard claims the platform supports.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.LtiPlatformConfiguration">
+            <summary>The LTI extension claim. Constant: <see cref="F:LtiAdvantage.Constants.LtiClaims.LtiPlatformConfiguration"/>.</summary>
+        </member>
+        <member name="T:LtiAdvantage.DynamicRegistration.ToolConfiguration">
+            <summary>
+            Tool-side registration request body sent to a platform's
+            <c>registration_endpoint</c>. Mirrors OIDC client metadata
+            (RFC 7591) plus the LTI <c>lti-tool-configuration</c> claim.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.ApplicationType">
+            <summary>OIDC application_type — typically <c>"web"</c>.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.ResponseTypes">
+            <summary>OAuth 2 response types — typically <c>["id_token"]</c>.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.GrantTypes">
+            <summary>OAuth 2 grant types — typically <c>["implicit", "client_credentials"]</c>.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.InitiateLoginUri">
+            <summary>The OIDC initiate_login_uri.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.RedirectUris">
+            <summary>Allowed launch redirect URIs.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.ClientName">
+            <summary>Human-readable client name.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.ClientUri">
+            <summary>The tool's homepage URL.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.LogoUri">
+            <summary>The tool's logo image URL.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.Scope">
+            <summary>Space-separated list of scopes the tool will request.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.TokenEndpointAuthMethod">
+            <summary>Auth method at the token endpoint — typically <c>"private_key_jwt"</c>.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.JwksUri">
+            <summary>URL of the tool's public JWKS document.</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.ClientId">
+            <summary>Echoed back by the platform on successful registration (Dynamic Registration §4.5).</summary>
+        </member>
+        <member name="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.LtiToolConfiguration">
+            <summary>The LTI extension claim. Constant: <see cref="F:LtiAdvantage.Constants.LtiClaims.LtiToolConfiguration"/>.</summary>
+        </member>
+        <member name="T:LtiAdvantage.Jwks.IJwksKeyStore">
+            <summary>
+            Provides the set of public keys to publish at /.well-known/jwks.json.
+            Implementations decide how keys are stored, rotated, and retired —
+            typically all currently-active and recently-retired (still in token TTL)
+            signing keys are returned, each with a stable <c>kid</c>.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Jwks.IJwksKeyStore.GetPublicKeysAsync">
+             <summary>
+             Returns the public keys to publish in the JWKS document.
+            
+             Rotation guidance:
+             - Always include the current signing key (the one used to sign tokens issued now).
+             - Continue to include each retired signing key for at least the longest TTL of any token signed with it,
+               so verifiers can still validate in-flight tokens after rotation.
+             - Each key MUST have a stable, unique <c>Kid</c>.
+             - Set <c>Use = "sig"</c> and <c>Alg = "RS256"</c> for LTI 1.3 signing keys.
+             - Do NOT include private key material — only the public components (<c>N</c>, <c>E</c>).
+             </summary>
         </member>
         <member name="T:LtiAdvantage.Lti.ContextClaimValueType">
             <summary>
@@ -2627,6 +2858,46 @@
             </example>
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Lti.LtiSubmissionReviewRequest">
+            <inheritdoc />
+            <summary>
+            LTI Submission Review request (https://www.imsglobal.org/spec/lti-sr/v1p0).
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiSubmissionReviewRequest.#ctor">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiSubmissionReviewRequest" /> with default
+            values for the MessageType and Version claims.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiSubmissionReviewRequest.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiSubmissionReviewRequest" /> with the claims.
+            </summary>
+            <param name="claims">A list of claims.</param>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiSubmissionReviewRequest.#ctor(System.IdentityModel.Tokens.Jwt.JwtPayload)">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiSubmissionReviewRequest" /> with the
+            claims in payload.
+            </summary>
+            <param name="payload"></param>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiSubmissionReviewRequest.AssignmentGradeServices">
+            <summary>The Assignment and Grade Services claim (the lineitem under review).</summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiSubmissionReviewRequest.NamesRoleService">
+            <summary>The Names and Roles Provisioning Service claim.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiSubmissionReviewRequest.ResourceLink">
+            <summary>The resource_link claim (same shape as in LtiResourceLinkRequest).</summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiSubmissionReviewRequest.ForUser">
+            <summary>The for_user claim (the user whose submission is being reviewed).</summary>
+        </member>
         <member name="T:LtiAdvantage.Lti.PlatformClaimValueType">
             <summary>
             Properties associated with the platform initiating the launch.
@@ -2996,6 +3267,50 @@
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.NamesRoleServiceClaimValueType.ServiceVersions">
             <summary>
             Service version. Default is <see cref="F:LtiAdvantage.NamesRoleProvisioningService.NamesRoleServiceClaimValueType.Version"/>.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.SubmissionReview.ForUserClaimValueType">
+            <summary>
+            The user whose submission is being reviewed.
+            See https://www.imsglobal.org/spec/lti-sr/v1p0/#for-user-claim
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.SubmissionReview.ForUserClaimValueType.UserId">
+            <summary>The user_id of the reviewed user.</summary>
+        </member>
+        <member name="P:LtiAdvantage.SubmissionReview.ForUserClaimValueType.Name">
+            <summary>The reviewed user's full name.</summary>
+        </member>
+        <member name="P:LtiAdvantage.SubmissionReview.ForUserClaimValueType.GivenName">
+            <summary>The reviewed user's given (first) name.</summary>
+        </member>
+        <member name="P:LtiAdvantage.SubmissionReview.ForUserClaimValueType.FamilyName">
+            <summary>The reviewed user's family (last) name.</summary>
+        </member>
+        <member name="P:LtiAdvantage.SubmissionReview.ForUserClaimValueType.Email">
+            <summary>The reviewed user's email.</summary>
+        </member>
+        <member name="P:LtiAdvantage.SubmissionReview.ForUserClaimValueType.Roles">
+            <summary>The roles of the reviewed user in the context.</summary>
+        </member>
+        <member name="P:LtiAdvantage.SubmissionReview.ForUserClaimValueType.PersonSourcedId">
+            <summary>The person sourcedId of the reviewed user.</summary>
+        </member>
+        <member name="T:LtiAdvantage.SubmissionReview.SubmissionReviewProperty">
+            <summary>
+            Submission Review extension on an AGS LineItem.
+            See https://www.imsglobal.org/spec/lti-sr/v1p0/#submissionreview-extension
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.SubmissionReview.SubmissionReviewProperty.Url">
+            <summary>
+            The launch URL the platform should use when launching back into
+            the tool to review a submission for this line item.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.SubmissionReview.SubmissionReviewProperty.Custom">
+            <summary>
+            Optional custom parameters to include with each Submission Review launch.
             </summary>
         </member>
         <member name="T:LtiAdvantage.Utilities.EnumExtensions">

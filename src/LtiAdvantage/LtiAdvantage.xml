@@ -2906,6 +2906,69 @@
             <summary>
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Lti.LtiEndAssessmentRequest">
+            <inheritdoc />
+            <summary>
+            LTI End Assessment request, sent by the assessment platform to the proctoring tool when
+            the candidate has finished, so the tool can close its proctoring session
+            (https://www.imsglobal.org/spec/proctoring/v1p0#lti-end-assessment-message).
+            </summary>
+            <remarks>
+            The platform only sends this message when the tool asked for it by setting
+            <see cref="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.EndAssessmentReturn"/>.
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiEndAssessmentRequest.#ctor">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiEndAssessmentRequest" /> with default
+            values for the MessageType and Version claims.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiEndAssessmentRequest.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiEndAssessmentRequest" /> with the claims.
+            </summary>
+            <param name="claims">A list of claims.</param>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiEndAssessmentRequest.#ctor(System.IdentityModel.Tokens.Jwt.JwtPayload)">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiEndAssessmentRequest" /> with the
+            claims in payload.
+            </summary>
+            <param name="payload"></param>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.ResourceLink">
+            <summary>The resource_link claim identifying the assessment. Required.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.AttemptNumber">
+            <summary>
+            The attempt that just ended, starting at 1. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.ProctoringSettings">
+            <summary>
+            Opaque proctoring configuration the platform holds on the tool's behalf.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.ErrorMessage">
+            <summary>
+            A message about the assessment intended for the end user.
+            </summary>
+            <remarks>
+            This is the proctoring-specific errormsg claim, not the Deep Linking one.
+            </remarks>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.ErrorLog">
+            <summary>
+            A message about the assessment intended for the tool's log.
+            </summary>
+            <remarks>
+            This is the proctoring-specific errorlog claim, not the Deep Linking one.
+            </remarks>
+        </member>
         <member name="T:LtiAdvantage.Lti.LtiMigrationClaimValueType">
             <summary>
             A mapping of ids that have shifted with the transition to LTI 1.3, 
@@ -3201,6 +3264,134 @@
               ...
             }
             </example>
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Lti.LtiStartAssessmentRequest">
+            <inheritdoc />
+            <summary>
+            LTI Start Assessment request, sent by the proctoring tool back to the assessment
+            platform once the candidate has been verified and the assessment may begin
+            (https://www.imsglobal.org/spec/proctoring/v1p0#lti-start-assessment-message).
+            </summary>
+            <remarks>
+            This is the one message in the proctoring flow that travels tool to platform. It is
+            POSTed to the <see cref="P:LtiAdvantage.Lti.LtiStartProctoringRequest.StartAssessmentUrl"/> the platform
+            supplied, and it must carry back the platform's
+            <see cref="P:LtiAdvantage.Lti.LtiStartProctoringRequest.SessionData"/> unchanged.
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiStartAssessmentRequest.#ctor">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiStartAssessmentRequest" /> with default
+            values for the MessageType and Version claims.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiStartAssessmentRequest.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiStartAssessmentRequest" /> with the claims.
+            </summary>
+            <param name="claims">A list of claims.</param>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiStartAssessmentRequest.#ctor(System.IdentityModel.Tokens.Jwt.JwtPayload)">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiStartAssessmentRequest" /> with the
+            claims in payload.
+            </summary>
+            <param name="payload"></param>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.ResourceLink">
+            <summary>The resource_link claim identifying the assessment. Required.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.AttemptNumber">
+            <summary>
+            The attempt this proctoring session covers, starting at 1. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.SessionData">
+            <summary>
+            The opaque value the platform issued on the
+            <see cref="T:LtiAdvantage.Lti.LtiStartProctoringRequest"/>, echoed back unchanged. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.EndAssessmentReturn">
+            <summary>
+            Set by the tool to ask the platform to send an <see cref="T:LtiAdvantage.Lti.LtiEndAssessmentRequest"/>
+            when the candidate finishes, so the tool can close its proctoring session.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.VerifiedUser">
+            <summary>
+            The user identity attributes the tool verified at check-in.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.ProctoringSettings">
+            <summary>
+            Opaque proctoring configuration the tool asks the platform to store for later
+            launches of this attempt.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Lti.LtiStartProctoringRequest">
+            <inheritdoc />
+            <summary>
+            LTI Start Proctoring request, sent by the assessment platform to the proctoring tool
+            to open a proctoring session before the assessment begins
+            (https://www.imsglobal.org/spec/proctoring/v1p0#lti-start-proctoring-message).
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiStartProctoringRequest.#ctor">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiStartProctoringRequest" /> with default
+            values for the MessageType and Version claims.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiStartProctoringRequest.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiStartProctoringRequest" /> with the claims.
+            </summary>
+            <param name="claims">A list of claims.</param>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiStartProctoringRequest.#ctor(System.IdentityModel.Tokens.Jwt.JwtPayload)">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiStartProctoringRequest" /> with the
+            claims in payload.
+            </summary>
+            <param name="payload"></param>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.ResourceLink">
+            <summary>The resource_link claim identifying the assessment. Required.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.AttemptNumber">
+            <summary>
+            The attempt this proctoring session covers, starting at 1. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.StartAssessmentUrl">
+            <summary>
+            The platform URL the proctoring tool submits the
+            <see cref="T:LtiAdvantage.Lti.LtiStartAssessmentRequest"/> to once the candidate is verified. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.SessionData">
+            <summary>
+            Opaque value the tool must echo back on the <see cref="T:LtiAdvantage.Lti.LtiStartAssessmentRequest"/>
+            so the platform can correlate the two messages. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.Acs">
+            <summary>
+            The Assessment Control Service claim, present when the platform lets the proctoring
+            tool pause, resume, terminate, update or flag the attempt.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.ProctoringSettings">
+            <summary>
+            Opaque proctoring configuration the platform holds on the tool's behalf.
             </summary>
         </member>
         <member name="T:LtiAdvantage.Lti.LtiSubmissionReviewRequest">
@@ -3615,6 +3806,232 @@
             <summary>
             Service version. Default is <see cref="F:LtiAdvantage.NamesRoleProvisioningService.NamesRoleServiceClaimValueType.Version"/>.
             </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.AssessmentControlAction">
+            <summary>
+            Represents the actions a proctoring tool may request of the platform through the
+            Assessment Control Service.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-actions.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlAction.Unknown">
+            <summary>
+            The action was absent or is not recognised by this library version.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlAction.Pause">
+            <summary>
+            Pause the assessment. The candidate cannot continue until it is resumed.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlAction.Resume">
+            <summary>
+            Resume a paused assessment.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlAction.Terminate">
+            <summary>
+            End the assessment. The candidate cannot continue.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlAction.Update">
+            <summary>
+            Update the assessment, for example to grant extra time.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlAction.Flag">
+            <summary>
+            Record an incident against the attempt without changing its state.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.AssessmentControlClaimValueType">
+            <summary>
+            LTI claim to include in an LtiStartProctoring message if the platform supports the
+            Assessment Control Service.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#acs-claim.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.AssessmentControlUrl">
+            <summary>
+            Fully resolved URL of the Assessment Control Service endpoint. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.Actions">
+            <summary>
+            The actions the platform permits the proctoring tool to request. Required.
+            A tool must not request an action absent from this list.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.AssessmentControlRequest">
+            <summary>
+            A control action the proctoring tool asks the platform to take against an
+            assessment attempt in progress.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-request.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.User">
+            <summary>
+            The candidate the action applies to. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.ResourceLink">
+            <summary>
+            The resource link of the assessment. Only <see cref="P:LtiAdvantage.Lti.ResourceLinkClaimValueType.Id"/>
+            is required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.AttemptNumber">
+            <summary>
+            The attempt the action applies to. Required.
+            </summary>
+            <remarks>
+            Read leniently: the specification's examples show the attempt number both as a
+            JSON number and as a quoted string.
+            </remarks>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.Action">
+            <summary>
+            The action to take. Required, and must be one of the actions the platform
+            advertised in <see cref="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.Actions"/>.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.IncidentTime">
+            <summary>
+            When the incident prompting this action occurred. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.IncidentSeverity">
+            <summary>
+            How serious the incident is, from 0 (least) to 1 (most).
+            </summary>
+            <remarks>
+            Read leniently: the specification's example shows this as a quoted string.
+            </remarks>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.ExtraTime">
+            <summary>
+            Additional minutes to grant the candidate. Only meaningful with
+            <see cref="F:LtiAdvantage.Proctoring.AssessmentControlAction.Update"/>.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.ReasonCode">
+            <summary>
+            A tool-specific code categorising the reason for the action.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.ReasonMsg">
+            <summary>
+            A human-readable explanation of the reason for the action.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.AssessmentControlResponse">
+            <summary>
+            The platform's report of the assessment attempt after applying a control action.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-response.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlResponse.Status">
+            <summary>
+            The state of the attempt after the action was applied.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlResponse.ExtraTime">
+            <summary>
+            The total extra minutes granted to the candidate for this attempt, counting any
+            previously granted time — not just the minutes added by this request.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.AssessmentControlStatus">
+            <summary>
+            Represents the state of an assessment attempt as reported by the platform in an
+            Assessment Control Service response.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-response.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlStatus.Unknown">
+            <summary>
+            The status was absent or is not recognised by this library version. Distinct from
+            <see cref="F:LtiAdvantage.Proctoring.AssessmentControlStatus.None"/>, which the platform sends deliberately.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlStatus.None">
+            <summary>
+            There is no attempt in progress.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlStatus.Running">
+            <summary>
+            The attempt is in progress.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlStatus.Paused">
+            <summary>
+            The attempt is paused and can be resumed.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlStatus.Terminated">
+            <summary>
+            The attempt was ended before the candidate finished.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlStatus.Complete">
+            <summary>
+            The candidate finished the attempt.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.AssessmentControlUser">
+            <summary>
+            Identifies the candidate an Assessment Control Service request applies to.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-request.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlUser.Iss">
+            <summary>
+            The issuer that identified the user, i.e. the platform's issuer identifier. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlUser.Sub">
+            <summary>
+            The user's opaque identifier, matching the "sub" claim of the launch. Required.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.ProctoringSettingsClaimValueType">
+            <summary>
+            Proctoring configuration exchanged between the platform and the proctoring tool.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#proctoring-settings-claim.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.ProctoringSettingsClaimValueType.Data">
+            <summary>
+            Opaque, tool-specific settings. The platform stores and echoes this value without
+            interpreting it; only the proctoring tool understands its format.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.VerifiedUserClaimValueType">
+            <summary>
+            The user identity attributes the proctoring tool verified before allowing the
+            assessment to start. Sent by the tool on the LtiStartAssessment message.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#verified-user-claim.
+            </summary>
+            <remarks>
+            Only the attributes the tool actually verified are populated. An attribute being
+            absent means "not verified", not "did not match".
+            </remarks>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.VerifiedUserClaimValueType.GivenName">
+            <summary>The verified given (first) name.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.VerifiedUserClaimValueType.FamilyName">
+            <summary>The verified family (last) name.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.VerifiedUserClaimValueType.Name">
+            <summary>The verified full name.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.VerifiedUserClaimValueType.Email">
+            <summary>The verified email address.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.VerifiedUserClaimValueType.Picture">
+            <summary>A URL to an image of the verified user, for example the identity photo taken at check-in.</summary>
         </member>
         <member name="T:LtiAdvantage.SubmissionReview.ForUserClaimValueType">
             <summary>

@@ -7,9 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ReferenceJson\AssessmentControlRequest.json" />
+    <None Remove="ReferenceJson\ContextGroupContainer.json" />
+    <None Remove="ReferenceJson\ContextGroupSetContainer.json" />
     <None Remove="ReferenceJson\LineItem.json" />
     <None Remove="ReferenceJson\LineItemContainer.json" />
+    <None Remove="ReferenceJson\LtiEndAssessmentRequest.json" />
     <None Remove="ReferenceJson\LtiResourceLinkRequest.json" />
+    <None Remove="ReferenceJson\LtiStartAssessmentRequest.json" />
+    <None Remove="ReferenceJson\LtiStartProctoringRequest.json" />
     <None Remove="ReferenceJson\LtiSubmissionReviewRequest.json" />
     <None Remove="ReferenceJson\PlatformOpenIdConfiguration.json" />
     <None Remove="ReferenceJson\Result.json" />
@@ -19,7 +25,25 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="ReferenceJson\AssessmentControlRequest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ReferenceJson\ContextGroupContainer.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ReferenceJson\ContextGroupSetContainer.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ReferenceJson\LineItem.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ReferenceJson\LtiEndAssessmentRequest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ReferenceJson\LtiStartAssessmentRequest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ReferenceJson\LtiStartProctoringRequest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ReferenceJson\LineItemContainer.json">

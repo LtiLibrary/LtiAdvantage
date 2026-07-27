@@ -885,6 +885,63 @@
             </param>
             <returns>The members.</returns>
         </member>
+        <member name="T:LtiAdvantage.AspNetCore.Proctoring.AssessmentControlControllerBase">
+            <inheritdoc cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
+            <summary>
+            Implements the platform side of the Assessment Control Service, which lets a proctoring
+            tool pause, resume, terminate, update or flag an assessment attempt in progress.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-service.
+            </summary>
+            <remarks>
+            The URL of this endpoint is what the platform advertises as
+            <see cref="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.AssessmentControlUrl"/> on the
+            LtiStartProctoring message.
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Proctoring.AssessmentControlControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.Proctoring.AssessmentControlControllerBase})">
+            <summary>
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Proctoring.AssessmentControlControllerBase.OnControlAssessmentAsync(LtiAdvantage.AspNetCore.Proctoring.ControlAssessmentRequest)">
+            <summary>
+            Applies the control action and returns the resulting state of the attempt.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Proctoring.AssessmentControlControllerBase.ControlAssessmentAsync(LtiAdvantage.Proctoring.AssessmentControlRequest)">
+            <summary>
+            Applies a control action to an assessment attempt.
+            </summary>
+            <param name="control">The control action to apply.</param>
+            <returns>The state of the attempt after the action was applied.</returns>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.Proctoring.ControlAssessmentRequest">
+            <summary>
+            Represents an assessment control request.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Proctoring.ControlAssessmentRequest.#ctor(LtiAdvantage.Proctoring.AssessmentControlRequest)">
+            <summary>
+            Initialize a new instance of the class.
+            </summary>
+            <param name="control">The submitted control action.</param>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Proctoring.ControlAssessmentRequest.Control">
+            <summary>
+            The control action the proctoring tool asked for.
+            </summary>
+            <remarks>
+            Implementations should reject an action the deployment did not advertise in its
+            <see cref="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.Actions"/>, and should verify that
+            <see cref="P:LtiAdvantage.Proctoring.AssessmentControlRequest.User"/> and
+            <see cref="P:LtiAdvantage.Proctoring.AssessmentControlRequest.AttemptNumber"/> identify an attempt the calling
+            tool is actually proctoring.
+            </remarks>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.Proctoring.IAssessmentControlController">
+            <summary>
+            Marker for ILogger dependency injection.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.Utilities.AuthorizationScopePolicyProvider">
             <inheritdoc />
             <summary>

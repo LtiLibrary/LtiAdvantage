@@ -1,0 +1,22 @@
+{
+  "id": "https://lms.example.com/class/2923/groups/",
+  "groups": [
+    {
+      "id": "44711f9f-64af-443a-bc3d-0abbfff73790",
+      "name": "Bob's Tuesday Group",
+      "set_ids": ["912cc53f-b431-447e-aff6-9d49aa9b72f2"],
+      "tag": "marking"
+    },
+    {
+      "id": "bf2042b4-fdad-486a-86f3-bdb84e28a099",
+      "name": "Bob's Friday Group",
+      "set_ids": ["912cc53f-b431-447e-aff6-9d49aa9b72f2", "8127ccca-1d2d-496d-976c-393616ad1ff4"],
+      "tag": "marking",
+      "hidden": true
+    },
+    {
+      "id": "89230b3-a341-447e-aff6-9d354aa9b72a6",
+      "name": "The cool kids group"
+    }
+  ]
+}

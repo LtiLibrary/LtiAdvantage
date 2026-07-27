@@ -1,0 +1,19 @@
+{
+  "id": "https://lms.example.com/class/2923/groups/sets",
+  "sets": [
+    {
+      "id": "912cc53f-b431-447e-aff6-9d49aa9b72f2",
+      "name": "The Chemistry Lab Group Set"
+    },
+    {
+      "id": "6af307fc-cc7d-4867-9e6f-20c85601367a",
+      "name": "Course Sections",
+      "tag": "http://purl.imsglobal.org/vocab/lis/v2/course#CourseSection"
+    },
+    {
+      "id": "02d133a7-d26e-41ec-8e63-c97fe562f0ca",
+      "name": "The Physics Lab Group Set",
+      "hidden": true
+    }
+  ]
+}

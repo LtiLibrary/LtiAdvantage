@@ -1,0 +1,407 @@
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using LtiAdvantage.IdentityModel.Validation;
+using Microsoft.IdentityModel.Tokens;
+using Xunit;
+
+namespace LtiAdvantage.UnitTests.Validation
+{
+    public class LtiTokenValidatorShould
+    {
+        private const string Issuer = "https://platform.example.com";
+        private const string ClientId = "client-1";
+        private const string JwksUri = "https://platform.example.com/.well-known/jwks.json";
+
+        [Fact]
+        public async Task AcceptAWellFormedToken()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken());
+
+            Assert.True(result.IsValid, result.Error);
+            Assert.Null(result.Error);
+            Assert.Equal("LtiResourceLinkRequest", result.MessageType);
+            Assert.Equal("user-1", result.Payload.Sub);
+        }
+
+        /// <summary>
+        /// The payload is the handoff point to the typed message classes.
+        /// </summary>
+        [Fact]
+        public async Task ReturnAPayloadTheMessageTypesCanConsume()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken());
+
+            var request = new LtiAdvantage.Lti.LtiResourceLinkRequest(result.Payload);
+            Assert.Equal("dep-1", request.DeploymentId);
+            Assert.Equal("user-1", request.UserId);
+        }
+
+        [Fact]
+        public async Task RejectAnUnreadableToken()
+        {
+            var validator = CreateValidator(new FakePlatform("key-1"));
+
+            Assert.False((await validator.ValidateAsync(null)).IsValid);
+            Assert.False((await validator.ValidateAsync("")).IsValid);
+            Assert.False((await validator.ValidateAsync("not-a-jwt")).IsValid);
+        }
+
+        [Fact]
+        public async Task RejectAnUnexpectedIssuer()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken(issuer: "https://evil.example.com"));
+
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task RejectATokenForAnotherAudience()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken(audiences: new[] {"someone-else"}));
+
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task RejectAnExpiredToken()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            // Beyond the default five minutes of clock skew.
+            var expired = platform.CreateIdToken(expires: DateTime.UtcNow.AddMinutes(-30));
+
+            Assert.False((await validator.ValidateAsync(expired)).IsValid);
+        }
+
+        [Fact]
+        public async Task RejectATokenSignedByAnUntrustedKey()
+        {
+            var platform = new FakePlatform("key-1");
+            var impostor = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            // Same key id, different key: the signature must not verify.
+            var result = await validator.ValidateAsync(impostor.CreateIdToken());
+
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task RejectATamperedToken()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            var token = platform.CreateIdToken();
+            var tampered = token.Substring(0, token.LastIndexOf('.') + 1) + "AAAA";
+
+            Assert.False((await validator.ValidateAsync(tampered)).IsValid);
+        }
+
+        [Theory]
+        [InlineData("1.1.0")]
+        [InlineData(null)]
+        public async Task RejectAnUnsupportedLtiVersion(string version)
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken(version: version));
+
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task RejectATokenWithoutAMessageTypeOrDeploymentId()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            Assert.False((await validator.ValidateAsync(platform.CreateIdToken(messageType: null))).IsValid);
+            Assert.False((await validator.ValidateAsync(platform.CreateIdToken(deploymentId: null))).IsValid);
+        }
+
+        [Fact]
+        public async Task RejectATokenWithoutANonce()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken(nonce: null));
+
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task AcceptATokenWithoutANonce_WhenNotRequired()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, options => options.RequireNonce = false);
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken(nonce: null));
+
+            Assert.True(result.IsValid, result.Error);
+        }
+
+        /// <summary>
+        /// A nonce may be used at most once, which is the whole point of the claim.
+        /// </summary>
+        [Fact]
+        public async Task RejectAReplayedNonce()
+        {
+            var platform = new FakePlatform("key-1");
+            var store = new InMemoryNonceStore();
+            var validator = CreateValidator(platform, options => options.NonceStore = store);
+
+            var token = platform.CreateIdToken(nonce: "nonce-once");
+
+            Assert.True((await validator.ValidateAsync(token)).IsValid);
+
+            var replay = await validator.ValidateAsync(token);
+            Assert.False(replay.IsValid);
+            Assert.Contains("nonce", replay.Error, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// With several audiences, azp decides which one the token was minted for. Accepting a
+        /// token without it would let a token issued for a sibling tool through.
+        /// </summary>
+        [Fact]
+        public async Task RejectMultipleAudiencesWithoutAValidAzp()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+            var audiences = new[] {ClientId, "other-tool"};
+
+            var noAzp = await validator.ValidateAsync(platform.CreateIdToken(audiences: audiences));
+            Assert.False(noAzp.IsValid);
+
+            var wrongAzp = await validator.ValidateAsync(
+                platform.CreateIdToken(audiences: audiences, azp: "other-tool"));
+            Assert.False(wrongAzp.IsValid);
+
+            var rightAzp = await validator.ValidateAsync(
+                platform.CreateIdToken(audiences: audiences, azp: ClientId));
+            Assert.True(rightAzp.IsValid, rightAzp.Error);
+        }
+
+        /// <summary>
+        /// The JWKS is fetched once and reused; refetching per launch would put the platform's
+        /// key endpoint in the hot path of every login.
+        /// </summary>
+        [Fact]
+        public async Task CacheTheJwks()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            for (var i = 0; i < 5; i++)
+            {
+                Assert.True((await validator.ValidateAsync(platform.CreateIdToken())).IsValid);
+            }
+
+            Assert.Equal(1, platform.FetchCount);
+        }
+
+        /// <summary>
+        /// When the platform rotates its signing key, a token with the new key id must be
+        /// accepted without waiting for the cache to expire.
+        /// </summary>
+        [Fact]
+        public async Task RefetchTheJwks_WhenTheKeyIdIsUnknown()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, options =>
+            {
+                options.JwksCacheDuration = TimeSpan.FromHours(24);
+                options.MinimumRefreshInterval = TimeSpan.Zero;
+            });
+
+            Assert.True((await validator.ValidateAsync(platform.CreateIdToken())).IsValid);
+            Assert.Equal(1, platform.FetchCount);
+
+            platform.RotateKey("key-2");
+
+            var afterRotation = await validator.ValidateAsync(platform.CreateIdToken());
+
+            Assert.True(afterRotation.IsValid, afterRotation.Error);
+            Assert.Equal(2, platform.FetchCount);
+        }
+
+        /// <summary>
+        /// The early refresh is rate limited, so a stream of tokens carrying bogus key ids
+        /// cannot be turned into a stream of requests against the platform.
+        /// </summary>
+        [Fact]
+        public async Task NotRefetchTheJwksRepeatedly_ForAnUnknownKeyId()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, options =>
+                options.MinimumRefreshInterval = TimeSpan.FromMinutes(5));
+
+            Assert.True((await validator.ValidateAsync(platform.CreateIdToken())).IsValid);
+
+            var impostor = new FakePlatform("bogus-key");
+            for (var i = 0; i < 10; i++)
+            {
+                Assert.False((await validator.ValidateAsync(impostor.CreateIdToken())).IsValid);
+            }
+
+            Assert.Equal(1, platform.FetchCount);
+        }
+
+        [Fact]
+        public void RequireTheRegistrationDetails()
+        {
+            var platform = new FakePlatform("key-1");
+
+            Assert.Throws<ArgumentNullException>(() => new LtiTokenValidator(null, platform.CreateClient()));
+            Assert.Throws<ArgumentNullException>(() => new LtiTokenValidator(new LtiTokenValidationOptions
+            {
+                Issuer = Issuer, ClientId = ClientId, JwksUri = JwksUri
+            }, null));
+
+            Assert.Throws<ArgumentException>(() => new LtiTokenValidator(new LtiTokenValidationOptions
+            {
+                ClientId = ClientId, JwksUri = JwksUri
+            }, platform.CreateClient()));
+            Assert.Throws<ArgumentException>(() => new LtiTokenValidator(new LtiTokenValidationOptions
+            {
+                Issuer = Issuer, JwksUri = JwksUri
+            }, platform.CreateClient()));
+            Assert.Throws<ArgumentException>(() => new LtiTokenValidator(new LtiTokenValidationOptions
+            {
+                Issuer = Issuer, ClientId = ClientId
+            }, platform.CreateClient()));
+        }
+
+        private static LtiTokenValidator CreateValidator(FakePlatform platform,
+            Action<LtiTokenValidationOptions> configure = null)
+        {
+            var options = new LtiTokenValidationOptions
+            {
+                Issuer = Issuer,
+                ClientId = ClientId,
+                JwksUri = JwksUri
+            };
+
+            configure?.Invoke(options);
+
+            return new LtiTokenValidator(options, platform.CreateClient());
+        }
+
+        /// <summary>
+        /// A platform that signs ID tokens and serves the matching JWKS over a stubbed transport.
+        /// </summary>
+        private sealed class FakePlatform
+        {
+            private readonly RSA _rsa = RSA.Create(2048);
+            private string _keyId;
+
+            public FakePlatform(string keyId) => _keyId = keyId;
+
+            public int FetchCount { get; private set; }
+
+            public void RotateKey(string keyId) => _keyId = keyId;
+
+            public HttpClient CreateClient() => new(new StubHandler(this));
+
+            public string CreateIdToken(
+                string issuer = Issuer,
+                string[] audiences = null,
+                string azp = null,
+                string nonce = "nonce-1",
+                string version = "1.3.0",
+                string messageType = "LtiResourceLinkRequest",
+                string deploymentId = "dep-1",
+                DateTime? expires = null)
+            {
+                var payload = new JwtPayload
+                {
+                    ["iss"] = issuer,
+                    ["sub"] = "user-1",
+                    ["iat"] = EpochTime.GetIntDate(DateTime.UtcNow),
+                    ["exp"] = EpochTime.GetIntDate(expires ?? DateTime.UtcNow.AddMinutes(5))
+                };
+
+                payload["aud"] = audiences == null ? new[] {ClientId} : audiences;
+                if (azp != null) payload["azp"] = azp;
+                if (nonce != null) payload["nonce"] = nonce;
+                if (version != null) payload["https://purl.imsglobal.org/spec/lti/claim/version"] = version;
+                if (messageType != null)
+                    payload["https://purl.imsglobal.org/spec/lti/claim/message_type"] = messageType;
+                if (deploymentId != null)
+                    payload["https://purl.imsglobal.org/spec/lti/claim/deployment_id"] = deploymentId;
+
+                var credentials = new SigningCredentials(
+                    new RsaSecurityKey(_rsa) {KeyId = _keyId}, SecurityAlgorithms.RsaSha256);
+
+                return new JwtSecurityTokenHandler().WriteToken(
+                    new JwtSecurityToken(new JwtHeader(credentials), payload));
+            }
+
+            private string CreateJwks()
+            {
+                // Publish public components only, as a real platform must.
+                var publicKey = new RsaSecurityKey(_rsa.ExportParameters(false)) {KeyId = _keyId};
+                var jwk = JsonWebKeyConverter.ConvertFromRSASecurityKey(publicKey);
+                jwk.Use = "sig";
+                jwk.Alg = SecurityAlgorithms.RsaSha256;
+
+                return JsonSerializer.Serialize(new {keys = new[] {jwk}});
+            }
+
+            private sealed class StubHandler : HttpMessageHandler
+            {
+                private readonly FakePlatform _platform;
+
+                public StubHandler(FakePlatform platform) => _platform = platform;
+
+                protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+                    CancellationToken cancellationToken)
+                {
+                    Assert.Equal(JwksUri, request.RequestUri.ToString());
+                    _platform.FetchCount++;
+
+                    return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(_platform.CreateJwks())
+                    });
+                }
+            }
+        }
+
+        private sealed class InMemoryNonceStore : INonceStore
+        {
+            private readonly HashSet<string> _seen = new(StringComparer.Ordinal);
+
+            public Task<bool> TryConsumeAsync(string nonce, CancellationToken cancellationToken = default)
+            {
+                lock (_seen)
+                {
+                    return Task.FromResult(_seen.Add(nonce));
+                }
+            }
+        }
+    }
+}

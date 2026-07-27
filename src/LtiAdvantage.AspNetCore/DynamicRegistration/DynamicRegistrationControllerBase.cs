@@ -236,6 +236,12 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
                 _logger.LogDebug($"{nameof(RegisterAsync)} was cancelled because the client disconnected.");
                 return new EmptyResult();
             }
+            catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+            {
+                // The caller went away. Let the framework abort the response rather than
+                // reporting a server error the caller will never see.
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An unexpected error occurred in {nameof(RegisterAsync)}.");

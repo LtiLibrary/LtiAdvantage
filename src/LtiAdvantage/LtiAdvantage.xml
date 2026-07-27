@@ -1904,6 +1904,11 @@
             that is not available via the normal launch.
             </remarks>
         </member>
+        <member name="P:LtiAdvantage.Lti.CustomPropertySubstitutions.CourseGroup">
+            <summary>
+            Substitution values for Course Groups Service variables.
+            </summary>
+        </member>
         <member name="P:LtiAdvantage.Lti.CustomPropertySubstitutions.LisCourseOffering">
             <summary>
             Substitution values for LIS Course Offering variables.
@@ -1971,12 +1976,51 @@
             <param name="source">Custom properties.</param>
             <returns>Custom properties with the variables replaced.</returns>
         </member>
+        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.Replace(System.String,System.String,System.String)">
+            <summary>
+            Replace one variable with its value, wherever it occurs.
+            </summary>
+            <remarks>
+            The variable name is escaped before it is used as a pattern, so the dots in a name
+            like <c>$Context.id</c> match dots rather than any character. The value is applied
+            through a match evaluator rather than as a replacement string, so a value that
+            happens to contain <c>$1</c> or <c>$&amp;</c> is inserted literally instead of being
+            read as a regex substitution.
+            </remarks>
+            <param name="value">The custom property value being substituted into.</param>
+            <param name="variable">The variable to replace, including the leading '$'.</param>
+            <param name="replacement">The value to insert. Null is treated as empty.</param>
+        </member>
         <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.SubstituteCustomVariable(System.String)">
             <summary>
             Replace variable with value. Unknown variables are ignored.
             </summary>
+            <remarks>
+            Where one variable name is a prefix of another, the longer name is substituted first.
+            Otherwise the shorter one consumes the start of the longer name and leaves its tail
+            behind: substituting <c>$Context.id</c> before <c>$Context.id.history</c> turns
+            "$Context.id.history" into "&lt;the context id&gt;.history".
+            </remarks>
             <param name="value">Variable to replace.</param>
             <returns>Value if variable is known.</returns>
+        </member>
+        <member name="T:LtiAdvantage.Lti.CourseGroup">
+            <summary>
+            Substitution values for Course Groups Service variables.
+            </summary>
+            <remarks>
+            Added by Course Groups Service 1.0.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#custom-parameter-substitutions.
+            </remarks>
+        </member>
+        <member name="P:LtiAdvantage.Lti.CourseGroup.Id">
+            <summary>
+            The id of any one context group associated with the launch, or an empty string when
+            the launch is not associated with a group.
+            <para>
+            Custom parameter substitution: $CourseGroup.id.
+            </para>
+            </summary>
         </member>
         <member name="T:LtiAdvantage.Lti.LisCourseOffering">
             <summary>
@@ -2433,9 +2477,20 @@
             </para>
             </summary>
         </member>
+        <member name="P:LtiAdvantage.Lti.LisMembership.CourseGroupIds">
+            <summary>
+            A comma separated list of the group ids the person is enrolled in, aligning to the
+            group_enrollments array of the Names and Role Provisioning Service response.
+            <para>
+            Parameter: n/a.
+            Custom parameter substitution: $Membership.course.groupIds.
+            Versions: added by Course Groups Service 1.0.
+            </para>
+            </summary>
+        </member>
         <member name="P:LtiAdvantage.Lti.LisMembership.CreatedTimestamp">
             <summary>
-            LIS membership variable. 
+            LIS membership variable.
             <para>
             Parameter: n/a.
             Custom parameter substitution: $Membership.createdTimestamp.

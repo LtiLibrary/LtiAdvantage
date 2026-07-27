@@ -19,6 +19,11 @@ namespace LtiAdvantage.Lti
         #region Custom Substitution Values
 
         /// <summary>
+        /// Substitution values for Course Groups Service variables.
+        /// </summary>
+        public CourseGroup CourseGroup { get; set; }
+
+        /// <summary>
         /// Substitution values for LIS Course Offering variables.
         /// </summary>
         public LisCourseOffering LisCourseOffering { get; set; }
@@ -102,8 +107,34 @@ namespace LtiAdvantage.Lti
         }
 
         /// <summary>
+        /// Replace one variable with its value, wherever it occurs.
+        /// </summary>
+        /// <remarks>
+        /// The variable name is escaped before it is used as a pattern, so the dots in a name
+        /// like <c>$Context.id</c> match dots rather than any character. The value is applied
+        /// through a match evaluator rather than as a replacement string, so a value that
+        /// happens to contain <c>$1</c> or <c>$&amp;</c> is inserted literally instead of being
+        /// read as a regex substitution.
+        /// </remarks>
+        /// <param name="value">The custom property value being substituted into.</param>
+        /// <param name="variable">The variable to replace, including the leading '$'.</param>
+        /// <param name="replacement">The value to insert. Null is treated as empty.</param>
+        private static string Replace(string value, string variable, string replacement)
+        {
+            var substitution = replacement ?? string.Empty;
+
+            return Regex.Replace(value, Regex.Escape(variable), _ => substitution, RegexOptions.IgnoreCase);
+        }
+
+        /// <summary>
         /// Replace variable with value. Unknown variables are ignored.
         /// </summary>
+        /// <remarks>
+        /// Where one variable name is a prefix of another, the longer name is substituted first.
+        /// Otherwise the shorter one consumes the start of the longer name and leaves its tail
+        /// behind: substituting <c>$Context.id</c> before <c>$Context.id.history</c> turns
+        /// "$Context.id.history" into "&lt;the context id&gt;.history".
+        /// </remarks>
         /// <param name="value">Variable to replace.</param>
         /// <returns>Value if variable is known.</returns>
         private string SubstituteCustomVariable(string value)
@@ -111,165 +142,174 @@ namespace LtiAdvantage.Lti
             // LIS Course Offering variable subsitutions
             if (LisCourseOffering != null)
             {
-                value = Regex.Replace(value, "\\$CourseOffering.academicSession", LisCourseOffering.AcademicSession ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseOffering.courseNumber", LisCourseOffering.CourseNumber ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseOffering.credits", LisCourseOffering.Credits ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseOffering.label", LisCourseOffering.Label ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseOffering.longDescription", LisCourseOffering.LongDescription ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseOffering.shortDescription", LisCourseOffering.ShortDescription ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseOffering.sourcedId", LisCourseOffering.SourcedId ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseOffering.title", LisCourseOffering.Title ?? string.Empty, RegexOptions.IgnoreCase);
+                value = Replace(value, "$CourseOffering.academicSession", LisCourseOffering.AcademicSession);
+                value = Replace(value, "$CourseOffering.courseNumber", LisCourseOffering.CourseNumber);
+                value = Replace(value, "$CourseOffering.credits", LisCourseOffering.Credits);
+                value = Replace(value, "$CourseOffering.label", LisCourseOffering.Label);
+                value = Replace(value, "$CourseOffering.longDescription", LisCourseOffering.LongDescription);
+                value = Replace(value, "$CourseOffering.shortDescription", LisCourseOffering.ShortDescription);
+                value = Replace(value, "$CourseOffering.sourcedId", LisCourseOffering.SourcedId);
+                value = Replace(value, "$CourseOffering.title", LisCourseOffering.Title);
             }
 
             // LIS Course Section variable subsitutions
             if (LisCourseSection != null)
             {
-                value = Regex.Replace(value, "\\$CourseSection.courseNumber", LisCourseSection.CourseNumber ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.credits", LisCourseSection.Credits ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.dataSource", LisCourseSection.DataSource ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.dept", LisCourseSection.Dept ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.enrollControl.accept", LisCourseSection.EnrollControlAccept ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.enrollControl.allowed", LisCourseSection.EnrollControlAllowed ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.label", LisCourseSection.Label ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.longDescription", LisCourseSection.LongDescription ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.maxNumberofStudents", LisCourseSection.MaxNumberOfStudents ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.numberofStudents", LisCourseSection.NumberOfStudents ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.shortDescription", LisCourseSection.ShortDescription ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.sourceSectionId", LisCourseSection.SourceSectionId ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.sourcedId", LisCourseSection.SourcedId ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.timeFrame.begin", LisCourseSection.TimeFrameBegin ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.timeFrame.end", LisCourseSection.TimeFrameEnd ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseSection.title", LisCourseSection.Title ?? string.Empty, RegexOptions.IgnoreCase);
+                value = Replace(value, "$CourseSection.courseNumber", LisCourseSection.CourseNumber);
+                value = Replace(value, "$CourseSection.credits", LisCourseSection.Credits);
+                value = Replace(value, "$CourseSection.dataSource", LisCourseSection.DataSource);
+                value = Replace(value, "$CourseSection.dept", LisCourseSection.Dept);
+                value = Replace(value, "$CourseSection.enrollControl.accept", LisCourseSection.EnrollControlAccept);
+                value = Replace(value, "$CourseSection.enrollControl.allowed", LisCourseSection.EnrollControlAllowed);
+                value = Replace(value, "$CourseSection.label", LisCourseSection.Label);
+                value = Replace(value, "$CourseSection.longDescription", LisCourseSection.LongDescription);
+                value = Replace(value, "$CourseSection.maxNumberofStudents", LisCourseSection.MaxNumberOfStudents);
+                value = Replace(value, "$CourseSection.numberofStudents", LisCourseSection.NumberOfStudents);
+                value = Replace(value, "$CourseSection.shortDescription", LisCourseSection.ShortDescription);
+                value = Replace(value, "$CourseSection.sourceSectionId", LisCourseSection.SourceSectionId);
+                value = Replace(value, "$CourseSection.sourcedId", LisCourseSection.SourcedId);
+                value = Replace(value, "$CourseSection.timeFrame.begin", LisCourseSection.TimeFrameBegin);
+                value = Replace(value, "$CourseSection.timeFrame.end", LisCourseSection.TimeFrameEnd);
+                value = Replace(value, "$CourseSection.title", LisCourseSection.Title);
             }
 
             // LIS Course Template variable subsitutions
             if (LisCourseTemplate != null)
             {
-                value = Regex.Replace(value, "\\$CourseTemplate.courseNumber", LisCourseTemplate.CourseNumber ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseTemplate.credits", LisCourseTemplate.Credits ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseTemplate.label", LisCourseTemplate.Label ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseTemplate.longDescription", LisCourseTemplate.LongDescription ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseTemplate.shortDescription", LisCourseTemplate.ShortDescription ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseTemplate.sourcedId", LisCourseTemplate.SourcedId ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$CourseTemplate.title", LisCourseTemplate.Title ?? string.Empty, RegexOptions.IgnoreCase);
+                value = Replace(value, "$CourseTemplate.courseNumber", LisCourseTemplate.CourseNumber);
+                value = Replace(value, "$CourseTemplate.credits", LisCourseTemplate.Credits);
+                value = Replace(value, "$CourseTemplate.label", LisCourseTemplate.Label);
+                value = Replace(value, "$CourseTemplate.longDescription", LisCourseTemplate.LongDescription);
+                value = Replace(value, "$CourseTemplate.shortDescription", LisCourseTemplate.ShortDescription);
+                value = Replace(value, "$CourseTemplate.sourcedId", LisCourseTemplate.SourcedId);
+                value = Replace(value, "$CourseTemplate.title", LisCourseTemplate.Title);
             }
 
             // LIS Group vaiable subsitutions
             if (LisGroup != null)
             {
-                value = Regex.Replace(value, "\\$Group.email", LisGroup.Email ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Group.enrollControl.accept", LisGroup.EnrollControlAccept ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Group.enrollControl.allowed", LisGroup.EnrollControlAllowed ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Group.grouptype.level", LisGroup.Level ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Group.grouptype.scheme", LisGroup.Scheme ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Group.grouptype.typevalue", LisGroup.Typevalue ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Group.longDescription", LisGroup.LongDescription ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Group.parentId", LisGroup.ParentId ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Group.shortDescription", LisGroup.ShortDescription ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Group.sourcedId", LisGroup.SourcedId ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Group.timeFrame.begin", LisGroup.TimeFrameBegin ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Group.timeFrame.end", LisGroup.TimeFrameEnd ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Group.url", LisGroup.Url ?? string.Empty, RegexOptions.IgnoreCase);
+                value = Replace(value, "$Group.email", LisGroup.Email);
+                value = Replace(value, "$Group.enrollControl.accept", LisGroup.EnrollControlAccept);
+                value = Replace(value, "$Group.enrollControl.allowed", LisGroup.EnrollControlAllowed);
+                value = Replace(value, "$Group.grouptype.level", LisGroup.Level);
+                value = Replace(value, "$Group.grouptype.scheme", LisGroup.Scheme);
+                value = Replace(value, "$Group.grouptype.typevalue", LisGroup.Typevalue);
+                value = Replace(value, "$Group.longDescription", LisGroup.LongDescription);
+                value = Replace(value, "$Group.parentId", LisGroup.ParentId);
+                value = Replace(value, "$Group.shortDescription", LisGroup.ShortDescription);
+                value = Replace(value, "$Group.sourcedId", LisGroup.SourcedId);
+                value = Replace(value, "$Group.timeFrame.begin", LisGroup.TimeFrameBegin);
+                value = Replace(value, "$Group.timeFrame.end", LisGroup.TimeFrameEnd);
+                value = Replace(value, "$Group.url", LisGroup.Url);
             }
 
             // LIS Membership variable subsitutions
             if (LisMembership != null)
             {
-                value = Regex.Replace(value, "\\$Membership.collectionSourcedId", LisMembership.CollectionSourcedId ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Membership.createdTimestamp", LisMembership.CreatedTimestamp ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Membership.dataSource", LisMembership.DataSource ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Membership.personSourcedId", LisMembership.PersonSourcedId ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Membership.role.scope.mentor", LisMembership.RoleScopeMentor ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Membership.role", LisMembership.Role ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Membership.sourcedId", LisMembership.SourcedId ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Membership.status", LisMembership.Status ?? string.Empty, RegexOptions.IgnoreCase);
+                value = Replace(value, "$Membership.collectionSourcedId", LisMembership.CollectionSourcedId);
+                value = Replace(value, "$Membership.course.groupIds", LisMembership.CourseGroupIds);
+                value = Replace(value, "$Membership.createdTimestamp", LisMembership.CreatedTimestamp);
+                value = Replace(value, "$Membership.dataSource", LisMembership.DataSource);
+                value = Replace(value, "$Membership.personSourcedId", LisMembership.PersonSourcedId);
+                value = Replace(value, "$Membership.role.scope.mentor", LisMembership.RoleScopeMentor);
+                value = Replace(value, "$Membership.role", LisMembership.Role);
+                value = Replace(value, "$Membership.sourcedId", LisMembership.SourcedId);
+                value = Replace(value, "$Membership.status", LisMembership.Status);
             }
 
             // LIS Message variable subsitutions
             if (LisMessage != null)
             {
-                value = Regex.Replace(value, "\\$Message.documentTarget", LisMessage.DocumentTarget ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Message.height", LisMessage.Height ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Message.locale", LisMessage.Locale ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Message.returnUrl", LisMessage.ReturnUrl ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Message.width", LisMessage.Width ?? string.Empty, RegexOptions.IgnoreCase);
+                value = Replace(value, "$Message.documentTarget", LisMessage.DocumentTarget);
+                value = Replace(value, "$Message.height", LisMessage.Height);
+                value = Replace(value, "$Message.locale", LisMessage.Locale);
+                value = Replace(value, "$Message.returnUrl", LisMessage.ReturnUrl);
+                value = Replace(value, "$Message.width", LisMessage.Width);
             }
 
             // LIS Person variable subsitutions
             if (LisPerson != null)
             {
-                value = Regex.Replace(value, "\\$Person.address.country", LisPerson.AddressCountry ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.address.locality", LisPerson.AddressLocality ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.address.postcode", LisPerson.AddressPostCode ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.address.statepr", LisPerson.AddressStatePr ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.address.street1", LisPerson.AddressStreet1 ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.address.street2", LisPerson.AddressStreet2 ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.address.street3", LisPerson.AddressStreet3 ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.address.street4", LisPerson.AddressStreet4 ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.address.timezone", LisPerson.AddressTimezone ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.email.personal", LisPerson.EmailPersonal ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.email.primary", LisPerson.EmailPrimary ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.name.full", LisPerson.NameFull ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.name.family", LisPerson.NameFamily ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.name.given", LisPerson.NameGiven ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.name.middle", LisPerson.NameMiddle ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.name.prefix", LisPerson.NamePrefix ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.name.suffix", LisPerson.NameSuffix ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.phone.home", LisPerson.PhoneHome ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.phone.mobile", LisPerson.PhoneMobile ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.phone.primary", LisPerson.PhonePrimary ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.phone.work", LisPerson.PhoneWork ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.sms", LisPerson.Sms ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.sourcedId", LisPerson.SourcedId ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Person.webaddress", LisPerson.WebAddress ?? string.Empty, RegexOptions.IgnoreCase);
+                value = Replace(value, "$Person.address.country", LisPerson.AddressCountry);
+                value = Replace(value, "$Person.address.locality", LisPerson.AddressLocality);
+                value = Replace(value, "$Person.address.postcode", LisPerson.AddressPostCode);
+                value = Replace(value, "$Person.address.statepr", LisPerson.AddressStatePr);
+                value = Replace(value, "$Person.address.street1", LisPerson.AddressStreet1);
+                value = Replace(value, "$Person.address.street2", LisPerson.AddressStreet2);
+                value = Replace(value, "$Person.address.street3", LisPerson.AddressStreet3);
+                value = Replace(value, "$Person.address.street4", LisPerson.AddressStreet4);
+                value = Replace(value, "$Person.address.timezone", LisPerson.AddressTimezone);
+                value = Replace(value, "$Person.email.personal", LisPerson.EmailPersonal);
+                value = Replace(value, "$Person.email.primary", LisPerson.EmailPrimary);
+                value = Replace(value, "$Person.name.full", LisPerson.NameFull);
+                value = Replace(value, "$Person.name.family", LisPerson.NameFamily);
+                value = Replace(value, "$Person.name.given", LisPerson.NameGiven);
+                value = Replace(value, "$Person.name.middle", LisPerson.NameMiddle);
+                value = Replace(value, "$Person.name.prefix", LisPerson.NamePrefix);
+                value = Replace(value, "$Person.name.suffix", LisPerson.NameSuffix);
+                value = Replace(value, "$Person.phone.home", LisPerson.PhoneHome);
+                value = Replace(value, "$Person.phone.mobile", LisPerson.PhoneMobile);
+                value = Replace(value, "$Person.phone.primary", LisPerson.PhonePrimary);
+                value = Replace(value, "$Person.phone.work", LisPerson.PhoneWork);
+                value = Replace(value, "$Person.sms", LisPerson.Sms);
+                value = Replace(value, "$Person.sourcedId", LisPerson.SourcedId);
+                value = Replace(value, "$Person.webaddress", LisPerson.WebAddress);
+            }
+
+            // Course Groups Service variable substitutions
+            if (CourseGroup != null)
+            {
+                value = Replace(value, "$CourseGroup.id", CourseGroup.Id);
             }
 
             // LTI Context variable substitutions
             if (LtiContext != null)
             {
-                value = Regex.Replace(value, "\\$Context.id", LtiContext.Id ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Context.id.history", LtiContext.IdHistory ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Context.label", LtiContext.Label ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Context.org", LtiContext.Org ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Context.title", LtiContext.SourcedId ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Context.title", LtiContext.Title ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$Context.type", LtiContext.Type ?? string.Empty, RegexOptions.IgnoreCase);
+                // $Context.id.history before $Context.id: see the remarks on this method.
+                value = Replace(value, "$Context.id.history", LtiContext.IdHistory);
+                value = Replace(value, "$Context.id", LtiContext.Id);
+                value = Replace(value, "$Context.label", LtiContext.Label);
+                value = Replace(value, "$Context.org", LtiContext.Org);
+                value = Replace(value, "$Context.sourcedId", LtiContext.SourcedId);
+                value = Replace(value, "$Context.title", LtiContext.Title);
+                value = Replace(value, "$Context.type", LtiContext.Type);
             }
 
             // LTI ResourceLink variable subsitutions
             if (LtiResourceLink != null)
             {
-                value = Regex.Replace(value, "\\$ResourceLink.description", LtiResourceLink.Description ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$ResourceLink.id", LtiResourceLink.Id ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$ResourceLink.id.history", LtiResourceLink.IdHistory ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$ResourceLink.title", LtiResourceLink.Title ?? string.Empty, RegexOptions.IgnoreCase);
+                value = Replace(value, "$ResourceLink.description", LtiResourceLink.Description);
+                // $ResourceLink.id.history before $ResourceLink.id: see the remarks on this method.
+                value = Replace(value, "$ResourceLink.id.history", LtiResourceLink.IdHistory);
+                value = Replace(value, "$ResourceLink.id", LtiResourceLink.Id);
+                value = Replace(value, "$ResourceLink.title", LtiResourceLink.Title);
             }
 
             // LTI User variable substitutions
             if (LtiUser != null)
             {
-                value = Regex.Replace(value, "\\$User.id", LtiUser.Id ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$User.image", LtiUser.Image ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$User.org", LtiUser.Org ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$User.scope.mentor", LtiUser.ScopeMentor ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$User.username", LtiUser.Username ?? string.Empty, RegexOptions.IgnoreCase);
+                value = Replace(value, "$User.id", LtiUser.Id);
+                value = Replace(value, "$User.image", LtiUser.Image);
+                value = Replace(value, "$User.org", LtiUser.Org);
+                value = Replace(value, "$User.scope.mentor", LtiUser.ScopeMentor);
+                value = Replace(value, "$User.username", LtiUser.Username);
             }
 
             // Tool Platform variable substitutions
             if (ToolPlatform != null)
             {
-                value = Regex.Replace(value, "\\$ToolPlatform.productFamilyCode", ToolPlatform.ProductFamilyCode ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$ToolPlatform.version", ToolPlatform.Version ?? string.Empty, RegexOptions.IgnoreCase);
+                value = Replace(value, "$ToolPlatform.productFamilyCode", ToolPlatform.ProductFamilyCode);
+                value = Replace(value, "$ToolPlatform.version", ToolPlatform.Version);
             }
 
             // Tool Platform Instance variable substitutions
             if (ToolPlatfomInstance != null)
             {
-                value = Regex.Replace(value, "\\$ToolPlatformInstance.contactEmail", ToolPlatfomInstance.ContactEmail ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$ToolPlatformInstance.description", ToolPlatfomInstance.Description ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$ToolPlatformInstance.guid", ToolPlatfomInstance.Guid ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$ToolPlatformInstance.name", ToolPlatfomInstance.Name ?? string.Empty, RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, "\\$ToolPlatformInstance.url", ToolPlatfomInstance.Url ?? string.Empty, RegexOptions.IgnoreCase);
+                value = Replace(value, "$ToolPlatformInstance.contactEmail", ToolPlatfomInstance.ContactEmail);
+                value = Replace(value, "$ToolPlatformInstance.description", ToolPlatfomInstance.Description);
+                value = Replace(value, "$ToolPlatformInstance.guid", ToolPlatfomInstance.Guid);
+                value = Replace(value, "$ToolPlatformInstance.name", ToolPlatfomInstance.Name);
+                value = Replace(value, "$ToolPlatformInstance.url", ToolPlatfomInstance.Url);
             }
 
             return value;
@@ -277,6 +317,25 @@ namespace LtiAdvantage.Lti
     }
 
     #region Substitution value classes
+
+    /// <summary>
+    /// Substitution values for Course Groups Service variables.
+    /// </summary>
+    /// <remarks>
+    /// Added by Course Groups Service 1.0.
+    /// See https://www.imsglobal.org/spec/lti-gs/v1p0#custom-parameter-substitutions.
+    /// </remarks>
+    public class CourseGroup
+    {
+        /// <summary>
+        /// The id of any one context group associated with the launch, or an empty string when
+        /// the launch is not associated with a group.
+        /// <para>
+        /// Custom parameter substitution: $CourseGroup.id.
+        /// </para>
+        /// </summary>
+        public string Id { get; set; }
+    }
 
     /// <summary>
     /// Substitution values for LIS Course Offering variables.
@@ -738,7 +797,18 @@ namespace LtiAdvantage.Lti
         public string CollectionSourcedId { get; set; }
 
         /// <summary>
-        /// LIS membership variable. 
+        /// A comma separated list of the group ids the person is enrolled in, aligning to the
+        /// group_enrollments array of the Names and Role Provisioning Service response.
+        /// <para>
+        /// Parameter: n/a.
+        /// Custom parameter substitution: $Membership.course.groupIds.
+        /// Versions: added by Course Groups Service 1.0.
+        /// </para>
+        /// </summary>
+        public string CourseGroupIds { get; set; }
+
+        /// <summary>
+        /// LIS membership variable.
         /// <para>
         /// Parameter: n/a.
         /// Custom parameter substitution: $Membership.createdTimestamp.

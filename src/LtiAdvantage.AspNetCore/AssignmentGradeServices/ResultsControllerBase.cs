@@ -69,6 +69,12 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
                     var request = new GetResultsRequest(contextId, lineItemId, userId, limit);
                     return await OnGetResultsAsync(request).ConfigureAwait(false);
                 }
+                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+                {
+                    // The caller went away. Let the framework abort the response rather than
+                    // reporting a server error the caller will never see.
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, $"An unexpected error occurred in {nameof(GetResultsAsync)}.");

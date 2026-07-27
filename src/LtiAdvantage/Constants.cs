@@ -55,9 +55,24 @@
             public const string LtiDeepLinkingResponseMessageType = "LtiDeepLinkingResponse";
 
             /// <summary>
+            /// The message type of an LtiEndAssessmentRequest (Proctoring Services 1.0 §4.4).
+            /// </summary>
+            public const string LtiEndAssessmentRequestMessageType = "LtiEndAssessment";
+
+            /// <summary>
             /// The message type of an LtiResourceLinkRequest.
             /// </summary>
             public const string LtiResourceLinkRequestMessageType = "LtiResourceLinkRequest";
+
+            /// <summary>
+            /// The message type of an LtiStartAssessmentRequest (Proctoring Services 1.0 §4.3).
+            /// </summary>
+            public const string LtiStartAssessmentRequestMessageType = "LtiStartAssessment";
+
+            /// <summary>
+            /// The message type of an LtiStartProctoringRequest (Proctoring Services 1.0 §4.2).
+            /// </summary>
+            public const string LtiStartProctoringRequestMessageType = "LtiStartProctoring";
 
             /// <summary>
             /// The message type of an LtiSubmissionReviewRequest.
@@ -76,9 +91,19 @@
         public static class LtiClaims
         {
             /// <summary>
+            /// The Assessment Control Service endpoint and permitted actions (Proctoring Services 1.0 §5.2).
+            /// </summary>
+            public const string Acs = "https://purl.imsglobal.org/spec/lti-ap/claim/acs";
+
+            /// <summary>
             /// The claim to include Names and Role Provisioning Service parameter in LTI 1.3 messages.
             /// </summary>
             public const string AssignmentGradeServices = "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint";
+
+            /// <summary>
+            /// The attempt number of the assessment being proctored (Proctoring Services 1.0 §4.2).
+            /// </summary>
+            public const string AttemptNumber = "https://purl.imsglobal.org/spec/lti-ap/claim/attempt_number";
 
             /// <summary>
             /// A list of content items.
@@ -89,6 +114,12 @@
             /// Properties of the context from which the launch originated (for example, course id and title).
             /// </summary>
             public const string Context = "https://purl.imsglobal.org/spec/lti/claim/context";
+
+            /// <summary>
+            /// The claim to include Course Groups Service parameters in LTI 1.3 messages
+            /// (Course Groups Service 1.0 §2.1).
+            /// </summary>
+            public const string CourseGroupsService = "https://purl.imsglobal.org/spec/lti-gs/claim/groupsservice";
 
             /// <summary>
             /// This is a map of key/value custom parameters which are to be included with the launch.
@@ -109,6 +140,12 @@
             /// The deployment identifier, uniquely identifying the tool's deployment on the platform.
             /// </summary>
             public const string DeploymentId = "https://purl.imsglobal.org/spec/lti/claim/deployment_id";
+
+            /// <summary>
+            /// Set by the proctoring tool to ask the platform to send an LtiEndAssessment message
+            /// when the assessment ends (Proctoring Services 1.0 §4.3).
+            /// </summary>
+            public const string EndAssessmentReturn = "https://purl.imsglobal.org/spec/lti-ap/claim/end_assessment_return";
 
             /// <summary>
             /// Optional plain text message.
@@ -178,6 +215,25 @@
             public const string Platform = "https://purl.imsglobal.org/spec/lti/claim/tool_platform";
 
             /// <summary>
+            /// Proctoring-specific log message, reported by the proctoring tool on LtiEndAssessment
+            /// (Proctoring Services 1.0 §4.4). Distinct from the Deep Linking <see cref="ErrorLog"/> claim.
+            /// </summary>
+            public const string ProctoringErrorLog = "https://purl.imsglobal.org/spec/lti-ap/claim/errorlog";
+
+            /// <summary>
+            /// Proctoring-specific error message intended for the end user, reported by the proctoring tool
+            /// on LtiEndAssessment (Proctoring Services 1.0 §4.4). Distinct from the Deep Linking
+            /// <see cref="ErrorMessage"/> claim.
+            /// </summary>
+            public const string ProctoringErrorMessage = "https://purl.imsglobal.org/spec/lti-ap/claim/errormsg";
+
+            /// <summary>
+            /// Opaque proctoring configuration passed between the platform and the proctoring tool
+            /// (Proctoring Services 1.0 §4.2).
+            /// </summary>
+            public const string ProctoringSettings = "https://purl.imsglobal.org/spec/lti-ap/claim/proctoring_settings";
+
+            /// <summary>
             /// A link to tool's resource from the tool's platform.
             /// </summary>
             public const string ResourceLink = "https://purl.imsglobal.org/spec/lti/claim/resource_link";
@@ -193,9 +249,27 @@
             public const string RoleScopeMentor = "https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor";
 
             /// <summary>
+            /// Opaque value the platform issues on LtiStartProctoring and requires back on
+            /// LtiStartAssessment to correlate the two messages (Proctoring Services 1.0 §4.2).
+            /// </summary>
+            public const string SessionData = "https://purl.imsglobal.org/spec/lti-ap/claim/session_data";
+
+            /// <summary>
+            /// The platform URL the proctoring tool POSTs the LtiStartAssessment message to
+            /// (Proctoring Services 1.0 §4.2).
+            /// </summary>
+            public const string StartAssessmentUrl = "https://purl.imsglobal.org/spec/lti-ap/claim/start_assessment_url";
+
+            /// <summary>
             /// The launch url.
             /// </summary>
             public const string TargetLinkUri = "https://purl.imsglobal.org/spec/lti/claim/target_link_uri";
+
+            /// <summary>
+            /// The user identity attributes the proctoring tool verified before the assessment started
+            /// (Proctoring Services 1.0 §4.3).
+            /// </summary>
+            public const string VerifiedUser = "https://purl.imsglobal.org/spec/lti-ap/claim/verified_user";
 
             /// <summary>
             /// The minimum LTI version required.
@@ -239,11 +313,35 @@
                 public const string ScoreReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/score.readonly";
             }
 
+            /// <summary>
+            /// Proctoring Services scopes.
+            /// </summary>
+            public static class Ap
+            {
+                /// <summary>
+                /// Assessment Control Service scope, required to invoke any control action
+                /// (Proctoring Services 1.0 §5.1).
+                /// </summary>
+                public const string ControlAll = "https://purl.imsglobal.org/spec/lti-ap/scope/control.all";
+            }
+
             /// <summary>LTI Dynamic Registration scopes (Dynamic Registration §4.4).</summary>
             public static class DynamicRegistration
             {
                 /// <summary>Scope required on the registration access token.</summary>
                 public const string Scope = "https://purl.imsglobal.org/spec/lti-reg/scope/registration";
+            }
+
+            /// <summary>
+            /// Course Groups Service scopes.
+            /// </summary>
+            public static class Gs
+            {
+                /// <summary>
+                /// Course Groups Service readonly scope, required for both the groups and the
+                /// group sets endpoints (Course Groups Service 1.0 §3).
+                /// </summary>
+                public const string ContextGroupReadonly = "https://purl.imsglobal.org/spec/lti-gs/scope/contextgroup.readonly";
             }
 
             /// <summary>
@@ -263,6 +361,16 @@
         /// </summary>
         public static class MediaTypes
         {
+            /// <summary>
+            /// https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-container-media-type
+            /// </summary>
+            public const string ContextGroupContainer = "application/vnd.ims.lti-gs.v1.contextgroupcontainer+json";
+
+            /// <summary>
+            /// https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-set-container-media-type
+            /// </summary>
+            public const string ContextGroupSetContainer = "application/vnd.ims.lti-gs.v1.contextgroupsetcontainer+json";
+
             /// <summary>
             /// JSON Web Key Set media type (RFC 7517 §6).
             /// </summary>
@@ -395,6 +503,33 @@
                 /// Scores endpoint.
                 /// </summary>
                 public const string ScoresService = "scores";
+            }
+
+            /// <summary>
+            /// Proctoring Services endpoints.
+            /// </summary>
+            public static class Ap
+            {
+                /// <summary>
+                /// Assessment Control Service endpoint.
+                /// </summary>
+                public const string AssessmentControlService = "assessment-control";
+            }
+
+            /// <summary>
+            /// Course Groups Service endpoints.
+            /// </summary>
+            public static class Gs
+            {
+                /// <summary>
+                /// Context group sets endpoint.
+                /// </summary>
+                public const string GroupSetsService = "group-sets";
+
+                /// <summary>
+                /// Context groups endpoint.
+                /// </summary>
+                public const string GroupsService = "groups";
             }
 
             /// <summary>

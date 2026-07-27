@@ -383,6 +383,137 @@
             Get or set the line item id.
             </summary>
         </member>
+        <member name="T:LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupSetsRequest">
+            <summary>
+            Represents a GetGroupSets request.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupSetsRequest.#ctor(System.String,System.Nullable{System.Int32})">
+            <summary>
+            Initialize a new instance of the class.
+            </summary>
+            <param name="contextId">Required context id.</param>
+            <param name="limit">Optional limit to the number of group sets to return.</param>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupSetsRequest.ContextId">
+            <summary>
+            Required context ID of the context whose group sets to return. For example, the course.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupSetsRequest.Limit">
+            <summary>
+            Specifies the maximum number of group sets to return.
+            </summary>
+            <remarks>
+            This parameter is merely a hint. The server is not obligated to honor this
+            limit and may at its own discretion choose a different value for the number
+            of group sets to return.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#limit-query-parameter.
+            </remarks>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupsRequest">
+            <summary>
+            Represents a GetGroups request.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupsRequest.#ctor(System.String,System.String,System.Nullable{System.Int32})">
+            <summary>
+            Initialize a new instance of the class.
+            </summary>
+            <param name="contextId">Required context id.</param>
+            <param name="userId">Optional user filter for groups the user belongs to.</param>
+            <param name="limit">Optional limit to the number of groups to return.</param>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupsRequest.ContextId">
+            <summary>
+            Required context ID of the context whose groups to return. For example, the course.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupsRequest.UserId">
+            <summary>
+            Optional user filter for groups to return.
+            </summary>
+            <remarks>
+            The result set will be filtered so that it includes only the groups the specified
+            user is a member of. If omitted, all groups in the context are returned.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#user-id-query-parameter.
+            </remarks>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupsRequest.Limit">
+            <summary>
+            Specifies the maximum number of groups to return.
+            </summary>
+            <remarks>
+            This parameter is merely a hint. The server is not obligated to honor this
+            limit and may at its own discretion choose a different value for the number
+            of groups to return.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#limit-query-parameter.
+            </remarks>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.CourseGroupsService.GroupsControllerBase">
+            <inheritdoc cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
+            <summary>
+            Implements the Course Groups Service groups endpoint.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#groups-endpoint.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.CourseGroupsService.GroupsControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.CourseGroupsService.GroupsControllerBase})">
+            <summary>
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.CourseGroupsService.GroupsControllerBase.OnGetGroupsAsync(LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupsRequest)">
+            <summary>
+            Returns the groups.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.CourseGroupsService.GroupsControllerBase.GetGroupsAsync(System.String,System.String,System.Nullable{System.Int32})">
+            <summary>
+            Returns the groups of a context.
+            </summary>
+            <param name="contextId">The context id.</param>
+            <param name="userId">Optional user filter for groups the user belongs to.</param>
+            <param name="limit">Optional limit to the number of groups to return.</param>
+            <returns>The groups.</returns>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.CourseGroupsService.GroupSetsControllerBase">
+            <inheritdoc cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
+            <summary>
+            Implements the Course Groups Service group sets endpoint.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#group-sets-endpoint.
+            </summary>
+            <remarks>
+            Group sets are optional. A platform that does not group its groups into sets omits
+            <see cref="P:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.ContextGroupSetsUrl"/> from the launch
+            claim and need not host this endpoint.
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.CourseGroupsService.GroupSetsControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.CourseGroupsService.GroupSetsControllerBase})">
+            <summary>
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.CourseGroupsService.GroupSetsControllerBase.OnGetGroupSetsAsync(LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupSetsRequest)">
+            <summary>
+            Returns the group sets.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.CourseGroupsService.GroupSetsControllerBase.GetGroupSetsAsync(System.String,System.Nullable{System.Int32})">
+            <summary>
+            Returns the group sets of a context.
+            </summary>
+            <param name="contextId">The context id.</param>
+            <param name="limit">Optional limit to the number of group sets to return.</param>
+            <returns>The group sets.</returns>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.CourseGroupsService.IGroupsController">
+            <summary>
+            Marker for ILogger dependency injection.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.CourseGroupsService.IGroupSetsController">
+            <summary>
+            Marker for ILogger dependency injection.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase">
             <summary>
             Platform-side endpoint for LTI Dynamic Registration 1.0.
@@ -658,7 +789,7 @@
             See https://www.imsglobal.org/spec/lti-nrps/v2p0#membership-differences.
             </remarks>
         </member>
-        <member name="M:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.GetMembershipRequest.#ctor(System.String,System.Nullable{System.Int32},System.String,System.Nullable{LtiAdvantage.Lti.Role})">
+        <member name="M:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.GetMembershipRequest.#ctor(System.String,System.Nullable{System.Int32},System.String,System.Nullable{LtiAdvantage.Lti.Role},System.Boolean)">
             <summary>
             Initialize a new instance of the class.
             </summary>
@@ -666,6 +797,7 @@
             <param name="limit">Optional limit to the number of members to return.</param>
             <param name="rlid">Optional resource link filter for members with access to resource link.</param>
             <param name="role">Optional role filter for members that have the specified role.</param>
+            <param name="includeGroups">Optional request for each member's group enrollments.</param>
         </member>
         <member name="P:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.GetMembershipRequest.ContextId">
             <summary>
@@ -708,6 +840,17 @@
             See https://www.imsglobal.org/spec/lti-nrps/v2p0#role-query-parameter.
             </remarks>
         </member>
+        <member name="P:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.GetMembershipRequest.IncludeGroups">
+            <summary>
+            Whether the caller asked for each member's group enrollments.
+            </summary>
+            <remarks>
+            Course Groups Service 1.0 extension. When true, a platform that supports the
+            Course Groups Service should populate <see cref="P:LtiAdvantage.NamesRoleProvisioningService.Member.GroupEnrollments"/> on each
+            returned member. Platforms that do not support the service ignore this.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
+            </remarks>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.IMembershipController">
             <summary>
             Marker for ILogger dependency injection.
@@ -728,7 +871,7 @@
             Returns the membership.
             </summary>
         </member>
-        <member name="M:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.MembershipControllerBase.GetMembershipAsync(System.String,System.Nullable{System.Int32},System.String,System.Nullable{LtiAdvantage.Lti.Role})">
+        <member name="M:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.MembershipControllerBase.GetMembershipAsync(System.String,System.Nullable{System.Int32},System.String,System.Nullable{LtiAdvantage.Lti.Role},System.Boolean)">
             <summary>
             Returns the membership of a context.
             </summary>
@@ -736,6 +879,10 @@
             <param name="limit">Optional limit to the number of members to return.</param>
             <param name="rlid">Optional resource link filter for members with access to resource link.</param>
             <param name="role">Optional role filter for members that have the specified role.</param>
+            <param name="groups">
+            Optional Course Groups Service 1.0 request for each member's group enrollments.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
+            </param>
             <returns>The members.</returns>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.Utilities.AuthorizationScopePolicyProvider">

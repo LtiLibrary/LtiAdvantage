@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
+using LtiAdvantage.CourseGroupsService;
 using LtiAdvantage.Lti;
 
 
@@ -26,10 +27,21 @@ namespace LtiAdvantage.NamesRoleProvisioningService
 
         /// <summary>
         /// The person's assigned family name.
-        /// Not specified  if not included in a basic launch from same context. 
+        /// Not specified  if not included in a basic launch from same context.
         /// </summary>
         [JsonPropertyName("family_name")]
         public string FamilyName { get; set; }
+
+        /// <summary>
+        /// The context groups this member belongs to.
+        /// </summary>
+        /// <remarks>
+        /// Course Groups Service 1.0 extension. Only included when the caller asked for
+        /// groups and the platform supports the Course Groups Service.
+        /// See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
+        /// </remarks>
+        [JsonPropertyName("group_enrollments")]
+        public GroupEnrollment[] GroupEnrollments { get; set; }
 
         /// <summary>
         /// The person's assigned first name.

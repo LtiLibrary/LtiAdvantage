@@ -319,9 +319,24 @@
             The message type of an LtiDeepLinkingRequest.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.Lti.LtiEndAssessmentRequestMessageType">
+            <summary>
+            The message type of an LtiEndAssessmentRequest (Proctoring Services 1.0 §4.4).
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.Lti.LtiResourceLinkRequestMessageType">
             <summary>
             The message type of an LtiResourceLinkRequest.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.Lti.LtiStartAssessmentRequestMessageType">
+            <summary>
+            The message type of an LtiStartAssessmentRequest (Proctoring Services 1.0 §4.3).
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.Lti.LtiStartProctoringRequestMessageType">
+            <summary>
+            The message type of an LtiStartProctoringRequest (Proctoring Services 1.0 §4.2).
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.Lti.LtiSubmissionReviewRequestMessageType">
@@ -339,9 +354,19 @@
             LTI claims.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.Acs">
+            <summary>
+            The Assessment Control Service endpoint and permitted actions (Proctoring Services 1.0 §5.2).
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.AssignmentGradeServices">
             <summary>
             The claim to include Names and Role Provisioning Service parameter in LTI 1.3 messages.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.AttemptNumber">
+            <summary>
+            The attempt number of the assessment being proctored (Proctoring Services 1.0 §4.2).
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.ContentItems">
@@ -352,6 +377,12 @@
         <member name="F:LtiAdvantage.Constants.LtiClaims.Context">
             <summary>
             Properties of the context from which the launch originated (for example, course id and title).
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.CourseGroupsService">
+            <summary>
+            The claim to include Course Groups Service parameters in LTI 1.3 messages
+            (Course Groups Service 1.0 §2.1).
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.Custom">
@@ -372,6 +403,12 @@
         <member name="F:LtiAdvantage.Constants.LtiClaims.DeploymentId">
             <summary>
             The deployment identifier, uniquely identifying the tool's deployment on the platform.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.EndAssessmentReturn">
+            <summary>
+            Set by the proctoring tool to ask the platform to send an LtiEndAssessment message
+            when the assessment ends (Proctoring Services 1.0 §4.3).
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.ErrorLog">
@@ -441,6 +478,25 @@
             Properties associated with the platform initiating the launch.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.ProctoringErrorLog">
+            <summary>
+            Proctoring-specific log message, reported by the proctoring tool on LtiEndAssessment
+            (Proctoring Services 1.0 §4.4). Distinct from the Deep Linking <see cref="F:LtiAdvantage.Constants.LtiClaims.ErrorLog"/> claim.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.ProctoringErrorMessage">
+            <summary>
+            Proctoring-specific error message intended for the end user, reported by the proctoring tool
+            on LtiEndAssessment (Proctoring Services 1.0 §4.4). Distinct from the Deep Linking
+            <see cref="F:LtiAdvantage.Constants.LtiClaims.ErrorMessage"/> claim.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.ProctoringSettings">
+            <summary>
+            Opaque proctoring configuration passed between the platform and the proctoring tool
+            (Proctoring Services 1.0 §4.2).
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.ResourceLink">
             <summary>
             A link to tool's resource from the tool's platform.
@@ -456,9 +512,27 @@
             An array of the user_id values which the current user can access as a mentor.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.SessionData">
+            <summary>
+            Opaque value the platform issues on LtiStartProctoring and requires back on
+            LtiStartAssessment to correlate the two messages (Proctoring Services 1.0 §4.2).
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.StartAssessmentUrl">
+            <summary>
+            The platform URL the proctoring tool POSTs the LtiStartAssessment message to
+            (Proctoring Services 1.0 §4.2).
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.TargetLinkUri">
             <summary>
             The launch url.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.VerifiedUser">
+            <summary>
+            The user identity attributes the proctoring tool verified before the assessment started
+            (Proctoring Services 1.0 §4.3).
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.Version">
@@ -501,11 +575,33 @@
             Custom Assignment and Grade Service score readonly scope.
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Constants.LtiScopes.Ap">
+            <summary>
+            Proctoring Services scopes.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiScopes.Ap.ControlAll">
+            <summary>
+            Assessment Control Service scope, required to invoke any control action
+            (Proctoring Services 1.0 §5.1).
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.Constants.LtiScopes.DynamicRegistration">
             <summary>LTI Dynamic Registration scopes (Dynamic Registration §4.4).</summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiScopes.DynamicRegistration.Scope">
             <summary>Scope required on the registration access token.</summary>
+        </member>
+        <member name="T:LtiAdvantage.Constants.LtiScopes.Gs">
+            <summary>
+            Course Groups Service scopes.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiScopes.Gs.ContextGroupReadonly">
+            <summary>
+            Course Groups Service readonly scope, required for both the groups and the
+            group sets endpoints (Course Groups Service 1.0 §3).
+            </summary>
         </member>
         <member name="T:LtiAdvantage.Constants.LtiScopes.Nrps">
             <summary>
@@ -520,6 +616,16 @@
         <member name="T:LtiAdvantage.Constants.MediaTypes">
             <summary>
             Service media types.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.MediaTypes.ContextGroupContainer">
+            <summary>
+            https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-container-media-type
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.MediaTypes.ContextGroupSetContainer">
+            <summary>
+            https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-set-container-media-type
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.MediaTypes.Jwks">
@@ -653,6 +759,31 @@
             Scores endpoint.
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Constants.ServiceEndpoints.Ap">
+            <summary>
+            Proctoring Services endpoints.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Ap.AssessmentControlService">
+            <summary>
+            Assessment Control Service endpoint.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Constants.ServiceEndpoints.Gs">
+            <summary>
+            Course Groups Service endpoints.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Gs.GroupSetsService">
+            <summary>
+            Context group sets endpoint.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Gs.GroupsService">
+            <summary>
+            Context groups endpoint.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.Constants.ServiceEndpoints.Jwks">
             <summary>
             JWKS publication endpoint.
@@ -669,6 +800,159 @@
         <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Nrps.MembershipService">
             <summary>
             Membership endpoint.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.CourseGroupsService.ContextGroupContainer">
+            <summary>
+            Represents the results returned by the Course Groups Service groups endpoint.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-container-media-type.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.ContextGroupContainer.Id">
+            <summary>
+            The ID of these results. Typically the request URL to the groups endpoint.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.ContextGroupContainer.UserId">
+            <summary>
+            The user the results were filtered to. Only present when the request
+            included a user filter.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.ContextGroupContainer.Groups">
+            <summary>
+            The groups in the specified context.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.CourseGroupsService.ContextGroupSetContainer">
+            <summary>
+            Represents the results returned by the Course Groups Service group sets endpoint.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-set-container-media-type.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.ContextGroupSetContainer.Id">
+            <summary>
+            The ID of these results. Typically the request URL to the group sets endpoint.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.ContextGroupSetContainer.Sets">
+            <summary>
+            The group sets in the specified context.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType">
+            <summary>
+            LTI claim to include in a launch message if the platform supports the
+            Course Groups Service.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#groupsservice-claim.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.#ctor">
+            <summary>
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.Version">
+            <summary>
+            The version of this implementation.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.ContextGroupsUrl">
+            <summary>
+            Fully resolved URL to the context groups endpoint. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.ContextGroupSetsUrl">
+            <summary>
+            Fully resolved URL to the context group sets endpoint.
+            Only present when the platform supports group sets.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.Scope">
+            <summary>
+            The scope to request to access this service. Contains
+            <see cref="F:LtiAdvantage.Constants.LtiScopes.Gs.ContextGroupReadonly"/>.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.ServiceVersions">
+            <summary>
+            Service version. Default is <see cref="F:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.Version"/>.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.CourseGroupsService.Group">
+            <summary>
+            Represents a group within a context.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-container-media-type.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.Group.Id">
+            <summary>
+            A unique identifier for the group. Stable for the lifetime of the group
+            within its context. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.Group.Name">
+            <summary>
+            The displayable name of the group. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.Group.SetIds">
+            <summary>
+            The identifiers of the <see cref="T:LtiAdvantage.CourseGroupsService.GroupSet"/>s this group belongs to.
+            Omitted when the group belongs to no set.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.Group.Tag">
+            <summary>
+            A string value identifying the purpose of this group. For example, "marking".
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.Group.Hidden">
+            <summary>
+            Whether the group is hidden from learners in the platform's UI.
+            Defaults to false when not specified.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.CourseGroupsService.GroupEnrollment">
+            <summary>
+            A single group membership reported against a member of a context.
+            Included in the Names and Role Provisioning Service membership response when
+            the caller requests groups.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.GroupEnrollment.GroupId">
+            <summary>
+            The <see cref="P:LtiAdvantage.CourseGroupsService.Group.Id"/> of a group the member belongs to.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.CourseGroupsService.GroupSet">
+            <summary>
+            Represents a named collection of <see cref="T:LtiAdvantage.CourseGroupsService.Group"/>s within a context.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-set-container-media-type.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.GroupSet.Id">
+            <summary>
+            A unique identifier for the group set. Stable for the lifetime of the set
+            within its context. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.GroupSet.Name">
+            <summary>
+            The displayable name of the group set. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.GroupSet.Tag">
+            <summary>
+            A string value identifying the purpose of this group set. May reference an
+            LIS vocabulary term, for example
+            "http://purl.imsglobal.org/vocab/lis/v2/course#CourseSection".
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.GroupSet.Hidden">
+            <summary>
+            Whether the group set is hidden from learners in the platform's UI.
+            Defaults to false when not specified.
             </summary>
         </member>
         <member name="T:LtiAdvantage.DeepLinking.ContentItem">
@@ -2754,6 +3038,12 @@
             Properties of the context from which the launch originated (for example, course id and title).
             </summary>
         </member>
+        <member name="P:LtiAdvantage.Lti.LtiRequest.CourseGroupsService">
+            <summary>
+            The Course Groups Service claim, present when the platform exposes the groups
+            (and optionally the group sets) endpoint for this context.
+            </summary>
+        </member>
         <member name="P:LtiAdvantage.Lti.LtiRequest.Custom">
             <summary>
             This is a map of key/value custom parameters which are to be included with the launch.
@@ -3177,8 +3467,18 @@
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.FamilyName">
             <summary>
             The person's assigned family name.
-            Not specified  if not included in a basic launch from same context. 
+            Not specified  if not included in a basic launch from same context.
             </summary>
+        </member>
+        <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.GroupEnrollments">
+            <summary>
+            The context groups this member belongs to.
+            </summary>
+            <remarks>
+            Course Groups Service 1.0 extension. Only included when the caller asked for
+            groups and the platform supports the Course Groups Service.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
+            </remarks>
         </member>
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.GivenName">
             <summary>

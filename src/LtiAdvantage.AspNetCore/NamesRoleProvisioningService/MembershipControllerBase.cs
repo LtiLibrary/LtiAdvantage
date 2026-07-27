@@ -45,6 +45,10 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
         /// <param name="limit">Optional limit to the number of members to return.</param>
         /// <param name="rlid">Optional resource link filter for members with access to resource link.</param>
         /// <param name="role">Optional role filter for members that have the specified role.</param>
+        /// <param name="groups">
+        /// Optional Course Groups Service 1.0 request for each member's group enrollments.
+        /// See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
+        /// </param>
         /// <returns>The members.</returns>
         [HttpGet]
         [Produces(Constants.MediaTypes.MembershipContainer)]
@@ -56,8 +60,8 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
             Policy = Constants.LtiScopes.Nrps.MembershipReadonly)]
         [Route("context/{contextId}/membership", Name = Constants.ServiceEndpoints.Nrps.MembershipService)]
         [Route("context/{contextId}/membership.{format}")]
-        public async Task<ActionResult<MembershipContainer>> GetMembershipAsync([Required] string contextId, 
-            int? limit = null, string rlid = null, Role? role = null)
+        public async Task<ActionResult<MembershipContainer>> GetMembershipAsync([Required] string contextId,
+            int? limit = null, string rlid = null, Role? role = null, bool groups = false)
         {
             try
             {
@@ -65,8 +69,14 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
 
                 try
                 {
-                    var request = new GetMembershipRequest(contextId, limit, rlid, role);
+                    var request = new GetMembershipRequest(contextId, limit, rlid, role, groups);
                     return await OnGetMembershipAsync(request).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+                {
+                    // The caller went away. Let the framework abort the response rather than
+                    // reporting a server error the caller will never see.
+                    throw;
                 }
                 catch (Exception ex)
                 {

@@ -9,9 +9,18 @@
 
 ### What's new
 
+- [LTI Course Groups Service 1.0](https://www.imsglobal.org/spec/lti-gs/v1p0) — `groupsservice` claim, `GroupsControllerBase` + `GroupSetsControllerBase`, and `group_enrollments` on the NRPS membership response (`?groups=true`)
+- [LTI Proctoring Services 1.0](https://www.imsglobal.org/spec/proctoring/v1p0) — `LtiStartProctoringRequest`, `LtiStartAssessmentRequest`, `LtiEndAssessmentRequest`, and the Assessment Control Service (`AssessmentControlControllerBase`)
+- `LtiTokenValidator` — validates an ID token's signature against the platform's JWKS (fetched and cached, refreshed on key rotation) plus `iss`/`aud`/`exp`/`nonce` and the LTI claims
+- `OpenIdConfigurationControllerBase` for platform `/.well-known/openid-configuration`, and `InMemoryJwksKeyStore` as a ready-made `IJwksKeyStore`
 - [LTI Submission Review 1.0](https://www.imsglobal.org/spec/lti-sr/v1p0) (`LtiSubmissionReviewRequest`, `for_user` claim, AGS `submissionReview` extension)
 - [JWKS publishing](https://www.imsglobal.org/spec/security/v1p0#tool-jwk-set-url) (`JwksControllerBase` + `IJwksKeyStore`) for `/.well-known/jwks.json`
 - [LTI Dynamic Registration 1.0](https://www.imsglobal.org/spec/lti-dr/v1p0) — tool-side `HttpClient` extensions and platform-side `DynamicRegistrationControllerBase`
+
+#### Fixed
+
+- Custom-variable substitution: `$Context.id.history` and `$ResourceLink.id.history` were mangled by the shorter `.id` variable being substituted first, and `$Context.sourcedId` was unreachable because the sourced id was written over `$Context.title`.
+- The `…ControllerBase` classes no longer turn a client disconnect into a 500.
 
 ## NuGet
 | Library | Release | Prerelease |

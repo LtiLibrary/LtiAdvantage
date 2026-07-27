@@ -551,6 +551,15 @@
                 /// </summary>
                 public const string MembershipService = "membership";
             }
+
+            /// <summary>
+            /// OpenID Provider Metadata publication endpoint.
+            /// </summary>
+            public static class OpenIdConnect
+            {
+                /// <summary>The well-known OpenID configuration endpoint route name.</summary>
+                public const string OpenIdConfigurationService = "openid-configuration";
+            }
         }
     }
 }

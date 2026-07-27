@@ -1,0 +1,102 @@
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using LtiAdvantage.Lti;
+using LtiAdvantage.Proctoring;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Logging;
+using Xunit;
+
+namespace LtiAdvantage.IntegrationTests.Proctoring
+{
+    public class AssessmentControlControllerShould : IDisposable
+    {
+        private const string Url = "assessment-control";
+        private readonly HttpClient _client;
+        private readonly TestServer _server;
+
+        public AssessmentControlControllerShould()
+        {
+            _server = new TestServer(new WebHostBuilder()
+                .UseContentRoot(AppContext.BaseDirectory)
+                .ConfigureLogging(l => { l.AddConsole(); l.AddDebug(); })
+                .UseStartup<Startup>());
+            _client = _server.CreateClient();
+        }
+
+        [Fact]
+        public async Task Reject_WhenScopeMissing()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Nrps.MembershipReadonly);
+
+            var response = await PostAsync(FlagRequest());
+
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task ApplyAction_AndReturnResultingStatus()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Ap.ControlAll);
+
+            var request = FlagRequest();
+            request.Action = AssessmentControlAction.Pause;
+
+            var response = await PostAsync(request);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var result = JsonSerializer.Deserialize<AssessmentControlResponse>(
+                await response.Content.ReadAsStringAsync());
+            Assert.Equal(AssessmentControlStatus.Paused, result.Status);
+        }
+
+        [Fact]
+        public async Task RoundTripExtraTime()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Ap.ControlAll);
+
+            var request = FlagRequest();
+            request.Action = AssessmentControlAction.Update;
+            request.ExtraTime = 20;
+
+            var response = await PostAsync(request);
+
+            response.EnsureSuccessStatusCode();
+            var result = JsonSerializer.Deserialize<AssessmentControlResponse>(
+                await response.Content.ReadAsStringAsync());
+            Assert.Equal(20, result.ExtraTime);
+        }
+
+        private Task<HttpResponseMessage> PostAsync(AssessmentControlRequest request)
+        {
+            var json = JsonSerializer.Serialize(request);
+            return _client.PostAsync(Url, new StringContent(json, Encoding.UTF8, "application/json"));
+        }
+
+        private static AssessmentControlRequest FlagRequest() => new()
+        {
+            User = new AssessmentControlUser
+            {
+                Iss = "https://assessment.example.com",
+                Sub = "2047534b3cc6d7086909"
+            },
+            ResourceLink = new ResourceLinkClaimValueType {Id = "398"},
+            AttemptNumber = 1,
+            Action = AssessmentControlAction.Flag,
+            IncidentTime = new DateTime(2026, 7, 27, 10, 45, 33, DateTimeKind.Utc),
+            IncidentSeverity = 0.1,
+            ReasonCode = "12056",
+            ReasonMsg = "Excessive background noise outside candidate control"
+        };
+
+        public void Dispose()
+        {
+            _client?.Dispose();
+            _server?.Dispose();
+        }
+    }
+}

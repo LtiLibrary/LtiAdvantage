@@ -31,6 +31,34 @@ namespace LtiAdvantage.Lti
         {
         }
 
+        #region Resource Link Claim
+
+        // See https://www.imsglobal.org/spec/lti/v1p3/#resource-link-claim
+
+        /// <summary>
+        /// The https://purl.imsglobal.org/spec/lti/claim/resource_link claim composes
+        /// properties for the resource link from which the launch message occurs.
+        /// <example>
+        /// {
+        ///   "id": "200d101f-2c14-434a-a0f3-57c2a42369fd",
+        ///   ...
+        /// }
+        /// </example>
+        /// </summary>
+        public ResourceLinkClaimValueType ResourceLink
+        {
+            get { return this.GetClaimValue<ResourceLinkClaimValueType>(Constants.LtiClaims.ResourceLink); }
+            set { this.SetClaimValue(Constants.LtiClaims.ResourceLink, value); }
+        }
+
+        #endregion
+
+        #region Optional Service Claims
+
+        // Each of these is the platform advertising a service the tool may call against this
+        // launch's context. All are optional: a platform that does not offer the service, or
+        // does not grant this deployment access to it, omits the claim.
+
         /// <summary>
         /// The Assignment and Grade Services claim.
         /// </summary>
@@ -59,20 +87,6 @@ namespace LtiAdvantage.Lti
             set { this.SetClaimValue(Constants.LtiClaims.NamesRoleService, value); }
         }
 
-        /// <summary>
-        /// The https://purl.imsglobal.org/spec/lti/claim/resource_link claim composes
-        /// properties for the resource link from which the launch message occurs.
-        /// <example>
-        /// {
-        ///   "id": "200d101f-2c14-434a-a0f3-57c2a42369fd",
-        ///   ...
-        /// }
-        /// </example>
-        /// </summary>
-        public ResourceLinkClaimValueType ResourceLink
-        {
-            get { return this.GetClaimValue<ResourceLinkClaimValueType>(Constants.LtiClaims.ResourceLink); }
-            set { this.SetClaimValue(Constants.LtiClaims.ResourceLink, value); }
-        }
+        #endregion
     }
 }

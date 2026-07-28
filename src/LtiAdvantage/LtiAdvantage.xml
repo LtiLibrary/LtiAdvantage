@@ -3218,12 +3218,6 @@
             Properties of the context from which the launch originated (for example, course id and title).
             </summary>
         </member>
-        <member name="P:LtiAdvantage.Lti.LtiRequest.CourseGroupsService">
-            <summary>
-            The Course Groups Service claim, present when the platform exposes the groups
-            (and optionally the group sets) endpoint for this context.
-            </summary>
-        </member>
         <member name="P:LtiAdvantage.Lti.LtiRequest.Custom">
             <summary>
             This is a map of key/value custom parameters which are to be included with the launch.
@@ -3364,6 +3358,12 @@
         <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.AssignmentGradeServices">
             <summary>
             The Assignment and Grade Services claim.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.CourseGroupsService">
+            <summary>
+            The Course Groups Service claim, present when the platform exposes the groups
+            (and optionally the group sets) endpoint for this context.
             </summary>
         </member>
         <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.NamesRoleService">

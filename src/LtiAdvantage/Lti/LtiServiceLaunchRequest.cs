@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using LtiAdvantage.AssignmentGradeServices;
+using LtiAdvantage.CourseGroupsService;
 using LtiAdvantage.NamesRoleProvisioningService;
 using LtiAdvantage.Utilities;
 
@@ -37,6 +38,16 @@ namespace LtiAdvantage.Lti
         {
             get { return this.GetClaimValue<AssignmentGradeServicesClaimValueType>(Constants.LtiClaims.AssignmentGradeServices); }
             set { this.SetClaimValue(Constants.LtiClaims.AssignmentGradeServices, value); }
+        }
+
+        /// <summary>
+        /// The Course Groups Service claim, present when the platform exposes the groups
+        /// (and optionally the group sets) endpoint for this context.
+        /// </summary>
+        public CourseGroupsServiceClaimValueType CourseGroupsService
+        {
+            get { return this.GetClaimValue<CourseGroupsServiceClaimValueType>(Constants.LtiClaims.CourseGroupsService); }
+            set { this.SetClaimValue(Constants.LtiClaims.CourseGroupsService, value); }
         }
 
         /// <summary>

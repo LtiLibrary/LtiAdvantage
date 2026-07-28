@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json;
-using LtiAdvantage.CourseGroupsService;
 using LtiAdvantage.Utilities;
 using JsonClaimValueTypes = System.IdentityModel.Tokens.Jwt.JsonClaimValueTypes;
 using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
@@ -241,16 +240,6 @@ namespace LtiAdvantage.Lti
         {
             get { return this.GetClaimValue<ContextClaimValueType>(Constants.LtiClaims.Context); }
             set { this.SetClaimValue(Constants.LtiClaims.Context, value); }
-        }
-
-        /// <summary>
-        /// The Course Groups Service claim, present when the platform exposes the groups
-        /// (and optionally the group sets) endpoint for this context.
-        /// </summary>
-        public CourseGroupsServiceClaimValueType CourseGroupsService
-        {
-            get { return this.GetClaimValue<CourseGroupsServiceClaimValueType>(Constants.LtiClaims.CourseGroupsService); }
-            set { this.SetClaimValue(Constants.LtiClaims.CourseGroupsService, value); }
         }
 
         /// <summary>

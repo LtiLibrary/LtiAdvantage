@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>.NET Core library with IMS LTIAdvantage support for Tool Consumer and Tool Provider applications.</Description>
     <AssemblyTitle>LtiAdvantage.IdentityServer4</AssemblyTitle>
-    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
     <PackageId>LtiAdvantage.Oidc</PackageId>
     <PackageTags>IMS;LTI;LTIAdvantage;.NET Core</PackageTags>
     <PackageProjectUrl>https://github.com/LtiLibrary/LtiAdvantage</PackageProjectUrl>
@@ -14,6 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
     <PackageReference Include="MinVer" Version="8.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -21,17 +25,6 @@
     </PackageReference>
     <PackageReference Include="OpenIddict.AspNetCore" Version="7.7.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
-  </ItemGroup>
-
-  <!-- Pin patched versions of crypto packages that OpenIddict pulls in transitively
-       (via Microsoft.AspNetCore.DataProtection); the resolved versions have known advisories. -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.2" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="8.0.5" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.14" />
   </ItemGroup>
 
 </Project>

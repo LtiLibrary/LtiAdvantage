@@ -1,18 +1,27 @@
 version: 2
 updates:
+  # One NuGet entry for every project (library + tests), so a package used in
+  # several projects is bumped in a single PR instead of one PR per folder.
   - package-ecosystem: "nuget"
-    directory: "/src/LtiAdvantage.AspNetCore"
+    directories:
+      - "/src/*"
+      - "/test/*"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "nuget"
-    directory: "/src/LtiAdvantage.IdentityModel"
+    open-pull-requests-limit: 10
+    groups:
+      # Patch and minor updates land together in one weekly PR.
+      nuget-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    # Major updates still get their own PR so breaking changes can be reviewed.
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "nuget"
-    directory: "/src/LtiAdvantage.Oidc"
-    schedule:
-      interval: "weekly"
-  - package-ecosystem: "nuget"
-    directory: "/src/LtiAdvantage"
-    schedule:
-      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"

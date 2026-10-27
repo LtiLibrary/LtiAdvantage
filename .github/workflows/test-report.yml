@@ -13,7 +13,7 @@ jobs:
   report:
     runs-on: ubuntu-latest
     steps:
-    - uses: dorny/test-reporter@v1
+    - uses: dorny/test-reporter@v3
       with:
         artifact: test-results            # artifact name
         name: XUnit Tests                  # Name of the check run which will be created

@@ -19,6 +19,7 @@ These are stable, public, and implementable. Pick one up only when a downstream 
 - Estimated size: similar to NRPS (a few days of work)
 - As built: the shape above, with `SetsControllerBase` named `GroupSetsControllerBase`. Two extras the plan missed: the service also extends the NRPS membership response with `group_enrollments` (surfaced as `?groups=true`), and it defines two custom-variable substitutions (`$Membership.course.groupIds`, `$CourseGroup.id`).
 - On where the `groupsservice` claim is declared: it went on `LtiRequest` first, on the reasoning that a platform may advertise the service on any launch, then moved down onto `LtiResourceLinkRequest` and `LtiSubmissionReviewRequest` — the same two message types that already carry the AGS and NRPS claims. Base-class placement was wrong for a reason worth remembering: the service claims are platform-to-tool advertisements of what the tool may call, so inheriting them put `groupsservice` on `LtiStartAssessmentRequest`, which travels tool to platform and cannot meaningfully advertise anything. The spec is no help here — it says only "for inclusion in LTI 1.3 messages" and names no message types — so the placement follows the existing NRPS convention rather than a spec statement. A test asserts the three service claims stay on the same types.
+  - Update (2026-10-28, rebase onto Tier 1 as merged): Tier 1 moved the AGS, NRPS and `resource_link` claims into a shared `LtiServiceLaunchRequest` base that only `LtiResourceLinkRequest` and `LtiSubmissionReviewRequest` derive from, so `groupsservice` now sits there too. The placement decision above is unchanged — tool-to-platform messages such as `LtiStartAssessmentRequest` derive from `LtiRequest` and still don't inherit it.
 
 ### Proctoring Services 1.0 — DONE (2026-07-27)
 - Spec: https://www.imsglobal.org/spec/proctoring/v1p0
@@ -93,6 +94,7 @@ Worth doing in a future minor — these aren't spec features, but they'd make th
 
 ## Decision log
 
+- **2026-10-28** — Rebased `feature/lti-tier2` onto `master` after Tier 1 (PR #237) merged, and re-checked the deferred specs: Asset Processor is still Candidate Final and member-only, and the postMessage trio shows no Candidate Final release. Nothing moves up.
 - **2026-07-27** — Implemented Tier 2 on `feature/lti-tier2` (branched off `feature/lti-tier1`): Course Groups Service 1.0, Proctoring Services 1.0 including the Assessment Control Service, and all five open quality gaps. Two deliberate exclusions:
   - **Asset Processor** — dropped from this pass. Still Candidate Final, and its specification is now behind the 1EdTech membership login, so the claim URIs and property names would have to be guessed. See the re-check note in its section above.
   - **All of Tier 3** — unchanged, and for the same reason the original plan gave. Five of the eight are member-only (PNS, Link and Content, Caliper Connector, AfA PNP, Data Privacy Launch) and cannot be read; the three postMessage specs are still v0.1 drafts and the plan's own guidance is not to implement drafts. Nothing here was speculatively built.

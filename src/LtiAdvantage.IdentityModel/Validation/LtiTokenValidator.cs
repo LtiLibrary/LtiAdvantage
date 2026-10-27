@@ -33,6 +33,15 @@ namespace LtiAdvantage.IdentityModel.Validation
         private readonly LtiTokenValidationOptions _options;
         private readonly JwksCache _jwksCache;
 
+        // Shared: JwtSecurityTokenHandler is safe for concurrent ReadJwtToken/ValidateToken calls.
+        private static readonly JwtSecurityTokenHandler Handler = new JwtSecurityTokenHandler
+        {
+            // Keep the claim types exactly as the platform sent them. The default inbound
+            // mapping rewrites "sub" and friends to WS-* URIs, which would break every
+            // lookup by LTI claim name.
+            MapInboundClaims = false
+        };
+
         /// <summary>
         /// Constructs a new <see cref="LtiTokenValidator"/>.
         /// </summary>
@@ -52,6 +61,10 @@ namespace LtiAdvantage.IdentityModel.Validation
                 throw new ArgumentException($"{nameof(options.ClientId)} is required", nameof(options));
             if (string.IsNullOrWhiteSpace(options.JwksUri))
                 throw new ArgumentException($"{nameof(options.JwksUri)} is required", nameof(options));
+            if (options.RequireNonce && options.NonceStore == null && !options.AllowNonceReuse)
+                throw new ArgumentException(
+                    $"{nameof(options.NonceStore)} is required to reject replayed tokens. Supply one, or set " +
+                    $"{nameof(options.AllowNonceReuse)} to accept tokens without replay detection.", nameof(options));
 
             _jwksCache = new JwksCache(client, options.JwksCacheDuration, options.MinimumRefreshInterval);
         }
@@ -76,13 +89,7 @@ namespace LtiAdvantage.IdentityModel.Validation
                 return LtiTokenValidationResult.Failure("The id_token is missing.");
             }
 
-            var handler = new JwtSecurityTokenHandler
-            {
-                // Keep the claim types exactly as the platform sent them. The default inbound
-                // mapping rewrites "sub" and friends to WS-* URIs, which would break every
-                // lookup by LTI claim name.
-                MapInboundClaims = false
-            };
+            var handler = Handler;
 
             if (!handler.CanReadToken(idToken))
             {

@@ -39,6 +39,21 @@ namespace LtiAdvantage.IntegrationTests.NamesRoleProvisioningService
             }
         }
 
+        /// <summary>
+        /// The Course Groups extension must not change membership responses for callers that did
+        /// not ask for groups: no "group_enrollments": null on every member.
+        /// </summary>
+        [Fact]
+        public async Task NotWriteNullGroupEnrollments_WhenGroupsWereNotRequested()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Nrps.MembershipReadonly);
+
+            var response = await _client.GetAsync(MembershipUrl);
+
+            response.EnsureSuccessStatusCode();
+            Assert.DoesNotContain("group_enrollments", await response.Content.ReadAsStringAsync());
+        }
+
         public void Dispose()
         {
             _client?.Dispose();

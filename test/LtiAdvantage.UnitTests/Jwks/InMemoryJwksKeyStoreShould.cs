@@ -124,6 +124,23 @@ namespace LtiAdvantage.UnitTests.Jwks
             Assert.Equal(new[] {"verify"}, published.KeyOps);
         }
 
+        /// <summary>A missing use is filled in to agree with key_ops (RFC 7517 §4.3).</summary>
+        [Theory]
+        [InlineData(null, "sig")]
+        [InlineData("sign", "sig")]
+        [InlineData("decrypt", "enc")]
+        public async Task DefaultUse_ConsistentWithKeyOps(string keyOp, string expectedUse)
+        {
+            using var rsa = RSA.Create(2048);
+            var key = InMemoryJwksKeyStore.CreateRsaKey(rsa, "key-1");
+            key.Use = null;
+            if (keyOp != null) key.KeyOps.Add(keyOp);
+
+            var published = (await new InMemoryJwksKeyStore(key).GetPublicKeysAsync()).Single();
+
+            Assert.Equal(expectedUse, published.Use);
+        }
+
         /// <summary>An EC key without alg gets the algorithm for its curve, not RS256.</summary>
         [Theory]
         [InlineData("P-256", "ES256")]

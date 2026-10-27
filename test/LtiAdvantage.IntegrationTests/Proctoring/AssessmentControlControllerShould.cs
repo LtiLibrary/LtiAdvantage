@@ -68,6 +68,32 @@ namespace LtiAdvantage.IntegrationTests.Proctoring
             Assert.Equal(20, result.ExtraTime);
         }
 
+        /// <summary>Proctoring 1.0 §5.1 required parameters are checked before the override runs.</summary>
+        [Theory]
+        [InlineData("user")]
+        [InlineData("resource_link")]
+        [InlineData("attempt_number")]
+        [InlineData("incident_time")]
+        [InlineData("incident_severity")]
+        public async Task Reject_MissingRequiredFields(string field)
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Ap.ControlAll);
+            var request = FlagRequest();
+            switch (field)
+            {
+                case "user": request.User = null; break;
+                case "resource_link": request.ResourceLink = null; break;
+                case "attempt_number": request.AttemptNumber = null; break;
+                case "incident_time": request.IncidentTime = null; break;
+                case "incident_severity": request.IncidentSeverity = 1.5; break;
+            }
+
+            var response = await PostAsync(request);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Contains(field, await response.Content.ReadAsStringAsync());
+        }
+
         /// <summary>Proctoring 1.0 §5: requests and responses use the ACS media type.</summary>
         [Fact]
         public async Task AcceptAndAnswerWithTheSpecMediaType()
@@ -114,7 +140,10 @@ namespace LtiAdvantage.IntegrationTests.Proctoring
             var response = await PostAsync(request);
 
             Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
-            Assert.DoesNotContain("\"status\":null", await response.Content.ReadAsStringAsync());
+            var body = await response.Content.ReadAsStringAsync();
+            Assert.DoesNotContain("\"status\":null", body);
+            // The test host runs as Production: no exception message in the response.
+            Assert.DoesNotContain("must set the response Status", body);
         }
 
         private Task<HttpResponseMessage> PostAsync(AssessmentControlRequest request)

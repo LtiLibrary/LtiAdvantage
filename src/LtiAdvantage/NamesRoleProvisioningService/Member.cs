@@ -41,6 +41,7 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
         /// </remarks>
         [JsonPropertyName("group_enrollments")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public GroupEnrollment[] GroupEnrollments { get; set; }
 
         /// <summary>

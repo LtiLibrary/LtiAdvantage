@@ -455,6 +455,50 @@ namespace LtiAdvantage.UnitTests.Validation
             Assert.Contains("deployment_id", unregistered.Error);
         }
 
+        /// <summary>
+        /// Without a nonce store replays cannot be detected, so that must be a deliberate choice,
+        /// not a silent default.
+        /// </summary>
+        [Fact]
+        public void RequireANonceStore_UnlessReuseIsExplicitlyAllowed()
+        {
+            var platform = new FakePlatform("key-1");
+            LtiTokenValidationOptions Options() => new() {Issuer = Issuer, ClientId = ClientId, JwksUri = JwksUri};
+
+            var ex = Assert.Throws<ArgumentException>(() => new LtiTokenValidator(Options(), platform.CreateClient()));
+            Assert.Contains("NonceStore", ex.Message);
+
+            var withStore = Options();
+            withStore.NonceStore = new InMemoryNonceStore();
+            _ = new LtiTokenValidator(withStore, platform.CreateClient());
+
+            var optedOut = Options();
+            optedOut.AllowNonceReuse = true;
+            _ = new LtiTokenValidator(optedOut, platform.CreateClient());
+
+            var nonceNotRequired = Options();
+            nonceNotRequired.RequireNonce = false;
+            _ = new LtiTokenValidator(nonceNotRequired, platform.CreateClient());
+        }
+
+        /// <summary>
+        /// A platform that publishes keys without a kid must not make every token look like a key
+        /// rotation, which would turn the cache into a poll every MinimumRefreshInterval.
+        /// </summary>
+        [Fact]
+        public async Task NotRefetch_WhenThePlatformPublishesNoKeyIds()
+        {
+            var platform = new FakePlatform("key-1") {PublishKeyIds = false};
+            var validator = CreateValidator(platform, options => options.MinimumRefreshInterval = TimeSpan.Zero);
+
+            for (var i = 0; i < 3; i++)
+            {
+                await validator.ValidateAsync(platform.CreateIdToken());
+            }
+
+            Assert.Equal(1, platform.FetchCount);
+        }
+
         [Fact]
         public void RequireTheRegistrationDetails()
         {
@@ -487,7 +531,9 @@ namespace LtiAdvantage.UnitTests.Validation
             {
                 Issuer = Issuer,
                 ClientId = ClientId,
-                JwksUri = JwksUri
+                JwksUri = JwksUri,
+                // Most tests reuse one nonce; the replay tests configure a real store.
+                AllowNonceReuse = true
             };
 
             configure?.Invoke(options);
@@ -509,6 +555,9 @@ namespace LtiAdvantage.UnitTests.Validation
 
             /// <summary>While true, the JWKS endpoint answers 503.</summary>
             public bool JwksDown { get; set; }
+
+            /// <summary>When false, the JWKS lists the key without a kid (tokens still carry one).</summary>
+            public bool PublishKeyIds { get; set; } = true;
 
             /// <summary>When set, the JWKS endpoint waits for this before answering.</summary>
             public TaskCompletionSource<bool> HoldJwks { get; set; }
@@ -558,7 +607,7 @@ namespace LtiAdvantage.UnitTests.Validation
             private string CreateJwks()
             {
                 // Publish public components only, as a real platform must.
-                var publicKey = new RsaSecurityKey(_rsa.ExportParameters(false)) {KeyId = _keyId};
+                var publicKey = new RsaSecurityKey(_rsa.ExportParameters(false)) {KeyId = PublishKeyIds ? _keyId : null};
                 var jwk = JsonWebKeyConverter.ConvertFromRSASecurityKey(publicKey);
                 jwk.Use = "sig";
                 jwk.Alg = SecurityAlgorithms.RsaSha256;

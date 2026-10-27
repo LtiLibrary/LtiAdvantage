@@ -27,6 +27,7 @@ namespace LtiAdvantage.CourseGroupsService
         /// "http://purl.imsglobal.org/vocab/lis/v2/course#CourseSection".
         /// </summary>
         [JsonPropertyName("tag")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Tag { get; set; }
 
         /// <summary>
@@ -34,6 +35,7 @@ namespace LtiAdvantage.CourseGroupsService
         /// Defaults to false when not specified.
         /// </summary>
         [JsonPropertyName("hidden")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? Hidden { get; set; }
     }
 }

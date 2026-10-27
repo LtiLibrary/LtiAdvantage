@@ -26,12 +26,14 @@ namespace LtiAdvantage.CourseGroupsService
         /// Omitted when the group belongs to no set.
         /// </summary>
         [JsonPropertyName("set_ids")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string[] SetIds { get; set; }
 
         /// <summary>
         /// A string value identifying the purpose of this group. For example, "marking".
         /// </summary>
         [JsonPropertyName("tag")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Tag { get; set; }
 
         /// <summary>
@@ -39,6 +41,7 @@ namespace LtiAdvantage.CourseGroupsService
         /// Defaults to false when not specified.
         /// </summary>
         [JsonPropertyName("hidden")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? Hidden { get; set; }
     }
 }

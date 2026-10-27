@@ -970,6 +970,12 @@
             <param name="control">The control action to apply.</param>
             <returns>The state of the attempt after the action was applied.</returns>
         </member>
+        <member name="M:LtiAdvantage.AspNetCore.Proctoring.AssessmentControlControllerBase.MissingRequiredFields(LtiAdvantage.Proctoring.AssessmentControlRequest)">
+            <summary>
+            The Proctoring 1.0 §5.1 required request parameters that are missing, and an
+            out-of-range <c>incident_severity</c>, as one message each.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.Proctoring.ControlAssessmentRequest">
             <summary>
             Represents an assessment control request.

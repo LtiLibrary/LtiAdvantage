@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using LtiAdvantage.Proctoring;
@@ -85,6 +86,17 @@ namespace LtiAdvantage.AspNetCore.Proctoring
                         });
                     }
 
+                    var missing = MissingRequiredFields(control);
+                    if (missing.Count > 0)
+                    {
+                        return BadRequest(new ProblemDetails
+                        {
+                            Title = "Invalid assessment control request",
+                            Status = StatusCodes.Status400BadRequest,
+                            Detail = string.Join(" ", missing)
+                        });
+                    }
+
                     var request = new ControlAssessmentRequest(control);
                     var result = await OnControlAssessmentAsync(request).ConfigureAwait(false);
 
@@ -112,7 +124,7 @@ namespace LtiAdvantage.AspNetCore.Proctoring
                         Status = StatusCodes.Status500InternalServerError,
                         Detail = _env.IsDevelopment()
                             ? ex.Message + ex.StackTrace
-                            : ex.Message
+                            : null // Exception messages can reveal configuration; Development only.
                     });
                 }
             }
@@ -120,6 +132,22 @@ namespace LtiAdvantage.AspNetCore.Proctoring
             {
                 _logger.LogDebug($"Exiting {nameof(ControlAssessmentAsync)}.");
             }
+        }
+
+        /// <summary>
+        /// The Proctoring 1.0 §5.1 required request parameters that are missing, and an
+        /// out-of-range <c>incident_severity</c>, as one message each.
+        /// </summary>
+        private static List<string> MissingRequiredFields(AssessmentControlRequest control)
+        {
+            var problems = new List<string>();
+            if (string.IsNullOrWhiteSpace(control.User?.Iss)) problems.Add("user.iss is required.");
+            if (string.IsNullOrWhiteSpace(control.User?.Sub)) problems.Add("user.sub is required.");
+            if (string.IsNullOrWhiteSpace(control.ResourceLink?.Id)) problems.Add("resource_link.id is required.");
+            if (control.AttemptNumber == null) problems.Add("attempt_number is required.");
+            if (control.IncidentTime == null) problems.Add("incident_time is required.");
+            if (control.IncidentSeverity is < 0 or > 1) problems.Add("incident_severity must be between 0 and 1.");
+            return problems;
         }
     }
 }

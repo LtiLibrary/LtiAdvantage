@@ -111,7 +111,15 @@ namespace LtiAdvantage.Jwks
                     $"Key '{key.Kid}' cannot be published: it must be an RSA or EC key with all its public " +
                     "parameters, and its key_ops (if any) must allow a public use such as verify.", nameof(key));
 
-            if (string.IsNullOrEmpty(publicKey.Use)) publicKey.Use = "sig";
+            // use must agree with key_ops (RFC 7517 §4.3): only default it to "sig" when the key
+            // is unrestricted or restricted to verification; "enc" for encryption-only keys.
+            if (string.IsNullOrEmpty(publicKey.Use))
+            {
+                var ops = publicKey.KeyOps;
+                if (ops.Count == 0 || ops.All(op => op == "verify")) publicKey.Use = "sig";
+                else if (ops.All(op => op == "encrypt" || op == "wrapKey")) publicKey.Use = "enc";
+                // Mixed operations: leave use unset rather than contradict key_ops.
+            }
             if (string.IsNullOrEmpty(publicKey.Alg))
             {
                 publicKey.Alg = publicKey.Kty == JsonWebAlgorithmsKeyTypes.RSA

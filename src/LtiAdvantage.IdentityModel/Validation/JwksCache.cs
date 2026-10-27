@@ -80,7 +80,9 @@ namespace LtiAdvantage.IdentityModel.Validation
                 var needsFreshKeys = entry == null
                     || now - entry.FetchedAt >= _cacheDuration
                     // A key id we do not hold usually means the peer rotated.
-                    || (requiredKeyId != null && !entry.HasKeyId(requiredKeyId));
+                    // (Only meaningful when the peer names its keys: if none has a kid, every token
+                    // would look like a rotation and the cache would degrade into polling.)
+                    || (requiredKeyId != null && entry.HasKeyIds && !entry.HasKeyId(requiredKeyId));
 
                 if (!needsFreshKeys)
                 {
@@ -198,6 +200,9 @@ namespace LtiAdvantage.IdentityModel.Validation
             public DateTimeOffset LastAttemptAt { get; set; }
 
             public bool HasKeyId(string keyId) => _keyIds.Contains(keyId);
+
+            /// <summary>True when at least one cached key has a kid.</summary>
+            public bool HasKeyIds => _keyIds.Count > 0;
         }
     }
 }

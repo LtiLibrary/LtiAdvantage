@@ -52,13 +52,25 @@ namespace LtiAdvantage.IdentityModel.Validation
         public TimeSpan MinimumRefreshInterval { get; set; } = TimeSpan.FromMinutes(5);
 
         /// <summary>
-        /// Records used nonces so a replayed token is rejected. Optional.
+        /// Records used nonces so a replayed token is rejected.
         /// </summary>
         /// <remarks>
-        /// When null the validator still requires a nonce to be present but cannot tell a first
-        /// use from a replay. Supply a store in production; see <see cref="INonceStore"/>.
+        /// LTI 1.3 requires each nonce to be accepted at most once, and only a store can tell a
+        /// first use from a replay. Required while <see cref="RequireNonce"/> is true, unless
+        /// <see cref="AllowNonceReuse"/> is set; see <see cref="INonceStore"/>.
         /// </remarks>
         public INonceStore NonceStore { get; set; }
+
+        /// <summary>
+        /// Accept tokens without replay detection when no <see cref="NonceStore"/> is set.
+        /// Defaults to false, so a missing store fails when the validator is constructed rather
+        /// than silently letting replayed tokens through.
+        /// </summary>
+        /// <remarks>
+        /// Only set this when replays are prevented elsewhere (for example the OIDC state check
+        /// already consumes the nonce), or in tests.
+        /// </remarks>
+        public bool AllowNonceReuse { get; set; }
 
         /// <summary>
         /// Whether the "nonce" claim must be present. Defaults to true, as LTI 1.3 requires.

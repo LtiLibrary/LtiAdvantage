@@ -20,6 +20,7 @@ namespace LtiAdvantage.CourseGroupsService
         /// included a user filter.
         /// </summary>
         [JsonPropertyName("user_id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string UserId { get; set; }
 
         /// <summary>

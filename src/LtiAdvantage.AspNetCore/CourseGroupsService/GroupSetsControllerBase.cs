@@ -86,7 +86,7 @@ namespace LtiAdvantage.AspNetCore.CourseGroupsService
                         Status = StatusCodes.Status500InternalServerError,
                         Detail = _env.IsDevelopment()
                             ? ex.Message + ex.StackTrace
-                            : ex.Message
+                            : null // Exception messages can reveal configuration; Development only.
                     });
                 }
             }

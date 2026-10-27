@@ -1,0 +1,28 @@
+{
+  "application_type": "web",
+  "response_types": ["id_token"],
+  "grant_types": ["implicit", "client_credentials"],
+  "initiate_login_uri": "https://tool.example.com/login",
+  "redirect_uris": ["https://tool.example.com/launch"],
+  "client_name": "Example Tool",
+  "client_uri": "https://tool.example.com",
+  "logo_uri": "https://tool.example.com/logo.png",
+  "scope": "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem https://purl.imsglobal.org/spec/lti-ags/scope/score https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly",
+  "token_endpoint_auth_method": "private_key_jwt",
+  "jwks_uri": "https://tool.example.com/.well-known/jwks.json",
+  "https://purl.imsglobal.org/spec/lti-tool-configuration": {
+    "domain": "tool.example.com",
+    "description": "An example LTI 1.3 tool",
+    "target_link_uri": "https://tool.example.com/launch",
+    "custom_parameters": { "context_history": "$Context.id.history" },
+    "claims": ["iss", "sub", "name", "email"],
+    "messages": [
+      {
+        "type": "LtiDeepLinkingRequest",
+        "target_link_uri": "https://tool.example.com/dl",
+        "label": "Add example content",
+        "placements": ["ContentArea"]
+      }
+    ]
+  }
+}

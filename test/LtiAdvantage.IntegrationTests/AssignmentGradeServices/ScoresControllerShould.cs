@@ -6,8 +6,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using LtiAdvantage.AssignmentGradeServices;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
@@ -16,22 +16,15 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
     public class ScoresControllerShould : IDisposable
     {
         private readonly HttpClient _client;
-        private readonly TestServer _server;
+        private readonly IHost _host;
 
         private const string ScoreUrl = "/context/1234/lineitems/1234/scores/1234";
         private const string ScoresUrl = "/context/1234/lineitems/1234/scores";
 
         public ScoresControllerShould()
         {
-            _server = new TestServer(new WebHostBuilder()
-                .UseContentRoot(AppContext.BaseDirectory)
-                .ConfigureLogging(logging =>
-                {
-                    logging.AddConsole();
-                    logging.AddDebug();
-                })
-                .UseStartup<Startup>());
-            _client = _server.CreateClient();
+            _host = TestHostFactory.Create();
+            _client = _host.GetTestClient();
         }
         
         /// <summary>
@@ -79,7 +72,7 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
         public void Dispose()
         {
             _client?.Dispose();
-            _server?.Dispose();
+            _host?.Dispose();
         }
     }
 }

@@ -46,6 +46,10 @@ namespace LtiAdvantage.Lti
 
         #endregion
 
+        /// <summary>
+        /// The claims in this request, each tagged with the request's issuer
+        /// (or <see cref="ClaimsIdentity.DefaultIssuer"/> when there is none).
+        /// </summary>
         public IEnumerable<Claim> IssuedClaims
         {
             get

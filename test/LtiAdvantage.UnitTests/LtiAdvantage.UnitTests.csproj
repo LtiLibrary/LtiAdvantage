@@ -10,9 +10,12 @@
     <None Remove="ReferenceJson\LineItem.json" />
     <None Remove="ReferenceJson\LineItemContainer.json" />
     <None Remove="ReferenceJson\LtiResourceLinkRequest.json" />
+    <None Remove="ReferenceJson\LtiSubmissionReviewRequest.json" />
+    <None Remove="ReferenceJson\PlatformOpenIdConfiguration.json" />
     <None Remove="ReferenceJson\Result.json" />
     <None Remove="ReferenceJson\ResultContainer.json" />
     <None Remove="ReferenceJson\Score.json" />
+    <None Remove="ReferenceJson\ToolConfiguration.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +28,12 @@
     <Content Include="ReferenceJson\LtiResourceLinkRequest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="ReferenceJson\LtiSubmissionReviewRequest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ReferenceJson\PlatformOpenIdConfiguration.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ReferenceJson\Result.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -32,6 +41,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ReferenceJson\Score.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ReferenceJson\ToolConfiguration.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -51,6 +63,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\LtiAdvantage\LtiAdvantage.csproj" />
+    <ProjectReference Include="..\..\src\LtiAdvantage.IdentityModel\LtiAdvantage.IdentityModel.csproj" />
   </ItemGroup>
 
 </Project>

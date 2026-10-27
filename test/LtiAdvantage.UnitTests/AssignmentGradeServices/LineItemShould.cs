@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Text.Json;
 using LtiAdvantage.AssignmentGradeServices;
+using LtiAdvantage.SubmissionReview;
 using Xunit;
 
 namespace LtiAdvantage.UnitTests.AssignmentGradeServices
@@ -40,6 +41,57 @@ namespace LtiAdvantage.UnitTests.AssignmentGradeServices
             var lineItemJson = JsonSerializer.Serialize(lineItem);
 
             JsonAssert.Equal(referenceJson, lineItemJson);
+        }
+
+        [Fact]
+        public void RoundTripSubmissionReviewProperty()
+        {
+            var lineItem = new LineItem
+            {
+                Id = "https://platform.example.com/lineitems/1",
+                Label = "Essay",
+                ScoreMaximum = 10,
+                SubmissionReviewExtension = new SubmissionReviewProperty
+                {
+                    Url = "https://tool.example.com/review",
+                    Custom = new System.Collections.Generic.Dictionary<string, string> { ["a"] = "1" }
+                }
+            };
+
+            var json = JsonSerializer.Serialize(lineItem);
+            var roundTripped = JsonSerializer.Deserialize<LineItem>(json);
+
+            Assert.NotNull(roundTripped.SubmissionReviewExtension);
+            Assert.Equal("https://tool.example.com/review", roundTripped.SubmissionReviewExtension.Url);
+            Assert.Equal("1", roundTripped.SubmissionReviewExtension.Custom["a"]);
+        }
+
+        /// <summary>
+        /// The spec's submissionReview properties (label, url, custom) must survive a round trip.
+        /// See https://www.imsglobal.org/spec/lti-sr/v1p0/#submissionreview-extension
+        /// </summary>
+        [Fact]
+        public void RoundTripSubmissionReview_LabelUrlAndCustom()
+        {
+            const string json = """
+                {
+                  "scoreMaximum": 60,
+                  "label": "Chapter 5 Test",
+                  "submissionReview": {
+                    "label": "Open My Tool Viewer",
+                    "url": "https://platform.example.com/act/849023/sub",
+                    "custom": { "action": "review", "a_id": "23942" }
+                  }
+                }
+                """;
+
+            var lineItem = JsonSerializer.Deserialize<LineItem>(json);
+            var roundTripped = JsonSerializer.Deserialize<LineItem>(JsonSerializer.Serialize(lineItem));
+
+            var review = roundTripped.SubmissionReviewExtension;
+            Assert.Equal("Open My Tool Viewer", review.Label);
+            Assert.Equal("https://platform.example.com/act/849023/sub", review.Url);
+            Assert.Equal("review", review.Custom["action"]);
         }
     }
 }

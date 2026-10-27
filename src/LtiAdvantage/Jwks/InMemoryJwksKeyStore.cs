@@ -99,59 +99,26 @@ namespace LtiAdvantage.Jwks
         }
 
         /// <summary>
-        /// Copies the public half of a key, leaving every private component behind.
+        /// Copies the public half of a key (see <see cref="PublicJsonWebKey.From"/>), and fills in
+        /// <c>use</c> and <c>alg</c> when they are missing.
         /// </summary>
         private static JsonWebKey ToPublicKey(JsonWebKey key)
         {
             if (key == null) throw new ArgumentException("A published key must not be null.", nameof(key));
 
-            // Only asymmetric signing keys can be published: a symmetric (oct) key has no public
-            // half, so it would go out with no key material at all.
-            string defaultAlg;
-            switch (key.Kty)
+            var publicKey = PublicJsonWebKey.From(key)
+                ?? throw new ArgumentException(
+                    $"Key '{key.Kid}' cannot be published: it must be an RSA or EC key with all its public " +
+                    "parameters, and its key_ops (if any) must allow a public use such as verify.", nameof(key));
+
+            if (string.IsNullOrEmpty(publicKey.Use)) publicKey.Use = "sig";
+            if (string.IsNullOrEmpty(publicKey.Alg))
             {
-                case JsonWebAlgorithmsKeyTypes.RSA:
-                    if (string.IsNullOrEmpty(key.N) || string.IsNullOrEmpty(key.E))
-                        throw new ArgumentException($"RSA key '{key.Kid}' has no public modulus or exponent.", nameof(key));
-                    defaultAlg = SecurityAlgorithms.RsaSha256;
-                    break;
-                case JsonWebAlgorithmsKeyTypes.EllipticCurve:
-                    if (string.IsNullOrEmpty(key.Crv) || string.IsNullOrEmpty(key.X) || string.IsNullOrEmpty(key.Y))
-                        throw new ArgumentException($"EC key '{key.Kid}' has no curve or public point.", nameof(key));
-                    defaultAlg = DefaultEcAlgorithm(key.Crv);
-                    break;
-                default:
-                    throw new ArgumentException(
-                        $"Key '{key.Kid}' has type '{key.Kty}'; only RSA and EC keys can be published.", nameof(key));
+                publicKey.Alg = publicKey.Kty == JsonWebAlgorithmsKeyTypes.RSA
+                    ? SecurityAlgorithms.RsaSha256
+                    : DefaultEcAlgorithm(publicKey.Crv);
             }
 
-            var publicKey = new JsonWebKey
-            {
-                Kty = key.Kty,
-                Use = string.IsNullOrEmpty(key.Use) ? "sig" : key.Use,
-                Alg = string.IsNullOrEmpty(key.Alg) ? defaultAlg : key.Alg,
-                Kid = key.Kid,
-
-                // RSA public components.
-                N = key.N,
-                E = key.E,
-
-                // EC public components, for a deployment that signs with ES256 rather than RS256.
-                Crv = key.Crv,
-                X = key.X,
-                Y = key.Y
-            };
-
-            foreach (var certificate in key.X5c)
-            {
-                publicKey.X5c.Add(certificate);
-            }
-
-            publicKey.X5t = key.X5t;
-            publicKey.X5u = key.X5u;
-
-            // D, P, Q, DP, DQ, QI, K and Oth are deliberately not copied. Publishing any of them
-            // would hand out the signing key.
             return publicKey;
         }
 

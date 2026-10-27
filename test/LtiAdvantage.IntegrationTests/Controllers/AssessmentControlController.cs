@@ -26,6 +26,10 @@ namespace LtiAdvantage.IntegrationTests.Controllers
                 _ => AssessmentControlStatus.Running
             };
 
+            // Lets a test check that a response without a status is not sent as "status": null.
+            if (request.Control.ReasonCode == "forget-status")
+                status = AssessmentControlStatus.Unknown;
+
             var result = (ActionResult<AssessmentControlResponse>) new ObjectResult(new AssessmentControlResponse
             {
                 Status = status,

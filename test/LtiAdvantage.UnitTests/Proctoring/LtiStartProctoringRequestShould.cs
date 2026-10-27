@@ -71,6 +71,23 @@ namespace LtiAdvantage.UnitTests.Proctoring
             Assert.Equal(2, request.AttemptNumber);
         }
 
+        /// <summary>
+        /// An action this library does not know (a later spec revision may add some) must survive
+        /// a read and re-write instead of turning into null.
+        /// </summary>
+        [Fact]
+        public void KeepUnrecognisedActions_OnARoundTrip()
+        {
+            const string json = """{"assessment_control_url":"https://platform.example.com/acs","actions":["pause","extend"]}""";
+
+            var claim = JsonSerializer.Deserialize<AssessmentControlClaimValueType>(json);
+            var rewritten = JsonSerializer.Serialize(claim);
+
+            Assert.Equal(new[] {AssessmentControlAction.Pause}, claim.Actions);
+            Assert.Contains("\"extend\"", rewritten);
+            Assert.DoesNotContain("null", rewritten);
+        }
+
         /// <summary>Setting a nullable claim to null removes it, instead of writing "null".</summary>
         [Fact]
         public void RemoveTheClaim_WhenSetToNull()

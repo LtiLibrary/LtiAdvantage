@@ -24,6 +24,23 @@ namespace LtiAdvantage.UnitTests.Lti
             Assert.Equal("ctx-1,ctx-0", result);
         }
 
+        /// <summary>
+        /// A substituted value is not scanned again: a course titled "$User.id" must not turn
+        /// into the launching user's id.
+        /// </summary>
+        [Fact]
+        public void NotExpandVariables_InsideSubstitutedValues()
+        {
+            var substitutions = new CustomPropertySubstitutions
+            {
+                LtiContext = new LtiContext {Id = "ctx-1", Title = "$User.id"},
+                LtiUser = new LtiUser {Id = "user-42"}
+            };
+
+            Assert.Equal("$User.id", Substitute(substitutions, "$Context.title"));
+            Assert.Equal("$User.id / user-42", Substitute(substitutions, "$Context.title / $User.id"));
+        }
+
         [Fact]
         public void SubstituteResourceLinkIdHistory_NotTheResourceLinkIdPrefix()
         {

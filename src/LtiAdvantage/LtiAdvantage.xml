@@ -618,6 +618,12 @@
             Service media types.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.MediaTypes.AssessmentControl">
+            <summary>
+            Assessment Control Service request and response body (Proctoring 1.0 §5).
+            https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-service
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.MediaTypes.ContextGroupContainer">
             <summary>
             https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-container-media-type
@@ -1828,11 +1834,32 @@
         </member>
         <member name="M:LtiAdvantage.Jwks.InMemoryJwksKeyStore.ToPublicKey(Microsoft.IdentityModel.Tokens.JsonWebKey)">
             <summary>
-            Copies the public half of a key, leaving every private component behind.
+            Copies the public half of a key (see <see cref="M:LtiAdvantage.Jwks.PublicJsonWebKey.From(Microsoft.IdentityModel.Tokens.JsonWebKey)"/>), and fills in
+            <c>use</c> and <c>alg</c> when they are missing.
             </summary>
         </member>
         <member name="M:LtiAdvantage.Jwks.InMemoryJwksKeyStore.DefaultEcAlgorithm(System.String)">
             <summary>The JWS algorithm that goes with an EC curve (RFC 7518 §3.4); null if unknown.</summary>
+        </member>
+        <member name="T:LtiAdvantage.Jwks.PublicJsonWebKey">
+            <summary>
+            Copies the public half of a JSON Web Key, for publishing in a JWKS. Shared by
+            <c>JwksControllerBase</c> and <see cref="T:LtiAdvantage.Jwks.InMemoryJwksKeyStore"/>, so both apply the same rules.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Jwks.PublicJsonWebKey.From(Microsoft.IdentityModel.Tokens.JsonWebKey)">
+            <summary>
+            Returns a copy of <paramref name="key"/> with only its public parameters, or <c>null</c>
+            when the key cannot be published: it is not an RSA or EC key (for example a symmetric
+            key), it is missing public parameters (<c>n</c>/<c>e</c> or <c>crv</c>/<c>x</c>/<c>y</c>)
+            that verifiers need, or <c>key_ops</c> restricts it to operations with no public
+            counterpart.
+            </summary>
+            <remarks>
+            Private parameters (<c>d</c>, <c>p</c>, <c>q</c>, <c>dp</c>, <c>dq</c>, <c>qi</c>,
+            <c>k</c>, <c>oth</c>) are never copied. <c>key_ops</c> are mapped to what the public key
+            may do (<c>sign</c> becomes <c>verify</c>, and so on), keeping the key's restriction.
+            </remarks>
         </member>
         <member name="T:LtiAdvantage.Lti.ContextClaimValueType">
             <summary>
@@ -1979,30 +2006,31 @@
             <param name="source">Custom properties.</param>
             <returns>Custom properties with the variables replaced.</returns>
         </member>
-        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.Replace(System.String,System.String,System.String)">
+        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.Add(System.Collections.Generic.IDictionary{System.String,System.String},System.String,System.String)">
             <summary>
-            Replace one variable with its value, wherever it occurs.
+            Records a variable's value, unless the variable was already recorded.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.SubstituteAll(System.String,System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Replaces every known variable in <paramref name="value"/> in a single pass.
             </summary>
             <remarks>
-            The variable name is escaped before it is used as a pattern, so the dots in a name
-            like <c>$Context.id</c> match dots rather than any character. The value is applied
-            through a match evaluator rather than as a replacement string, so a value that
-            happens to contain <c>$1</c> or <c>$&amp;</c> is inserted literally instead of being
-            read as a regex substitution.
+            One pass over the original text means a substituted value is never scanned again, so a
+            context titled "$User.id" stays "$User.id" instead of expanding to the user's id. The
+            alternation lists longer names first, so where one name is a prefix of another
+            (<c>$Context.id</c> and <c>$Context.id.history</c>) the longer one wins regardless of
+            the order the variables were recorded in. Names are regex-escaped, and values are
+            inserted through a match evaluator, so neither is read as regex syntax.
             </remarks>
-            <param name="value">The custom property value being substituted into.</param>
-            <param name="variable">The variable to replace, including the leading '$'.</param>
-            <param name="replacement">The value to insert. Null is treated as empty.</param>
         </member>
         <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.SubstituteCustomVariable(System.String)">
             <summary>
             Replace variable with value. Unknown variables are ignored.
             </summary>
             <remarks>
-            Where one variable name is a prefix of another, the longer name is substituted first.
-            Otherwise the shorter one consumes the start of the longer name and leaves its tail
-            behind: substituting <c>$Context.id</c> before <c>$Context.id.history</c> turns
-            "$Context.id.history" into "&lt;the context id&gt;.history".
+            Each section records its variables, and <see cref="M:LtiAdvantage.Lti.CustomPropertySubstitutions.SubstituteAll(System.String,System.Collections.Generic.IDictionary{System.String,System.String})"/> then replaces them
+            all in one pass. Variables of sections that are not set stay as they are.
             </remarks>
             <param name="value">Variable to replace.</param>
             <returns>Value if variable is known.</returns>
@@ -3976,10 +4004,21 @@
             Fully resolved URL of the Assessment Control Service endpoint. Required.
             </summary>
         </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.ActionNames">
+            <summary>
+            The actions the platform permits the proctoring tool to request, exactly as sent.
+            Required. A tool must not request an action absent from this list.
+            </summary>
+            <remarks>
+            Kept as strings so that actions this library version does not know (a later spec
+            revision may add some) survive a read and re-write unchanged. Use
+            <see cref="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.Actions"/> for the recognised ones.
+            </remarks>
+        </member>
         <member name="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.Actions">
             <summary>
-            The actions the platform permits the proctoring tool to request. Required.
-            A tool must not request an action absent from this list.
+            The recognised actions in <see cref="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.ActionNames"/>; unrecognised names are left out.
+            Setting this replaces <see cref="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.ActionNames"/>.
             </summary>
         </member>
         <member name="T:LtiAdvantage.Proctoring.AssessmentControlRequest">

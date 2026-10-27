@@ -382,6 +382,61 @@ namespace LtiAdvantage.UnitTests.Validation
             Assert.Contains("iat", beyondSkew.Error);
         }
 
+        /// <summary>
+        /// A forged token with an unknown key id triggers a refetch. If the platform is slow to
+        /// answer, launches whose key is already cached must not wait behind it.
+        /// </summary>
+        [Fact]
+        public async Task NotBlockCachedKeys_WhileARefreshIsInFlight()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, options => options.MinimumRefreshInterval = TimeSpan.Zero);
+            Assert.True((await validator.ValidateAsync(platform.CreateIdToken())).IsValid);
+
+            platform.HoldJwks = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var impostor = new FakePlatform("bogus-key");
+            var stuck = validator.ValidateAsync(impostor.CreateIdToken());
+
+            var legit = validator.ValidateAsync(platform.CreateIdToken());
+            var finished = await Task.WhenAny(legit, Task.Delay(TimeSpan.FromSeconds(5)));
+
+            Assert.Same(legit, finished);
+            Assert.True(legit.Result.IsValid, legit.Result.Error);
+            Assert.False(stuck.IsCompleted);
+
+            platform.HoldJwks.SetResult(true);
+            Assert.False((await stuck).IsValid);
+        }
+
+        [Fact]
+        public async Task ReportAFailure_ForANonNumericIat()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken(rawIssuedAt: "not-a-number"));
+
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task ReportAFailure_WhenTheNonceStoreThrows()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, options => options.NonceStore = new ThrowingNonceStore());
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken());
+
+            Assert.False(result.IsValid);
+            Assert.Contains("nonce store unavailable", result.Error);
+        }
+
+        private sealed class ThrowingNonceStore : INonceStore
+        {
+            public Task<bool> TryConsumeAsync(string nonce, CancellationToken cancellationToken = default) =>
+                throw new InvalidOperationException("nonce store unavailable");
+        }
+
         [Fact]
         public void RequireTheRegistrationDetails()
         {
@@ -437,6 +492,9 @@ namespace LtiAdvantage.UnitTests.Validation
             /// <summary>While true, the JWKS endpoint answers 503.</summary>
             public bool JwksDown { get; set; }
 
+            /// <summary>When set, the JWKS endpoint waits for this before answering.</summary>
+            public TaskCompletionSource<bool> HoldJwks { get; set; }
+
             public void RotateKey(string keyId) => _keyId = keyId;
 
             public HttpClient CreateClient() => new(new StubHandler(this));
@@ -451,7 +509,8 @@ namespace LtiAdvantage.UnitTests.Validation
                 string deploymentId = "dep-1",
                 DateTime? expires = null,
                 DateTime? issuedAt = null,
-                bool includeIssuedAt = true)
+                bool includeIssuedAt = true,
+                object rawIssuedAt = null)
             {
                 var payload = new JwtPayload
                 {
@@ -459,7 +518,8 @@ namespace LtiAdvantage.UnitTests.Validation
                     ["sub"] = "user-1",
                     ["exp"] = EpochTime.GetIntDate(expires ?? DateTime.UtcNow.AddMinutes(5))
                 };
-                if (includeIssuedAt) payload["iat"] = EpochTime.GetIntDate(issuedAt ?? DateTime.UtcNow);
+                if (rawIssuedAt != null) payload["iat"] = rawIssuedAt;
+                else if (includeIssuedAt) payload["iat"] = EpochTime.GetIntDate(issuedAt ?? DateTime.UtcNow);
 
                 payload["aud"] = audiences == null ? new[] {ClientId} : audiences;
                 if (azp != null) payload["azp"] = azp;
@@ -494,19 +554,21 @@ namespace LtiAdvantage.UnitTests.Validation
 
                 public StubHandler(FakePlatform platform) => _platform = platform;
 
-                protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+                protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
                     CancellationToken cancellationToken)
                 {
                     Assert.Equal(JwksUri, request.RequestUri.ToString());
                     _platform.FetchCount++;
 
-                    if (_platform.JwksDown)
-                        return Task.FromResult(new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
+                    if (_platform.HoldJwks != null) await _platform.HoldJwks.Task;
 
-                    return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                    if (_platform.JwksDown)
+                        return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+
+                    return new HttpResponseMessage(HttpStatusCode.OK)
                     {
                         Content = new StringContent(_platform.CreateJwks())
-                    });
+                    };
                 }
             }
         }

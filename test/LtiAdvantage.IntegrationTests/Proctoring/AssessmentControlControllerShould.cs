@@ -68,6 +68,45 @@ namespace LtiAdvantage.IntegrationTests.Proctoring
             Assert.Equal(20, result.ExtraTime);
         }
 
+        /// <summary>Proctoring 1.0 §5: requests and responses use the ACS media type.</summary>
+        [Fact]
+        public async Task AcceptAndAnswerWithTheSpecMediaType()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Ap.ControlAll);
+            var json = JsonSerializer.Serialize(FlagRequest());
+
+            var response = await _client.PostAsync(Url,
+                new StringContent(json, Encoding.UTF8, "application/vnd.ims.lti-ap.v1.control+json"));
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("application/vnd.ims.lti-ap.v1.control+json", response.Content.Headers.ContentType.MediaType);
+        }
+
+        [Fact]
+        public async Task Reject_AnUnrecognisedAction()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Ap.ControlAll);
+            var json = JsonSerializer.Serialize(FlagRequest()).Replace("\"action\":\"flag\"", "\"action\":\"extend\"");
+            Assert.Contains("\"extend\"", json);
+
+            var response = await _client.PostAsync(Url, new StringContent(json, Encoding.UTF8, "application/json"));
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task NotSendANullStatus()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Ap.ControlAll);
+            var request = FlagRequest();
+            request.ReasonCode = "forget-status";
+
+            var response = await PostAsync(request);
+
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.DoesNotContain("\"status\":null", await response.Content.ReadAsStringAsync());
+        }
+
         private Task<HttpResponseMessage> PostAsync(AssessmentControlRequest request)
         {
             var json = JsonSerializer.Serialize(request);

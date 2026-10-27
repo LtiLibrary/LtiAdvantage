@@ -137,7 +137,7 @@ namespace LtiAdvantage.IdentityModel.Validation
             {
                 principal = handler.ValidateToken(idToken, parameters, out validatedToken);
             }
-            catch (SecurityTokenException ex)
+            catch (Exception ex) when (ex is SecurityTokenException || ex is ArgumentException || ex is FormatException)
             {
                 return LtiTokenValidationResult.Failure($"The id_token failed validation: {ex.Message}");
             }
@@ -147,16 +147,25 @@ namespace LtiAdvantage.IdentityModel.Validation
                 return LtiTokenValidationResult.Failure("The id_token is not a JWS.");
             }
 
-            var ltiFailure = ValidateLtiClaims(jwt);
-            if (ltiFailure != null)
+            try
             {
-                return ltiFailure;
-            }
+                var ltiFailure = ValidateLtiClaims(jwt);
+                if (ltiFailure != null)
+                {
+                    return ltiFailure;
+                }
 
-            var nonceFailure = await ValidateNonceAsync(jwt, cancellationToken).ConfigureAwait(false);
-            if (nonceFailure != null)
+                var nonceFailure = await ValidateNonceAsync(jwt, cancellationToken).ConfigureAwait(false);
+                if (nonceFailure != null)
+                {
+                    return nonceFailure;
+                }
+            }
+            catch (Exception ex) when (!(ex is OperationCanceledException && cancellationToken.IsCancellationRequested))
             {
-                return nonceFailure;
+                // A malformed claim (such as a non-numeric iat) or a failing nonce store must still
+                // come back as a failed validation, as this method promises.
+                return LtiTokenValidationResult.Failure($"The id_token could not be validated: {ex.Message}");
             }
 
             return LtiTokenValidationResult.Success(principal, jwt.Payload,

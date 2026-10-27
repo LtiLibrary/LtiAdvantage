@@ -1,4 +1,6 @@
+using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using LtiAdvantage.DynamicRegistration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -55,8 +57,10 @@ namespace LtiAdvantage.AspNetCore.OpenIdConnect
         /// Returns the platform's OpenID Provider Metadata document.
         /// </summary>
         [HttpGet]
+        [AllowAnonymous] // Public metadata: tools fetch it before they hold any credentials.
         [Produces("application/json")]
         [ProducesResponseType(typeof(PlatformOpenIdConfiguration), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [Route(".well-known/openid-configuration",
             Name = Constants.ServiceEndpoints.OpenIdConnect.OpenIdConfigurationService)]
         public async Task<ActionResult<PlatformOpenIdConfiguration>> GetOpenIdConfigurationAsync()
@@ -64,7 +68,26 @@ namespace LtiAdvantage.AspNetCore.OpenIdConnect
             _logger.LogDebug($"Entering {nameof(GetOpenIdConfigurationAsync)}.");
             try
             {
-                return await OnGetOpenIdConfigurationAsync().ConfigureAwait(false);
+                var configuration = await OnGetOpenIdConfigurationAsync().ConfigureAwait(false);
+                if (configuration == null)
+                    throw new InvalidOperationException(
+                        $"{nameof(OnGetOpenIdConfigurationAsync)} must return the platform's OpenID configuration.");
+                return configuration;
+            }
+            catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+            {
+                // The caller went away; let the framework abort the response.
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An unexpected error occurred in {nameof(GetOpenIdConfigurationAsync)}.");
+                // This endpoint is public, so no exception details are returned.
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "The OpenID configuration could not be loaded",
+                    Status = StatusCodes.Status500InternalServerError
+                });
             }
             finally
             {

@@ -111,6 +111,19 @@ namespace LtiAdvantage.UnitTests.Jwks
             Assert.Throws<ArgumentException>(() => new InMemoryJwksKeyStore(noModulus));
         }
 
+        /// <summary>key_ops keep their restriction, mapped to the public operation.</summary>
+        [Fact]
+        public async Task MapKeyOps_ToThePublicOperation()
+        {
+            using var rsa = RSA.Create(2048);
+            var key = InMemoryJwksKeyStore.CreateRsaKey(rsa, "key-1");
+            key.KeyOps.Add("sign");
+
+            var published = (await new InMemoryJwksKeyStore(key).GetPublicKeysAsync()).Single();
+
+            Assert.Equal(new[] {"verify"}, published.KeyOps);
+        }
+
         /// <summary>An EC key without alg gets the algorithm for its curve, not RS256.</summary>
         [Theory]
         [InlineData("P-256", "ES256")]

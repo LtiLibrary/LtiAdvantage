@@ -52,8 +52,10 @@ namespace LtiAdvantage.AspNetCore.Proctoring
         /// <param name="control">The control action to apply.</param>
         /// <returns>The state of the attempt after the action was applied.</returns>
         [HttpPost]
-        [Consumes("application/json")]
-        [Produces("application/json")]
+        // The spec requires its own media type for both directions (Proctoring 1.0 §5); plain JSON is
+        // also accepted from callers that do not send it.
+        [Consumes(Constants.MediaTypes.AssessmentControl, "application/json")]
+        [Produces(Constants.MediaTypes.AssessmentControl)]
         [ProducesResponseType(typeof(AssessmentControlResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -71,8 +73,29 @@ namespace LtiAdvantage.AspNetCore.Proctoring
 
                 try
                 {
+                    // An action this library does not recognise cannot be handed to the override
+                    // as "Unknown"; tell the tool instead.
+                    if (control.Action == AssessmentControlAction.Unknown)
+                    {
+                        return BadRequest(new ProblemDetails
+                        {
+                            Title = "Unsupported action",
+                            Status = StatusCodes.Status400BadRequest,
+                            Detail = "The action is missing or not one this platform supports."
+                        });
+                    }
+
                     var request = new ControlAssessmentRequest(control);
-                    return await OnControlAssessmentAsync(request).ConfigureAwait(false);
+                    var result = await OnControlAssessmentAsync(request).ConfigureAwait(false);
+
+                    // status is required in the response; never send it as null.
+                    var response = result.Value ?? (result.Result as ObjectResult)?.Value as AssessmentControlResponse;
+                    if (response != null && response.Status == AssessmentControlStatus.Unknown)
+                        throw new InvalidOperationException(
+                            $"{nameof(OnControlAssessmentAsync)} must set the response Status " +
+                            $"(use {nameof(AssessmentControlStatus)}.{nameof(AssessmentControlStatus.None)} for no attempt in progress).");
+
+                    return result;
                 }
                 catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
                 {

@@ -695,6 +695,7 @@
             or <c>null</c> when the key is not an RSA or EC key (for example a symmetric key), or is
             missing public parameters (<c>n</c>/<c>e</c> or <c>crv</c>/<c>x</c>/<c>y</c>) that verifiers need,
             or is restricted by <c>key_ops</c> to operations that have no public counterpart.
+            See <see cref="M:LtiAdvantage.Jwks.PublicJsonWebKey.From(Microsoft.IdentityModel.Tokens.JsonWebKey)"/>.
             </summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.Jwks.JwksDocument">
@@ -788,6 +789,12 @@
             Does not support membership differences.
             See https://www.imsglobal.org/spec/lti-nrps/v2p0#membership-differences.
             </remarks>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.GetMembershipRequest.#ctor(System.String,System.Nullable{System.Int32},System.String,System.Nullable{LtiAdvantage.Lti.Role})">
+            <summary>
+            Initializes a new instance of the class, without group enrollments.
+            </summary>
+            <remarks>Kept so code compiled against the four-parameter constructor keeps working.</remarks>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.GetMembershipRequest.#ctor(System.String,System.Nullable{System.Int32},System.String,System.Nullable{LtiAdvantage.Lti.Role},System.Boolean)">
             <summary>

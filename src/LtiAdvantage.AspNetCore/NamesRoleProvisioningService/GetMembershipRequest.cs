@@ -14,6 +14,15 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
     public class GetMembershipRequest
     {
         /// <summary>
+        /// Initializes a new instance of the class, without group enrollments.
+        /// </summary>
+        /// <remarks>Kept so code compiled against the four-parameter constructor keeps working.</remarks>
+        public GetMembershipRequest(string contextId, int? limit, string rlid, Role? role)
+            : this(contextId, limit, rlid, role, false)
+        {
+        }
+
+        /// <summary>
         /// Initialize a new instance of the class.
         /// </summary>
         /// <param name="contextId">Required context id.</param>

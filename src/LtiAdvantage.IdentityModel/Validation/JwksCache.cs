@@ -32,7 +32,8 @@ namespace LtiAdvantage.IdentityModel.Validation
 
         // When the last fetch of a URL that has no cached keys failed, so retries are rate limited.
         private readonly Dictionary<string, DateTimeOffset> _failedFirstFetches = new();
-        private readonly SemaphoreSlim _lock = new(1, 1);
+        private readonly object _gate = new();
+        private readonly Dictionary<string, Task<IReadOnlyCollection<SecurityKey>>> _inFlight = new();
 
         /// <summary>
         /// Constructs a new <see cref="JwksCache"/>.
@@ -67,69 +68,98 @@ namespace LtiAdvantage.IdentityModel.Validation
             if (string.IsNullOrWhiteSpace(jwksUri))
                 throw new ArgumentException("URL is required", nameof(jwksUri));
 
-            await _lock.WaitAsync(cancellationToken).ConfigureAwait(false);
-            try
+            Task<IReadOnlyCollection<SecurityKey>> fetch;
+
+            // The lock only guards the cache's bookkeeping; the HTTP fetch runs outside it, so a
+            // slow or hanging JWKS endpoint never blocks callers whose key is already cached.
+            lock (_gate)
             {
                 var now = DateTimeOffset.UtcNow;
                 _entries.TryGetValue(jwksUri, out var entry);
 
-                if (entry != null && !ShouldRefresh(entry, requiredKeyId, now))
+                var needsFreshKeys = entry == null
+                    || now - entry.FetchedAt >= _cacheDuration
+                    // A key id we do not hold usually means the peer rotated.
+                    || (requiredKeyId != null && !entry.HasKeyId(requiredKeyId));
+
+                if (!needsFreshKeys)
                 {
                     return entry.Keys;
                 }
 
-                if (entry == null
-                    && _failedFirstFetches.TryGetValue(jwksUri, out var failedAt)
-                    && now - failedAt < _minimumRefreshInterval)
+                // Join a fetch that is already running rather than starting another.
+                if (!_inFlight.TryGetValue(jwksUri, out fetch))
                 {
-                    throw new HttpRequestException(
-                        $"The JWKS at {jwksUri} could not be fetched recently; not retrying until " +
-                        $"{failedAt + _minimumRefreshInterval:O}.");
-                }
-
-                IReadOnlyCollection<SecurityKey> keys;
-                try
-                {
-                    keys = await FetchAsync(jwksUri, cancellationToken).ConfigureAwait(false);
-                }
-                catch (Exception) when (!cancellationToken.IsCancellationRequested)
-                {
-                    if (entry == null)
+                    // Never fetch more often than the minimum interval, counting failed attempts.
+                    if (entry != null && now - entry.LastAttemptAt < _minimumRefreshInterval)
                     {
-                        _failedFirstFetches[jwksUri] = now;
-                        throw;
+                        return entry.Keys;
                     }
 
-                    // Keep serving the keys we have, and wait the minimum interval before retrying.
-                    entry.LastAttemptAt = now;
-                    return entry.Keys;
-                }
+                    if (entry == null
+                        && _failedFirstFetches.TryGetValue(jwksUri, out var failedAt)
+                        && now - failedAt < _minimumRefreshInterval)
+                    {
+                        throw new HttpRequestException(
+                            $"The JWKS at {jwksUri} could not be fetched recently; not retrying until " +
+                            $"{failedAt + _minimumRefreshInterval:O}.");
+                    }
 
-                _failedFirstFetches.Remove(jwksUri);
-                _entries[jwksUri] = new Entry(keys, now);
+                    if (entry != null) entry.LastAttemptAt = now;
+                    fetch = FetchAndStoreAsync(jwksUri, now);
+                    _inFlight[jwksUri] = fetch;
+                }
+            }
+
+            return await fetch.WaitAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Fetches the key set and stores it. If the fetch fails and keys were fetched before,
+        /// those are returned instead; otherwise the failure is recorded and rethrown.
+        /// </summary>
+        /// <remarks>
+        /// Shared by every caller waiting for the same URL, so it does not take any one caller's
+        /// cancellation token: one caller giving up must not cancel the fetch for the others.
+        /// </remarks>
+        private async Task<IReadOnlyCollection<SecurityKey>> FetchAndStoreAsync(string jwksUri, DateTimeOffset startedAt)
+        {
+            // Never complete synchronously: the caller registers this task as in flight while it
+            // holds the lock, and the bookkeeping below must only run after that.
+            await Task.Yield();
+
+            try
+            {
+                var keys = await FetchAsync(jwksUri, CancellationToken.None).ConfigureAwait(false);
+                lock (_gate)
+                {
+                    _entries[jwksUri] = new Entry(keys, DateTimeOffset.UtcNow);
+                    _failedFirstFetches.Remove(jwksUri);
+                }
                 return keys;
+            }
+            catch (Exception)
+            {
+                lock (_gate)
+                {
+                    if (_entries.TryGetValue(jwksUri, out var entry))
+                    {
+                        // Keep serving the keys we have; the next attempt waits the minimum interval.
+                        entry.LastAttemptAt = startedAt;
+                        return entry.Keys;
+                    }
+
+                    _failedFirstFetches[jwksUri] = startedAt;
+                }
+                throw;
             }
             finally
             {
-                _lock.Release();
+                lock (_gate)
+                {
+                    _inFlight.Remove(jwksUri);
+                }
             }
-        }
-
-        private bool ShouldRefresh(Entry entry, string requiredKeyId, DateTimeOffset now)
-        {
-            // Never fetch more often than the minimum interval, counting failed attempts too.
-            if (now - entry.LastAttemptAt < _minimumRefreshInterval)
-            {
-                return false;
-            }
-
-            if (now - entry.FetchedAt >= _cacheDuration)
-            {
-                return true;
-            }
-
-            // A key id we do not hold usually means the peer rotated.
-            return requiredKeyId != null && !entry.HasKeyId(requiredKeyId);
         }
 
         private async Task<IReadOnlyCollection<SecurityKey>> FetchAsync(string jwksUri,

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace LtiAdvantage.Lti
@@ -107,212 +109,228 @@ namespace LtiAdvantage.Lti
         }
 
         /// <summary>
-        /// Replace one variable with its value, wherever it occurs.
+        /// Records a variable's value, unless the variable was already recorded.
+        /// </summary>
+        private static void Add(IDictionary<string, string> variables, string variable, string replacement)
+        {
+            if (!variables.ContainsKey(variable))
+            {
+                variables.Add(variable, replacement ?? string.Empty);
+            }
+        }
+
+        /// <summary>
+        /// Replaces every known variable in <paramref name="value"/> in a single pass.
         /// </summary>
         /// <remarks>
-        /// The variable name is escaped before it is used as a pattern, so the dots in a name
-        /// like <c>$Context.id</c> match dots rather than any character. The value is applied
-        /// through a match evaluator rather than as a replacement string, so a value that
-        /// happens to contain <c>$1</c> or <c>$&amp;</c> is inserted literally instead of being
-        /// read as a regex substitution.
+        /// One pass over the original text means a substituted value is never scanned again, so a
+        /// context titled "$User.id" stays "$User.id" instead of expanding to the user's id. The
+        /// alternation lists longer names first, so where one name is a prefix of another
+        /// (<c>$Context.id</c> and <c>$Context.id.history</c>) the longer one wins regardless of
+        /// the order the variables were recorded in. Names are regex-escaped, and values are
+        /// inserted through a match evaluator, so neither is read as regex syntax.
         /// </remarks>
-        /// <param name="value">The custom property value being substituted into.</param>
-        /// <param name="variable">The variable to replace, including the leading '$'.</param>
-        /// <param name="replacement">The value to insert. Null is treated as empty.</param>
-        private static string Replace(string value, string variable, string replacement)
+        private static string SubstituteAll(string value, IDictionary<string, string> variables)
         {
-            var substitution = replacement ?? string.Empty;
+            if (string.IsNullOrEmpty(value) || variables.Count == 0 || value.IndexOf('$') < 0)
+            {
+                return value;
+            }
 
-            return Regex.Replace(value, Regex.Escape(variable), _ => substitution, RegexOptions.IgnoreCase);
+            var pattern = string.Join("|", variables.Keys
+                .OrderByDescending(name => name.Length)
+                .Select(Regex.Escape));
+
+            return Regex.Replace(value, pattern, match => variables[match.Value], RegexOptions.IgnoreCase);
         }
 
         /// <summary>
         /// Replace variable with value. Unknown variables are ignored.
         /// </summary>
         /// <remarks>
-        /// Where one variable name is a prefix of another, the longer name is substituted first.
-        /// Otherwise the shorter one consumes the start of the longer name and leaves its tail
-        /// behind: substituting <c>$Context.id</c> before <c>$Context.id.history</c> turns
-        /// "$Context.id.history" into "&lt;the context id&gt;.history".
+        /// Each section records its variables, and <see cref="SubstituteAll"/> then replaces them
+        /// all in one pass. Variables of sections that are not set stay as they are.
         /// </remarks>
         /// <param name="value">Variable to replace.</param>
         /// <returns>Value if variable is known.</returns>
         private string SubstituteCustomVariable(string value)
         {
+            var variables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
             // LIS Course Offering variable subsitutions
             if (LisCourseOffering != null)
             {
-                value = Replace(value, "$CourseOffering.academicSession", LisCourseOffering.AcademicSession);
-                value = Replace(value, "$CourseOffering.courseNumber", LisCourseOffering.CourseNumber);
-                value = Replace(value, "$CourseOffering.credits", LisCourseOffering.Credits);
-                value = Replace(value, "$CourseOffering.label", LisCourseOffering.Label);
-                value = Replace(value, "$CourseOffering.longDescription", LisCourseOffering.LongDescription);
-                value = Replace(value, "$CourseOffering.shortDescription", LisCourseOffering.ShortDescription);
-                value = Replace(value, "$CourseOffering.sourcedId", LisCourseOffering.SourcedId);
-                value = Replace(value, "$CourseOffering.title", LisCourseOffering.Title);
+                Add(variables, "$CourseOffering.academicSession", LisCourseOffering.AcademicSession);
+                Add(variables, "$CourseOffering.courseNumber", LisCourseOffering.CourseNumber);
+                Add(variables, "$CourseOffering.credits", LisCourseOffering.Credits);
+                Add(variables, "$CourseOffering.label", LisCourseOffering.Label);
+                Add(variables, "$CourseOffering.longDescription", LisCourseOffering.LongDescription);
+                Add(variables, "$CourseOffering.shortDescription", LisCourseOffering.ShortDescription);
+                Add(variables, "$CourseOffering.sourcedId", LisCourseOffering.SourcedId);
+                Add(variables, "$CourseOffering.title", LisCourseOffering.Title);
             }
 
             // LIS Course Section variable subsitutions
             if (LisCourseSection != null)
             {
-                value = Replace(value, "$CourseSection.courseNumber", LisCourseSection.CourseNumber);
-                value = Replace(value, "$CourseSection.credits", LisCourseSection.Credits);
-                value = Replace(value, "$CourseSection.dataSource", LisCourseSection.DataSource);
-                value = Replace(value, "$CourseSection.dept", LisCourseSection.Dept);
-                value = Replace(value, "$CourseSection.enrollControl.accept", LisCourseSection.EnrollControlAccept);
-                value = Replace(value, "$CourseSection.enrollControl.allowed", LisCourseSection.EnrollControlAllowed);
-                value = Replace(value, "$CourseSection.label", LisCourseSection.Label);
-                value = Replace(value, "$CourseSection.longDescription", LisCourseSection.LongDescription);
-                value = Replace(value, "$CourseSection.maxNumberofStudents", LisCourseSection.MaxNumberOfStudents);
-                value = Replace(value, "$CourseSection.numberofStudents", LisCourseSection.NumberOfStudents);
-                value = Replace(value, "$CourseSection.shortDescription", LisCourseSection.ShortDescription);
-                value = Replace(value, "$CourseSection.sourceSectionId", LisCourseSection.SourceSectionId);
-                value = Replace(value, "$CourseSection.sourcedId", LisCourseSection.SourcedId);
-                value = Replace(value, "$CourseSection.timeFrame.begin", LisCourseSection.TimeFrameBegin);
-                value = Replace(value, "$CourseSection.timeFrame.end", LisCourseSection.TimeFrameEnd);
-                value = Replace(value, "$CourseSection.title", LisCourseSection.Title);
+                Add(variables, "$CourseSection.courseNumber", LisCourseSection.CourseNumber);
+                Add(variables, "$CourseSection.credits", LisCourseSection.Credits);
+                Add(variables, "$CourseSection.dataSource", LisCourseSection.DataSource);
+                Add(variables, "$CourseSection.dept", LisCourseSection.Dept);
+                Add(variables, "$CourseSection.enrollControl.accept", LisCourseSection.EnrollControlAccept);
+                Add(variables, "$CourseSection.enrollControl.allowed", LisCourseSection.EnrollControlAllowed);
+                Add(variables, "$CourseSection.label", LisCourseSection.Label);
+                Add(variables, "$CourseSection.longDescription", LisCourseSection.LongDescription);
+                Add(variables, "$CourseSection.maxNumberofStudents", LisCourseSection.MaxNumberOfStudents);
+                Add(variables, "$CourseSection.numberofStudents", LisCourseSection.NumberOfStudents);
+                Add(variables, "$CourseSection.shortDescription", LisCourseSection.ShortDescription);
+                Add(variables, "$CourseSection.sourceSectionId", LisCourseSection.SourceSectionId);
+                Add(variables, "$CourseSection.sourcedId", LisCourseSection.SourcedId);
+                Add(variables, "$CourseSection.timeFrame.begin", LisCourseSection.TimeFrameBegin);
+                Add(variables, "$CourseSection.timeFrame.end", LisCourseSection.TimeFrameEnd);
+                Add(variables, "$CourseSection.title", LisCourseSection.Title);
             }
 
             // LIS Course Template variable subsitutions
             if (LisCourseTemplate != null)
             {
-                value = Replace(value, "$CourseTemplate.courseNumber", LisCourseTemplate.CourseNumber);
-                value = Replace(value, "$CourseTemplate.credits", LisCourseTemplate.Credits);
-                value = Replace(value, "$CourseTemplate.label", LisCourseTemplate.Label);
-                value = Replace(value, "$CourseTemplate.longDescription", LisCourseTemplate.LongDescription);
-                value = Replace(value, "$CourseTemplate.shortDescription", LisCourseTemplate.ShortDescription);
-                value = Replace(value, "$CourseTemplate.sourcedId", LisCourseTemplate.SourcedId);
-                value = Replace(value, "$CourseTemplate.title", LisCourseTemplate.Title);
+                Add(variables, "$CourseTemplate.courseNumber", LisCourseTemplate.CourseNumber);
+                Add(variables, "$CourseTemplate.credits", LisCourseTemplate.Credits);
+                Add(variables, "$CourseTemplate.label", LisCourseTemplate.Label);
+                Add(variables, "$CourseTemplate.longDescription", LisCourseTemplate.LongDescription);
+                Add(variables, "$CourseTemplate.shortDescription", LisCourseTemplate.ShortDescription);
+                Add(variables, "$CourseTemplate.sourcedId", LisCourseTemplate.SourcedId);
+                Add(variables, "$CourseTemplate.title", LisCourseTemplate.Title);
             }
 
             // LIS Group vaiable subsitutions
             if (LisGroup != null)
             {
-                value = Replace(value, "$Group.email", LisGroup.Email);
-                value = Replace(value, "$Group.enrollControl.accept", LisGroup.EnrollControlAccept);
-                value = Replace(value, "$Group.enrollControl.allowed", LisGroup.EnrollControlAllowed);
-                value = Replace(value, "$Group.grouptype.level", LisGroup.Level);
-                value = Replace(value, "$Group.grouptype.scheme", LisGroup.Scheme);
-                value = Replace(value, "$Group.grouptype.typevalue", LisGroup.Typevalue);
-                value = Replace(value, "$Group.longDescription", LisGroup.LongDescription);
-                value = Replace(value, "$Group.parentId", LisGroup.ParentId);
-                value = Replace(value, "$Group.shortDescription", LisGroup.ShortDescription);
-                value = Replace(value, "$Group.sourcedId", LisGroup.SourcedId);
-                value = Replace(value, "$Group.timeFrame.begin", LisGroup.TimeFrameBegin);
-                value = Replace(value, "$Group.timeFrame.end", LisGroup.TimeFrameEnd);
-                value = Replace(value, "$Group.url", LisGroup.Url);
+                Add(variables, "$Group.email", LisGroup.Email);
+                Add(variables, "$Group.enrollControl.accept", LisGroup.EnrollControlAccept);
+                Add(variables, "$Group.enrollControl.allowed", LisGroup.EnrollControlAllowed);
+                Add(variables, "$Group.grouptype.level", LisGroup.Level);
+                Add(variables, "$Group.grouptype.scheme", LisGroup.Scheme);
+                Add(variables, "$Group.grouptype.typevalue", LisGroup.Typevalue);
+                Add(variables, "$Group.longDescription", LisGroup.LongDescription);
+                Add(variables, "$Group.parentId", LisGroup.ParentId);
+                Add(variables, "$Group.shortDescription", LisGroup.ShortDescription);
+                Add(variables, "$Group.sourcedId", LisGroup.SourcedId);
+                Add(variables, "$Group.timeFrame.begin", LisGroup.TimeFrameBegin);
+                Add(variables, "$Group.timeFrame.end", LisGroup.TimeFrameEnd);
+                Add(variables, "$Group.url", LisGroup.Url);
             }
 
             // LIS Membership variable subsitutions
             if (LisMembership != null)
             {
-                value = Replace(value, "$Membership.collectionSourcedId", LisMembership.CollectionSourcedId);
-                value = Replace(value, "$Membership.course.groupIds", LisMembership.CourseGroupIds);
-                value = Replace(value, "$Membership.createdTimestamp", LisMembership.CreatedTimestamp);
-                value = Replace(value, "$Membership.dataSource", LisMembership.DataSource);
-                value = Replace(value, "$Membership.personSourcedId", LisMembership.PersonSourcedId);
-                value = Replace(value, "$Membership.role.scope.mentor", LisMembership.RoleScopeMentor);
-                value = Replace(value, "$Membership.role", LisMembership.Role);
-                value = Replace(value, "$Membership.sourcedId", LisMembership.SourcedId);
-                value = Replace(value, "$Membership.status", LisMembership.Status);
+                Add(variables, "$Membership.collectionSourcedId", LisMembership.CollectionSourcedId);
+                Add(variables, "$Membership.course.groupIds", LisMembership.CourseGroupIds);
+                Add(variables, "$Membership.createdTimestamp", LisMembership.CreatedTimestamp);
+                Add(variables, "$Membership.dataSource", LisMembership.DataSource);
+                Add(variables, "$Membership.personSourcedId", LisMembership.PersonSourcedId);
+                Add(variables, "$Membership.role.scope.mentor", LisMembership.RoleScopeMentor);
+                Add(variables, "$Membership.role", LisMembership.Role);
+                Add(variables, "$Membership.sourcedId", LisMembership.SourcedId);
+                Add(variables, "$Membership.status", LisMembership.Status);
             }
 
             // LIS Message variable subsitutions
             if (LisMessage != null)
             {
-                value = Replace(value, "$Message.documentTarget", LisMessage.DocumentTarget);
-                value = Replace(value, "$Message.height", LisMessage.Height);
-                value = Replace(value, "$Message.locale", LisMessage.Locale);
-                value = Replace(value, "$Message.returnUrl", LisMessage.ReturnUrl);
-                value = Replace(value, "$Message.width", LisMessage.Width);
+                Add(variables, "$Message.documentTarget", LisMessage.DocumentTarget);
+                Add(variables, "$Message.height", LisMessage.Height);
+                Add(variables, "$Message.locale", LisMessage.Locale);
+                Add(variables, "$Message.returnUrl", LisMessage.ReturnUrl);
+                Add(variables, "$Message.width", LisMessage.Width);
             }
 
             // LIS Person variable subsitutions
             if (LisPerson != null)
             {
-                value = Replace(value, "$Person.address.country", LisPerson.AddressCountry);
-                value = Replace(value, "$Person.address.locality", LisPerson.AddressLocality);
-                value = Replace(value, "$Person.address.postcode", LisPerson.AddressPostCode);
-                value = Replace(value, "$Person.address.statepr", LisPerson.AddressStatePr);
-                value = Replace(value, "$Person.address.street1", LisPerson.AddressStreet1);
-                value = Replace(value, "$Person.address.street2", LisPerson.AddressStreet2);
-                value = Replace(value, "$Person.address.street3", LisPerson.AddressStreet3);
-                value = Replace(value, "$Person.address.street4", LisPerson.AddressStreet4);
-                value = Replace(value, "$Person.address.timezone", LisPerson.AddressTimezone);
-                value = Replace(value, "$Person.email.personal", LisPerson.EmailPersonal);
-                value = Replace(value, "$Person.email.primary", LisPerson.EmailPrimary);
-                value = Replace(value, "$Person.name.full", LisPerson.NameFull);
-                value = Replace(value, "$Person.name.family", LisPerson.NameFamily);
-                value = Replace(value, "$Person.name.given", LisPerson.NameGiven);
-                value = Replace(value, "$Person.name.middle", LisPerson.NameMiddle);
-                value = Replace(value, "$Person.name.prefix", LisPerson.NamePrefix);
-                value = Replace(value, "$Person.name.suffix", LisPerson.NameSuffix);
-                value = Replace(value, "$Person.phone.home", LisPerson.PhoneHome);
-                value = Replace(value, "$Person.phone.mobile", LisPerson.PhoneMobile);
-                value = Replace(value, "$Person.phone.primary", LisPerson.PhonePrimary);
-                value = Replace(value, "$Person.phone.work", LisPerson.PhoneWork);
-                value = Replace(value, "$Person.sms", LisPerson.Sms);
-                value = Replace(value, "$Person.sourcedId", LisPerson.SourcedId);
-                value = Replace(value, "$Person.webaddress", LisPerson.WebAddress);
+                Add(variables, "$Person.address.country", LisPerson.AddressCountry);
+                Add(variables, "$Person.address.locality", LisPerson.AddressLocality);
+                Add(variables, "$Person.address.postcode", LisPerson.AddressPostCode);
+                Add(variables, "$Person.address.statepr", LisPerson.AddressStatePr);
+                Add(variables, "$Person.address.street1", LisPerson.AddressStreet1);
+                Add(variables, "$Person.address.street2", LisPerson.AddressStreet2);
+                Add(variables, "$Person.address.street3", LisPerson.AddressStreet3);
+                Add(variables, "$Person.address.street4", LisPerson.AddressStreet4);
+                Add(variables, "$Person.address.timezone", LisPerson.AddressTimezone);
+                Add(variables, "$Person.email.personal", LisPerson.EmailPersonal);
+                Add(variables, "$Person.email.primary", LisPerson.EmailPrimary);
+                Add(variables, "$Person.name.full", LisPerson.NameFull);
+                Add(variables, "$Person.name.family", LisPerson.NameFamily);
+                Add(variables, "$Person.name.given", LisPerson.NameGiven);
+                Add(variables, "$Person.name.middle", LisPerson.NameMiddle);
+                Add(variables, "$Person.name.prefix", LisPerson.NamePrefix);
+                Add(variables, "$Person.name.suffix", LisPerson.NameSuffix);
+                Add(variables, "$Person.phone.home", LisPerson.PhoneHome);
+                Add(variables, "$Person.phone.mobile", LisPerson.PhoneMobile);
+                Add(variables, "$Person.phone.primary", LisPerson.PhonePrimary);
+                Add(variables, "$Person.phone.work", LisPerson.PhoneWork);
+                Add(variables, "$Person.sms", LisPerson.Sms);
+                Add(variables, "$Person.sourcedId", LisPerson.SourcedId);
+                Add(variables, "$Person.webaddress", LisPerson.WebAddress);
             }
 
             // Course Groups Service variable substitutions
             if (CourseGroup != null)
             {
-                value = Replace(value, "$CourseGroup.id", CourseGroup.Id);
+                Add(variables, "$CourseGroup.id", CourseGroup.Id);
             }
 
             // LTI Context variable substitutions
             if (LtiContext != null)
             {
                 // $Context.id.history before $Context.id: see the remarks on this method.
-                value = Replace(value, "$Context.id.history", LtiContext.IdHistory);
-                value = Replace(value, "$Context.id", LtiContext.Id);
-                value = Replace(value, "$Context.label", LtiContext.Label);
-                value = Replace(value, "$Context.org", LtiContext.Org);
-                value = Replace(value, "$Context.sourcedId", LtiContext.SourcedId);
-                value = Replace(value, "$Context.title", LtiContext.Title);
-                value = Replace(value, "$Context.type", LtiContext.Type);
+                Add(variables, "$Context.id.history", LtiContext.IdHistory);
+                Add(variables, "$Context.id", LtiContext.Id);
+                Add(variables, "$Context.label", LtiContext.Label);
+                Add(variables, "$Context.org", LtiContext.Org);
+                Add(variables, "$Context.sourcedId", LtiContext.SourcedId);
+                Add(variables, "$Context.title", LtiContext.Title);
+                Add(variables, "$Context.type", LtiContext.Type);
             }
 
             // LTI ResourceLink variable subsitutions
             if (LtiResourceLink != null)
             {
-                value = Replace(value, "$ResourceLink.description", LtiResourceLink.Description);
+                Add(variables, "$ResourceLink.description", LtiResourceLink.Description);
                 // $ResourceLink.id.history before $ResourceLink.id: see the remarks on this method.
-                value = Replace(value, "$ResourceLink.id.history", LtiResourceLink.IdHistory);
-                value = Replace(value, "$ResourceLink.id", LtiResourceLink.Id);
-                value = Replace(value, "$ResourceLink.title", LtiResourceLink.Title);
+                Add(variables, "$ResourceLink.id.history", LtiResourceLink.IdHistory);
+                Add(variables, "$ResourceLink.id", LtiResourceLink.Id);
+                Add(variables, "$ResourceLink.title", LtiResourceLink.Title);
             }
 
             // LTI User variable substitutions
             if (LtiUser != null)
             {
-                value = Replace(value, "$User.id", LtiUser.Id);
-                value = Replace(value, "$User.image", LtiUser.Image);
-                value = Replace(value, "$User.org", LtiUser.Org);
-                value = Replace(value, "$User.scope.mentor", LtiUser.ScopeMentor);
-                value = Replace(value, "$User.username", LtiUser.Username);
+                Add(variables, "$User.id", LtiUser.Id);
+                Add(variables, "$User.image", LtiUser.Image);
+                Add(variables, "$User.org", LtiUser.Org);
+                Add(variables, "$User.scope.mentor", LtiUser.ScopeMentor);
+                Add(variables, "$User.username", LtiUser.Username);
             }
 
             // Tool Platform variable substitutions
             if (ToolPlatform != null)
             {
-                value = Replace(value, "$ToolPlatform.productFamilyCode", ToolPlatform.ProductFamilyCode);
-                value = Replace(value, "$ToolPlatform.version", ToolPlatform.Version);
+                Add(variables, "$ToolPlatform.productFamilyCode", ToolPlatform.ProductFamilyCode);
+                Add(variables, "$ToolPlatform.version", ToolPlatform.Version);
             }
 
             // Tool Platform Instance variable substitutions
             if (ToolPlatfomInstance != null)
             {
-                value = Replace(value, "$ToolPlatformInstance.contactEmail", ToolPlatfomInstance.ContactEmail);
-                value = Replace(value, "$ToolPlatformInstance.description", ToolPlatfomInstance.Description);
-                value = Replace(value, "$ToolPlatformInstance.guid", ToolPlatfomInstance.Guid);
-                value = Replace(value, "$ToolPlatformInstance.name", ToolPlatfomInstance.Name);
-                value = Replace(value, "$ToolPlatformInstance.url", ToolPlatfomInstance.Url);
+                Add(variables, "$ToolPlatformInstance.contactEmail", ToolPlatfomInstance.ContactEmail);
+                Add(variables, "$ToolPlatformInstance.description", ToolPlatfomInstance.Description);
+                Add(variables, "$ToolPlatformInstance.guid", ToolPlatfomInstance.Guid);
+                Add(variables, "$ToolPlatformInstance.name", ToolPlatfomInstance.Name);
+                Add(variables, "$ToolPlatformInstance.url", ToolPlatfomInstance.Url);
             }
 
-            return value;
+            return SubstituteAll(value, variables);
         }
     }
 

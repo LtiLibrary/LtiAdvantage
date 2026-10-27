@@ -362,6 +362,12 @@
         public static class MediaTypes
         {
             /// <summary>
+            /// Assessment Control Service request and response body (Proctoring 1.0 §5).
+            /// https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-service
+            /// </summary>
+            public const string AssessmentControl = "application/vnd.ims.lti-ap.v1.control+json";
+
+            /// <summary>
             /// https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-container-media-type
             /// </summary>
             public const string ContextGroupContainer = "application/vnd.ims.lti-gs.v1.contextgroupcontainer+json";

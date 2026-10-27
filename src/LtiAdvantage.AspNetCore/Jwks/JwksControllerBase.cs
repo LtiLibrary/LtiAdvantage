@@ -45,6 +45,7 @@ namespace LtiAdvantage.AspNetCore.Jwks
         [AllowAnonymous]
         [Produces(Constants.MediaTypes.Jwks)]
         [ProducesResponseType(typeof(JsonWebKeySet), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [Route(".well-known/jwks.json", Name = Constants.ServiceEndpoints.Jwks.JwksService)]
         public async Task<ActionResult<JsonWebKeySet>> GetJwksAsync()
         {
@@ -62,12 +63,24 @@ namespace LtiAdvantage.AspNetCore.Jwks
                     var publicKey = ToPublicKey(key);
                     if (publicKey == null)
                     {
-                        _logger.LogWarning("Skipping JWKS key {Kid}: it is not an RSA or EC key.", key?.Kid);
+                        _logger.LogWarning(
+                            "Skipping JWKS key {Kid}: it is not an RSA or EC key with all its public parameters.", key?.Kid);
                         continue;
                     }
                     set.Keys.Add(publicKey);
                 }
                 return set;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An unexpected error occurred in {nameof(GetJwksAsync)}.");
+                Response.Headers[HeaderNames.CacheControl] = "no-store";
+                // This endpoint is public, so no exception details are returned.
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "The key set could not be loaded",
+                    Status = StatusCodes.Status500InternalServerError
+                });
             }
             finally
             {
@@ -103,7 +116,8 @@ namespace LtiAdvantage.AspNetCore.Jwks
 
         /// <summary>
         /// Returns a copy of <paramref name="key"/> with only its public parameters,
-        /// or <c>null</c> when the key is not an RSA or EC key (for example a symmetric key).
+        /// or <c>null</c> when the key is not an RSA or EC key (for example a symmetric key), or is
+        /// missing public parameters (<c>n</c>/<c>e</c> or <c>crv</c>/<c>x</c>/<c>y</c>) that verifiers need.
         /// </summary>
         public static JsonWebKey ToPublicKey(JsonWebKey key)
         {
@@ -128,10 +142,12 @@ namespace LtiAdvantage.AspNetCore.Jwks
             switch (key.Kty)
             {
                 case JsonWebAlgorithmsKeyTypes.RSA:
+                    if (string.IsNullOrEmpty(key.N) || string.IsNullOrEmpty(key.E)) return null;
                     publicKey.N = key.N;
                     publicKey.E = key.E;
                     return publicKey;
                 case JsonWebAlgorithmsKeyTypes.EllipticCurve:
+                    if (string.IsNullOrEmpty(key.Crv) || string.IsNullOrEmpty(key.X) || string.IsNullOrEmpty(key.Y)) return null;
                     publicKey.Crv = key.Crv;
                     publicKey.X = key.X;
                     publicKey.Y = key.Y;

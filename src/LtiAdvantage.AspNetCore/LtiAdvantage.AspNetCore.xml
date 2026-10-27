@@ -388,39 +388,46 @@
             Platform-side endpoint for LTI Dynamic Registration 1.0.
             See https://www.imsglobal.org/spec/lti-dr/v1p0/#registration-endpoint
             </summary>
+            <remarks>
+            A request goes through three steps, in this order:
+            <list type="number">
+            <item><see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.AuthorizeRegistrationAsync(System.String)"/> decides whether the caller may register (401/403 otherwise).</item>
+            <item>The body is read and checked by <see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.ValidateRegistration(LtiAdvantage.DynamicRegistration.ToolConfiguration)"/> (400 <c>invalid_client_metadata</c> otherwise).</item>
+            <item><see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.OnRegisterAsync(LtiAdvantage.AspNetCore.DynamicRegistration.RegisterToolRequest)"/> stores the registration and returns it with a new <c>client_id</c> (201).</item>
+            </list>
+            </remarks>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase})">
             <summary>Initializes the base.</summary>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.OnRegisterAsync(LtiAdvantage.AspNetCore.DynamicRegistration.RegisterToolRequest)">
             <summary>
-            Persist the registration. Implementations MUST set <see cref="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.ClientId"/>
-            on <c>request.Tool</c> (or return a new instance) before returning.
+            Stores the registration and returns the registered tool configuration with a newly
+            assigned <see cref="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.ClientId"/>. The endpoint answers 201 Created with it.
             </summary>
             <remarks>
             Called only after <see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.AuthorizeRegistrationAsync(System.String)"/> allowed the request and
-            <see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.ValidateRegistration(LtiAdvantage.DynamicRegistration.ToolConfiguration)"/> found no errors.
+            <see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.ValidateRegistration(LtiAdvantage.DynamicRegistration.ToolConfiguration)"/> found no errors. Any <c>client_id</c> the tool sent has
+            already been cleared, so the platform always chooses it.
             <list type="bullet">
-            <item>To accept, return the registered <see cref="T:LtiAdvantage.DynamicRegistration.ToolConfiguration"/>, as a value or inside a
-            2xx (or status-less) <see cref="T:Microsoft.AspNetCore.Mvc.ObjectResult"/> such as <c>Ok(tool)</c>. The response is always
-            201 Created, and a missing <c>client_id</c> is a server error.</item>
-            <item>To reject, return an error result such as <c>BadRequest(new RegistrationError { ... })</c>.
-            It is passed through; an <see cref="T:Microsoft.AspNetCore.Mvc.ObjectResult"/> without a status code is sent as 400.</item>
+            <item>To reject the registration, throw <see cref="T:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationRejectedException"/>.</item>
+            <item>Returning <c>null</c>, or a configuration without a <c>client_id</c>, is a server error (500).</item>
             </list>
             </remarks>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.AuthorizeRegistrationAsync(System.String)">
             <summary>
             Decides whether a registration request may proceed. Return <c>null</c> to allow it,
-            or a result (such as <c>Unauthorized()</c> or <c>Forbid()</c>) to reject it.
+            or a result (such as <c>Unauthorized()</c>) to reject it.
             </summary>
             <remarks>
-            The spec leaves the <c>registration_token</c> optional and opaque (DR §3.3), so platforms that
-            issue their own tokens (for example single-use tokens stored in a database), or accept
-            registrations without one, should override this method.
+            Runs before the request body is read. The spec leaves the <c>registration_token</c> optional
+            and opaque (DR §3.3), so platforms that issue their own tokens (for example single-use tokens
+            stored in a database), or accept registrations without one, should override this method.
             The default authenticates the request with the <see cref="F:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme"/>
             scheme and requires the <see cref="F:LtiAdvantage.Constants.LtiScopes.DynamicRegistration.Scope"/> policy
-            (registered by <c>AddLtiAdvantagePolicies</c>).
+            (registered by <c>AddLtiAdvantagePolicies</c>). If that scheme is not registered, every request
+            is answered 401 and a warning is logged.
             </remarks>
             <param name="registrationToken">
             The Bearer token from the <c>Authorization</c> header, or <c>null</c> when none was sent.
@@ -433,8 +440,12 @@
             Override to add platform-specific rules (call the base method to keep the standard checks).
             </summary>
         </member>
-        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.RegisterAsync(LtiAdvantage.DynamicRegistration.ToolConfiguration)">
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.RegisterAsync">
             <inheritdoc />
+            <remarks>
+            The body is read by the action itself (not model binding), so that authorization runs before
+            anything about the body is reported back to the caller.
+            </remarks>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.RequireWebUrl(System.Collections.Generic.ICollection{System.String},System.String,System.String)">
             <summary>
@@ -447,8 +458,11 @@
         <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.IDynamicRegistrationController">
             <summary>The platform-side LTI Dynamic Registration endpoint.</summary>
         </member>
-        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.IDynamicRegistrationController.RegisterAsync(LtiAdvantage.DynamicRegistration.ToolConfiguration)">
-            <summary>Registers a new tool. Returns 201 with the assigned <c>client_id</c> echoed back.</summary>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.IDynamicRegistrationController.RegisterAsync">
+            <summary>
+            Registers a new tool from the <see cref="T:LtiAdvantage.DynamicRegistration.ToolConfiguration"/> in the request body.
+            Returns 201 with the assigned <c>client_id</c> echoed back.
+            </summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.RegisterToolRequest">
             <summary>Request passed to the controller's <c>OnRegisterAsync</c> override.</summary>
@@ -475,12 +489,24 @@
         <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationError.InvalidClientMetadata(System.String)">
             <summary>Creates an <c>invalid_client_metadata</c> error with the given description.</summary>
         </member>
-        <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationModelStateFilterAttribute">
+        <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationRejectedException">
             <summary>
-            Turns a missing or malformed registration request body into the RFC 7591 error body
-            required by LTI Dynamic Registration 1.0 §3.6.2, instead of the default
-            <see cref="T:Microsoft.AspNetCore.Mvc.ValidationProblemDetails"/> that <see cref="T:Microsoft.AspNetCore.Mvc.ApiControllerAttribute"/> returns.
+            Thrown from <c>OnRegisterAsync</c> to reject a registration. The endpoint answers with
+            <see cref="P:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationRejectedException.StatusCode"/> (default 400) and a <see cref="T:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationError"/> body
+            (RFC 7591 §3.2.2, LTI Dynamic Registration 1.0 §3.6.2).
             </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationRejectedException.#ctor(System.String,System.String,System.Int32)">
+            <summary>Rejects the registration.</summary>
+            <param name="error">Error code, e.g. <c>invalid_client_metadata</c> or <c>invalid_redirect_uri</c>.</param>
+            <param name="description">Human-readable description, sent to the tool.</param>
+            <param name="statusCode">HTTP status code; must be a 4xx code. Default 400.</param>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationRejectedException.Error">
+            <summary>The error code.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationRejectedException.StatusCode">
+            <summary>The HTTP status code to answer with.</summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.Jwks.IJwksController">
             <summary>JWKS publication endpoint.</summary>
@@ -523,7 +549,8 @@
         <member name="M:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase.ToPublicKey(Microsoft.IdentityModel.Tokens.JsonWebKey)">
             <summary>
             Returns a copy of <paramref name="key"/> with only its public parameters,
-            or <c>null</c> when the key is not an RSA or EC key (for example a symmetric key).
+            or <c>null</c> when the key is not an RSA or EC key (for example a symmetric key), or is
+            missing public parameters (<c>n</c>/<c>e</c> or <c>crv</c>/<c>x</c>/<c>y</c>) that verifiers need.
             </summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.Lti.ServiceResponse">

@@ -145,6 +145,8 @@ namespace LtiAdvantage.UnitTests.DynamicRegistration
         [InlineData("https://platform.example.com", "https://platform.example.com/.well-known/openid-configuration")]
         [InlineData("https://platform.example.com/", "https://platform.example.com/lti/config?reg=1")]
         [InlineData("https://platform.example.com/tenant1", "https://platform.example.com/tenant1/.well-known/openid-configuration")]
+        // Plain http is allowed for local development.
+        [InlineData("http://localhost:5000", "http://localhost:5000/.well-known/openid-configuration")]
         public async Task AcceptPlatformConfiguration_WhenUrlIsUnderIssuer(string issuer, string url)
         {
             using var client = new HttpClient(new StubHandler((req, ct) =>
@@ -164,6 +166,8 @@ namespace LtiAdvantage.UnitTests.DynamicRegistration
         [InlineData("https://platform.example.com/tenant1", "https://platform.example.com/tenant1evil/.well-known/openid-configuration")]
         // Issuer must use https.
         [InlineData("http://platform.example.com", "http://platform.example.com/.well-known/openid-configuration")]
+        // Only http(s), even on loopback.
+        [InlineData("ftp://localhost/x", "ftp://localhost/x/.well-known/openid-configuration")]
         // URL must not contain a fragment.
         [InlineData("https://platform.example.com", "https://platform.example.com/.well-known/openid-configuration#x")]
         // Missing issuer.
@@ -188,6 +192,20 @@ namespace LtiAdvantage.UnitTests.DynamicRegistration
 
             Assert.Contains("OpenID configuration", ex.Message);
             Assert.Contains("404", ex.Message);
+        }
+
+        [Fact]
+        public async Task TruncateLongErrorBodies()
+        {
+            var longBody = new string('x', 10_000);
+            using var client = new HttpClient(new StubHandler((req, ct) =>
+                JsonResponse(HttpStatusCode.InternalServerError, longBody)));
+
+            var ex = await Assert.ThrowsAsync<HttpRequestException>(() =>
+                client.RegisterToolAsync("https://platform.example.com/lti/register", "tok", new ToolConfiguration()));
+
+            Assert.True(ex.Message.Length < 1_000, $"message length {ex.Message.Length}");
+            Assert.Contains("truncated", ex.Message);
         }
 
         private static HttpResponseMessage JsonResponse(HttpStatusCode status, string body) =>

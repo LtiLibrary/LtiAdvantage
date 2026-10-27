@@ -86,7 +86,7 @@ namespace LtiAdvantage.IntegrationTests.DynamicRegistration
         }
 
         [Fact]
-        public async Task SendErrorWithoutStatus_As400()
+        public async Task Answer400_WhenOverrideRejects()
         {
             AuthorizeWithRegistrationScope();
             var tool = MinimalTool();
@@ -95,31 +95,62 @@ namespace LtiAdvantage.IntegrationTests.DynamicRegistration
             var resp = await PostAsync(tool);
 
             Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
-            Assert.Contains("invalid_redirect_uri", await resp.Content.ReadAsStringAsync());
+            using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            Assert.Equal("invalid_redirect_uri", doc.RootElement.GetProperty("error").GetString());
+            Assert.Equal("Redirect URI not allowed.", doc.RootElement.GetProperty("error_description").GetString());
         }
 
-        [Fact]
-        public async Task Answer201_WhenOverrideReturnsOk()
+        [Theory]
+        [InlineData("return-null")]
+        [InlineData("no-client-id")]
+        public async Task Answer500WithoutDetails_WhenOverrideReturnsNoClientId(string behavior)
         {
             AuthorizeWithRegistrationScope();
             var tool = MinimalTool();
-            tool.ClientName = "ok";
-
-            var resp = await PostAsync(tool);
-
-            Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
-        }
-
-        [Fact]
-        public async Task Fail_WhenOverrideReturnsOkWithoutClientId()
-        {
-            AuthorizeWithRegistrationScope();
-            var tool = MinimalTool();
-            tool.ClientName = "ok-without-client-id";
+            tool.ClientName = behavior;
 
             var resp = await PostAsync(tool);
 
             Assert.Equal(HttpStatusCode.InternalServerError, resp.StatusCode);
+            // The test host runs as Production, where exception details must not be returned.
+            using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            Assert.False(doc.RootElement.TryGetProperty("detail", out var detail) && detail.ValueKind == JsonValueKind.String);
+        }
+
+        [Fact]
+        public async Task IgnoreClientIdSentByTool()
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            tool.ClientName = "keep-client-id";
+            tool.ClientId = "existing-tool-client-id";
+
+            var resp = await PostAsync(tool);
+
+            Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+            var registered = JsonSerializer.Deserialize<ToolConfiguration>(await resp.Content.ReadAsStringAsync());
+            Assert.False(string.IsNullOrWhiteSpace(registered.ClientId));
+            Assert.NotEqual("existing-tool-client-id", registered.ClientId);
+        }
+
+        [Fact]
+        public async Task Reject_MissingTokenEndpointAuthMethodAndApplicationType()
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            tool.TokenEndpointAuthMethod = null;
+            tool.ApplicationType = null;
+
+            var description = await AssertInvalidClientMetadata(await PostAsync(tool), "token_endpoint_auth_method");
+            Assert.Contains("application_type", description);
+        }
+
+        [Fact]
+        public async Task Answer401_BeforeReadingBody_WhenUnauthenticated()
+        {
+            var resp = await _client.PostAsync(Url, new StringContent("not json", Encoding.UTF8, "application/json"));
+
+            Assert.Equal(HttpStatusCode.Unauthorized, resp.StatusCode);
         }
 
         [Theory]

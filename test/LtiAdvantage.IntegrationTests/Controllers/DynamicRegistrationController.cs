@@ -24,26 +24,25 @@ namespace LtiAdvantage.IntegrationTests.Controllers
                 : base.AuthorizeRegistrationAsync(registrationToken);
         }
 
-        // The client name selects a behavior, so tests can exercise how the base handles each result.
-        protected override Task<ActionResult<ToolConfiguration>> OnRegisterAsync(RegisterToolRequest request)
+        // The client name selects a behavior, so tests can exercise how the base handles each outcome.
+        protected override Task<ToolConfiguration> OnRegisterAsync(RegisterToolRequest request)
         {
             switch (request.Tool.ClientName)
             {
                 case "reject":
-                    // An error without a status code must not go out as 200 OK.
-                    return Result(new ObjectResult(new { error = "invalid_redirect_uri" }));
-                case "ok-without-client-id":
-                    return Result(Ok(request.Tool));
-                case "ok":
-                    request.Tool.ClientId = Guid.NewGuid().ToString();
-                    return Result(Ok(request.Tool));
+                    throw new RegistrationRejectedException("invalid_redirect_uri", "Redirect URI not allowed.");
+                case "return-null":
+                    return Task.FromResult<ToolConfiguration>(null);
+                case "keep-client-id":
+                    // A careless override that only fills in a missing client_id.
+                    request.Tool.ClientId ??= Guid.NewGuid().ToString();
+                    return Task.FromResult(request.Tool);
+                case "no-client-id":
+                    return Task.FromResult(request.Tool);
                 default:
                     request.Tool.ClientId = Guid.NewGuid().ToString();
-                    return Result(new ObjectResult(request.Tool) { StatusCode = 201 });
+                    return Task.FromResult(request.Tool);
             }
         }
-
-        private static Task<ActionResult<ToolConfiguration>> Result(ActionResult result) =>
-            Task.FromResult<ActionResult<ToolConfiguration>>(result);
     }
 }

@@ -60,7 +60,7 @@ namespace LtiAdvantage.IntegrationTests.Jwks
             // The document may be cached briefly.
             Assert.Equal("public, max-age=300", response.Headers.CacheControl?.ToString());
 
-            // Symmetric keys MUST NOT be published.
+            // Symmetric keys and incomplete keys MUST NOT be published.
             Assert.Equal(1, keys.GetArrayLength());
         }
 

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using LtiAdvantage.DynamicRegistration;
 using Microsoft.AspNetCore.Authentication;
@@ -21,6 +21,14 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
     /// Platform-side endpoint for LTI Dynamic Registration 1.0.
     /// See https://www.imsglobal.org/spec/lti-dr/v1p0/#registration-endpoint
     /// </summary>
+    /// <remarks>
+    /// A request goes through three steps, in this order:
+    /// <list type="number">
+    /// <item><see cref="AuthorizeRegistrationAsync"/> decides whether the caller may register (401/403 otherwise).</item>
+    /// <item>The body is read and checked by <see cref="ValidateRegistration"/> (400 <c>invalid_client_metadata</c> otherwise).</item>
+    /// <item><see cref="OnRegisterAsync"/> stores the registration and returns it with a new <c>client_id</c> (201).</item>
+    /// </list>
+    /// </remarks>
     [ApiController]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -37,39 +45,48 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
         }
 
         /// <summary>
-        /// Persist the registration. Implementations MUST set <see cref="ToolConfiguration.ClientId"/>
-        /// on <c>request.Tool</c> (or return a new instance) before returning.
+        /// Stores the registration and returns the registered tool configuration with a newly
+        /// assigned <see cref="ToolConfiguration.ClientId"/>. The endpoint answers 201 Created with it.
         /// </summary>
         /// <remarks>
         /// Called only after <see cref="AuthorizeRegistrationAsync"/> allowed the request and
-        /// <see cref="ValidateRegistration"/> found no errors.
+        /// <see cref="ValidateRegistration"/> found no errors. Any <c>client_id</c> the tool sent has
+        /// already been cleared, so the platform always chooses it.
         /// <list type="bullet">
-        /// <item>To accept, return the registered <see cref="ToolConfiguration"/>, as a value or inside a
-        /// 2xx (or status-less) <see cref="ObjectResult"/> such as <c>Ok(tool)</c>. The response is always
-        /// 201 Created, and a missing <c>client_id</c> is a server error.</item>
-        /// <item>To reject, return an error result such as <c>BadRequest(new RegistrationError { ... })</c>.
-        /// It is passed through; an <see cref="ObjectResult"/> without a status code is sent as 400.</item>
+        /// <item>To reject the registration, throw <see cref="RegistrationRejectedException"/>.</item>
+        /// <item>Returning <c>null</c>, or a configuration without a <c>client_id</c>, is a server error (500).</item>
         /// </list>
         /// </remarks>
-        protected abstract Task<ActionResult<ToolConfiguration>> OnRegisterAsync(RegisterToolRequest request);
+        protected abstract Task<ToolConfiguration> OnRegisterAsync(RegisterToolRequest request);
 
         /// <summary>
         /// Decides whether a registration request may proceed. Return <c>null</c> to allow it,
-        /// or a result (such as <c>Unauthorized()</c> or <c>Forbid()</c>) to reject it.
+        /// or a result (such as <c>Unauthorized()</c>) to reject it.
         /// </summary>
         /// <remarks>
-        /// The spec leaves the <c>registration_token</c> optional and opaque (DR §3.3), so platforms that
-        /// issue their own tokens (for example single-use tokens stored in a database), or accept
-        /// registrations without one, should override this method.
+        /// Runs before the request body is read. The spec leaves the <c>registration_token</c> optional
+        /// and opaque (DR §3.3), so platforms that issue their own tokens (for example single-use tokens
+        /// stored in a database), or accept registrations without one, should override this method.
         /// The default authenticates the request with the <see cref="JwtBearerDefaults.AuthenticationScheme"/>
         /// scheme and requires the <see cref="Constants.LtiScopes.DynamicRegistration.Scope"/> policy
-        /// (registered by <c>AddLtiAdvantagePolicies</c>).
+        /// (registered by <c>AddLtiAdvantagePolicies</c>). If that scheme is not registered, every request
+        /// is answered 401 and a warning is logged.
         /// </remarks>
         /// <param name="registrationToken">
         /// The Bearer token from the <c>Authorization</c> header, or <c>null</c> when none was sent.
         /// </param>
         protected virtual async Task<ActionResult> AuthorizeRegistrationAsync(string registrationToken)
         {
+            var schemes = HttpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
+            if (await schemes.GetSchemeAsync(JwtBearerDefaults.AuthenticationScheme).ConfigureAwait(false) == null)
+            {
+                _logger.LogWarning(
+                    "Dynamic registration rejected: no '{Scheme}' authentication scheme is registered. " +
+                    "Register one or override {Method}.",
+                    JwtBearerDefaults.AuthenticationScheme, nameof(AuthorizeRegistrationAsync));
+                return Unauthorized();
+            }
+
             var authentication = await HttpContext.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme)
                 .ConfigureAwait(false);
             if (!authentication.Succeeded) return Unauthorized();
@@ -90,6 +107,8 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
         {
             var errors = new List<string>();
 
+            if (tool.ApplicationType != "web")
+                errors.Add("application_type must be web.");
             RequireWebUrl(errors, "initiate_login_uri", tool.InitiateLoginUri);
             RequireWebUrl(errors, "jwks_uri", tool.JwksUri);
 
@@ -118,16 +137,19 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// The body is read by the action itself (not model binding), so that authorization runs before
+        /// anything about the body is reported back to the caller.
+        /// </remarks>
         [HttpPost]
         [AllowAnonymous] // Authorization is done by AuthorizeRegistrationAsync, since the token is optional.
-        [RegistrationModelStateFilter]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(ToolConfiguration), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(RegistrationError), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [Route("lti/register", Name = "lti-dynamic-registration")]
-        public async Task<ActionResult<ToolConfiguration>> RegisterAsync([Required] [FromBody] ToolConfiguration tool)
+        public async Task<ActionResult<ToolConfiguration>> RegisterAsync()
         {
             try
             {
@@ -136,6 +158,11 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
                 var rejected = await AuthorizeRegistrationAsync(GetBearerToken()).ConfigureAwait(false);
                 if (rejected != null) return rejected;
 
+                var tool = await ReadToolConfigurationAsync().ConfigureAwait(false);
+                if (tool == null)
+                    return BadRequest(RegistrationError.InvalidClientMetadata(
+                        "The request body must be a JSON tool configuration."));
+
                 var errors = ValidateRegistration(tool);
                 if (errors.Count > 0)
                 {
@@ -143,23 +170,22 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
                     return BadRequest(RegistrationError.InvalidClientMetadata(string.Join(" ", errors)));
                 }
 
-                var result = await OnRegisterAsync(new RegisterToolRequest(tool)).ConfigureAwait(false);
-                var objectResult = result.Result as ObjectResult;
-                var registered = result.Value ?? objectResult?.Value as ToolConfiguration;
-                var isSuccess = result.Result == null
-                    || (objectResult != null && (objectResult.StatusCode == null || IsSuccessStatusCode(objectResult.StatusCode.Value)));
+                // The platform assigns the client_id; never keep one chosen by the tool.
+                tool.ClientId = null;
 
-                if (registered == null || !isSuccess)
+                ToolConfiguration registered;
+                try
                 {
-                    // A rejection. An ObjectResult with no status code would otherwise go out as 200 OK.
-                    if (objectResult != null && objectResult.StatusCode == null)
-                        objectResult.StatusCode = StatusCodes.Status400BadRequest;
-                    return result;
+                    registered = await OnRegisterAsync(new RegisterToolRequest(tool)).ConfigureAwait(false);
+                }
+                catch (RegistrationRejectedException ex)
+                {
+                    return StatusCode(ex.StatusCode, new RegistrationError { Error = ex.Error, ErrorDescription = ex.Message });
                 }
 
-                if (string.IsNullOrWhiteSpace(registered.ClientId))
+                if (registered == null || string.IsNullOrWhiteSpace(registered.ClientId))
                     throw new InvalidOperationException(
-                        $"{nameof(OnRegisterAsync)} must assign a client_id to the registered tool configuration.");
+                        $"{nameof(OnRegisterAsync)} must return the registered tool configuration with a client_id.");
 
                 return StatusCode(StatusCodes.Status201Created, registered);
             }
@@ -170,12 +196,26 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
                 {
                     Title = "An unexpected error occurred",
                     Status = StatusCodes.Status500InternalServerError,
-                    Detail = _env.IsDevelopment() ? ex.Message + ex.StackTrace : ex.Message
+                    // Exception details can reveal configuration, so they are shown only in development.
+                    Detail = _env.IsDevelopment() ? ex.Message + ex.StackTrace : null
                 });
             }
             finally
             {
                 _logger.LogDebug($"Exiting {nameof(RegisterAsync)}.");
+            }
+        }
+
+        private async Task<ToolConfiguration> ReadToolConfigurationAsync()
+        {
+            try
+            {
+                return await JsonSerializer.DeserializeAsync<ToolConfiguration>(Request.Body, cancellationToken: HttpContext.RequestAborted)
+                    .ConfigureAwait(false);
+            }
+            catch (JsonException)
+            {
+                return null; // Empty or malformed body.
             }
         }
 
@@ -187,8 +227,6 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
             var token = header.Substring(prefix.Length).Trim();
             return token.Length == 0 ? null : token;
         }
-
-        private static bool IsSuccessStatusCode(int statusCode) => statusCode >= 200 && statusCode < 300;
 
         /// <summary>
         /// Requires an absolute https URL (http is allowed only for loopback hosts, for local development).

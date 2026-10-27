@@ -114,7 +114,10 @@ namespace LtiAdvantage.IdentityModel.Client
 
             if (string.IsNullOrWhiteSpace(issuer) || !Uri.TryCreate(issuer, UriKind.Absolute, out var issuerUri))
                 throw new InvalidOperationException("The platform OpenID configuration has no valid issuer.");
-            if (issuerUri.Scheme != Uri.UriSchemeHttps && !issuerUri.IsLoopback)
+            // https only; plain http is allowed for loopback hosts, for local development.
+            var isAllowedScheme = issuerUri.Scheme == Uri.UriSchemeHttps
+                || (issuerUri.Scheme == Uri.UriSchemeHttp && issuerUri.IsLoopback);
+            if (!isAllowedScheme)
                 throw new InvalidOperationException($"The platform issuer '{issuer}' must use https.");
             if (!string.IsNullOrEmpty(issuerUri.Query) || !string.IsNullOrEmpty(issuerUri.Fragment))
                 throw new InvalidOperationException($"The platform issuer '{issuer}' must not contain a query or fragment.");
@@ -135,6 +138,12 @@ namespace LtiAdvantage.IdentityModel.Client
                     "The registration must be aborted.");
         }
 
+        // Error bodies go into exception messages and from there into logs, so keep them short.
+        private const int MaxErrorBodyLength = 500;
+
+        private static string Truncate(string body) =>
+            body.Length <= MaxErrorBodyLength ? body : body.Substring(0, MaxErrorBodyLength) + "… (truncated)";
+
         private static async Task<T> ReadJsonOrThrowAsync<T>(
             HttpResponseMessage response, string operation, CancellationToken cancellationToken) where T : class
         {
@@ -142,7 +151,7 @@ namespace LtiAdvantage.IdentityModel.Client
             if (!response.IsSuccessStatusCode)
             {
                 throw new HttpRequestException(
-                    $"{operation} failed: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {body}");
+                    $"{operation} failed: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {Truncate(body)}");
             }
 
             if (string.IsNullOrWhiteSpace(body))

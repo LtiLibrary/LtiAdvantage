@@ -29,7 +29,10 @@ namespace LtiAdvantage.IntegrationTests.Controllers
 
             var symmetric = new JsonWebKey { Kty = "oct", Kid = "test-oct", K = Base64UrlEncoder.Encode(new byte[32]) };
 
-            return Task.FromResult<IReadOnlyList<JsonWebKey>>(new[] { jwk, symmetric });
+            // An RSA key without its modulus is useless to verifiers and must be skipped.
+            var incomplete = new JsonWebKey { Kty = "RSA", Kid = "test-incomplete", E = "AQAB" };
+
+            return Task.FromResult<IReadOnlyList<JsonWebKey>>(new[] { jwk, symmetric, incomplete });
         }
     }
 }

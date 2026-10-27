@@ -30,6 +30,7 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// The scope to request to access this service.
         /// It's optional and not provided from every platform.
         /// If not provided, the default scope is "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly".
+        /// <c>null</c> when the platform did not send it.
         /// </summary>
         [JsonPropertyName("scope")]
         public string[] Scope { get; set; }

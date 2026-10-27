@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using AuthenticationHeaderValue = System.Net.Http.Headers.AuthenticationHeaderValue;
 
 namespace LtiAdvantage.AspNetCore.DynamicRegistration
 {
@@ -69,8 +70,8 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
         /// stored in a database), or accept registrations without one, should override this method.
         /// The default authenticates the request with the <see cref="JwtBearerDefaults.AuthenticationScheme"/>
         /// scheme and requires the <see cref="Constants.LtiScopes.DynamicRegistration.Scope"/> policy
-        /// (registered by <c>AddLtiAdvantagePolicies</c>). If that scheme is not registered, every request
-        /// is answered 401 and a warning is logged.
+        /// (registered by <c>AddLtiAdvantagePolicies</c>). If the scheme is not registered, every request
+        /// is answered 401; if the policy is not registered, 403. Both log a warning.
         /// </remarks>
         /// <param name="registrationToken">
         /// The Bearer token from the <c>Authorization</c> header, or <c>null</c> when none was sent.
@@ -90,6 +91,16 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
             var authentication = await HttpContext.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme)
                 .ConfigureAwait(false);
             if (!authentication.Succeeded) return Unauthorized();
+
+            var policies = HttpContext.RequestServices.GetRequiredService<IAuthorizationPolicyProvider>();
+            if (await policies.GetPolicyAsync(Constants.LtiScopes.DynamicRegistration.Scope).ConfigureAwait(false) == null)
+            {
+                _logger.LogWarning(
+                    "Dynamic registration rejected: no '{Policy}' authorization policy is registered. " +
+                    "Call AddLtiAdvantagePolicies or override {Method}.",
+                    Constants.LtiScopes.DynamicRegistration.Scope, nameof(AuthorizeRegistrationAsync));
+                return StatusCode(StatusCodes.Status403Forbidden);
+            }
 
             var authorizationService = HttpContext.RequestServices.GetRequiredService<IAuthorizationService>();
             var authorization = await authorizationService
@@ -122,6 +133,9 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
             RequireValues(errors, "grant_types", tool.GrantTypes, "implicit", "client_credentials");
             RequireValues(errors, "response_types", tool.ResponseTypes, "id_token");
 
+            OptionalWebUrl(errors, "client_uri", tool.ClientUri);
+            OptionalWebUrl(errors, "logo_uri", tool.LogoUri);
+
             var lti = tool.LtiToolConfiguration;
             if (lti == null)
             {
@@ -131,6 +145,13 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
             {
                 if (string.IsNullOrWhiteSpace(lti.Domain)) errors.Add("domain is required.");
                 RequireWebUrl(errors, "target_link_uri", lti.TargetLinkUri);
+
+                foreach (var message in lti.Messages ?? Enumerable.Empty<MessageDescriptor>())
+                {
+                    if (message == null) continue;
+                    OptionalWebUrl(errors, "messages.target_link_uri", message.TargetLinkUri);
+                    OptionalWebUrl(errors, "messages.icon_uri", message.IconUri);
+                }
             }
 
             return errors;
@@ -138,12 +159,12 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
 
         /// <inheritdoc />
         /// <remarks>
-        /// The body is read by the action itself (not model binding), so that authorization runs before
-        /// anything about the body is reported back to the caller.
+        /// The body is read by the action itself (not model binding or a <c>[Consumes]</c> filter), so that
+        /// authorization runs before anything about the body is reported back to the caller. The body is
+        /// parsed as JSON whatever its <c>Content-Type</c>.
         /// </remarks>
         [HttpPost]
         [AllowAnonymous] // Authorization is done by AuthorizeRegistrationAsync, since the token is optional.
-        [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(ToolConfiguration), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(RegistrationError), StatusCodes.Status400BadRequest)]
@@ -158,10 +179,9 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
                 var rejected = await AuthorizeRegistrationAsync(GetBearerToken()).ConfigureAwait(false);
                 if (rejected != null) return rejected;
 
-                var tool = await ReadToolConfigurationAsync().ConfigureAwait(false);
+                var (tool, readError) = await ReadToolConfigurationAsync().ConfigureAwait(false);
                 if (tool == null)
-                    return BadRequest(RegistrationError.InvalidClientMetadata(
-                        "The request body must be a JSON tool configuration."));
+                    return BadRequest(RegistrationError.InvalidClientMetadata(readError));
 
                 var errors = ValidateRegistration(tool);
                 if (errors.Count > 0)
@@ -189,6 +209,12 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
 
                 return StatusCode(StatusCodes.Status201Created, registered);
             }
+            catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+            {
+                // The client disconnected; there is no one to answer and nothing to log as an error.
+                _logger.LogDebug($"{nameof(RegisterAsync)} was cancelled because the client disconnected.");
+                return new EmptyResult();
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An unexpected error occurred in {nameof(RegisterAsync)}.");
@@ -206,46 +232,49 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
             }
         }
 
-        private async Task<ToolConfiguration> ReadToolConfigurationAsync()
+        private async Task<(ToolConfiguration Tool, string Error)> ReadToolConfigurationAsync()
         {
+            const string expected = "The request body must be a JSON tool configuration.";
             try
             {
-                return await JsonSerializer.DeserializeAsync<ToolConfiguration>(Request.Body, cancellationToken: HttpContext.RequestAborted)
+                var tool = await JsonSerializer
+                    .DeserializeAsync<ToolConfiguration>(Request.Body, cancellationToken: HttpContext.RequestAborted)
                     .ConfigureAwait(false);
+                return (tool, tool == null ? expected : null);
             }
-            catch (JsonException)
+            catch (JsonException ex)
             {
-                return null; // Empty or malformed body.
+                // Name the offending field when the JSON is valid but a value has the wrong type.
+                var path = string.IsNullOrEmpty(ex.Path) || ex.Path == "$" ? null : ex.Path;
+                return (null, path == null ? expected : $"{expected} The value at {path} is invalid.");
             }
         }
 
         private string GetBearerToken()
         {
-            var header = Request.Headers[HeaderNames.Authorization].ToString();
-            const string prefix = "Bearer ";
-            if (!header.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) return null;
-            var token = header.Substring(prefix.Length).Trim();
-            return token.Length == 0 ? null : token;
+            var headers = Request.Headers[HeaderNames.Authorization];
+            if (headers.Count != 1) return null; // Missing, or ambiguous with several values.
+
+            return AuthenticationHeaderValue.TryParse(headers[0], out var header)
+                && string.Equals(header.Scheme, "Bearer", StringComparison.OrdinalIgnoreCase)
+                && !string.IsNullOrWhiteSpace(header.Parameter)
+                    ? header.Parameter.Trim()
+                    : null;
         }
 
-        /// <summary>
-        /// Requires an absolute https URL (http is allowed only for loopback hosts, for local development).
-        /// Other schemes, such as <c>javascript:</c> or <c>file:</c>, are rejected. A bare path such as
-        /// <c>/login</c> is rejected too: on Unix, <see cref="Uri.TryCreate(string, UriKind, out Uri)"/>
-        /// would otherwise treat it as an absolute <c>file:</c> URI.
-        /// </summary>
+        /// <summary>Requires a URL accepted by <see cref="RegistrationUrl.IsAllowed(string)"/>.</summary>
         private static void RequireWebUrl(ICollection<string> errors, string name, string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-            {
                 errors.Add($"{name} is required.");
-                return;
-            }
+            else if (!RegistrationUrl.IsAllowed(value))
+                errors.Add($"{name} must be an absolute https URL.");
+        }
 
-            var isWebUrl = Uri.TryCreate(value, UriKind.Absolute, out var uri)
-                && !uri.IsFile && !uri.IsUnc
-                && (uri.Scheme == Uri.UriSchemeHttps || (uri.Scheme == Uri.UriSchemeHttp && uri.IsLoopback));
-            if (!isWebUrl)
+        /// <summary>Like <see cref="RequireWebUrl"/>, but the value may be absent.</summary>
+        private static void OptionalWebUrl(ICollection<string> errors, string name, string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value) && !RegistrationUrl.IsAllowed(value))
                 errors.Add($"{name} must be an absolute https URL.");
         }
 

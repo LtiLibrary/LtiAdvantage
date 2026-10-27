@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using LtiAdvantage.AspNetCore.DynamicRegistration;
 using LtiAdvantage.DynamicRegistration;
@@ -10,16 +11,20 @@ namespace LtiAdvantage.IntegrationTests.Controllers
 {
     public class DynamicRegistrationController : DynamicRegistrationControllerBase
     {
-        /// <summary>An opaque (non-JWT) registration token this test platform accepts.</summary>
-        public const string OpaqueRegistrationToken = "opaque-single-use-token";
+        private readonly TestRegistrationTokenStore _tokens;
 
-        public DynamicRegistrationController(IWebHostEnvironment env, ILogger<DynamicRegistrationControllerBase> logger)
-            : base(env, logger) { }
+        public DynamicRegistrationController(
+            IWebHostEnvironment env, ILogger<DynamicRegistrationControllerBase> logger, TestRegistrationTokenStore tokens)
+            : base(env, logger)
+        {
+            _tokens = tokens;
+        }
 
-        // Shows a platform accepting its own opaque token, and falling back to the default JWT check.
+        // Shows a platform accepting its own opaque, single-use tokens, and falling back to the default
+        // JWT check for anything else.
         protected override Task<ActionResult> AuthorizeRegistrationAsync(string registrationToken)
         {
-            return registrationToken == OpaqueRegistrationToken
+            return _tokens.TryRedeem(registrationToken)
                 ? Task.FromResult<ActionResult>(null)
                 : base.AuthorizeRegistrationAsync(registrationToken);
         }
@@ -44,5 +49,23 @@ namespace LtiAdvantage.IntegrationTests.Controllers
                     return Task.FromResult(request.Tool);
             }
         }
+    }
+
+    /// <summary>
+    /// Opaque, single-use registration tokens issued by the test platform, as a real platform
+    /// would keep them in a database.
+    /// </summary>
+    public class TestRegistrationTokenStore
+    {
+        private readonly ConcurrentDictionary<string, bool> _issued = new ConcurrentDictionary<string, bool>();
+
+        public string Issue()
+        {
+            var token = Guid.NewGuid().ToString("N");
+            _issued[token] = true;
+            return token;
+        }
+
+        public bool TryRedeem(string token) => token != null && _issued.TryRemove(token, out _);
     }
 }

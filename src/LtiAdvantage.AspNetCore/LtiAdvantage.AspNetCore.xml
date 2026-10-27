@@ -426,8 +426,8 @@
             stored in a database), or accept registrations without one, should override this method.
             The default authenticates the request with the <see cref="F:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme"/>
             scheme and requires the <see cref="F:LtiAdvantage.Constants.LtiScopes.DynamicRegistration.Scope"/> policy
-            (registered by <c>AddLtiAdvantagePolicies</c>). If that scheme is not registered, every request
-            is answered 401 and a warning is logged.
+            (registered by <c>AddLtiAdvantagePolicies</c>). If the scheme is not registered, every request
+            is answered 401; if the policy is not registered, 403. Both log a warning.
             </remarks>
             <param name="registrationToken">
             The Bearer token from the <c>Authorization</c> header, or <c>null</c> when none was sent.
@@ -443,17 +443,16 @@
         <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.RegisterAsync">
             <inheritdoc />
             <remarks>
-            The body is read by the action itself (not model binding), so that authorization runs before
-            anything about the body is reported back to the caller.
+            The body is read by the action itself (not model binding or a <c>[Consumes]</c> filter), so that
+            authorization runs before anything about the body is reported back to the caller. The body is
+            parsed as JSON whatever its <c>Content-Type</c>.
             </remarks>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.RequireWebUrl(System.Collections.Generic.ICollection{System.String},System.String,System.String)">
-            <summary>
-            Requires an absolute https URL (http is allowed only for loopback hosts, for local development).
-            Other schemes, such as <c>javascript:</c> or <c>file:</c>, are rejected. A bare path such as
-            <c>/login</c> is rejected too: on Unix, <see cref="M:System.Uri.TryCreate(System.String,System.UriKind,System.Uri@)"/>
-            would otherwise treat it as an absolute <c>file:</c> URI.
-            </summary>
+            <summary>Requires a URL accepted by <see cref="M:LtiAdvantage.DynamicRegistration.RegistrationUrl.IsAllowed(System.String)"/>.</summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.OptionalWebUrl(System.Collections.Generic.ICollection{System.String},System.String,System.String)">
+            <summary>Like <see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.RequireWebUrl(System.Collections.Generic.ICollection{System.String},System.String,System.String)"/>, but the value may be absent.</summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.IDynamicRegistrationController">
             <summary>The platform-side LTI Dynamic Registration endpoint.</summary>

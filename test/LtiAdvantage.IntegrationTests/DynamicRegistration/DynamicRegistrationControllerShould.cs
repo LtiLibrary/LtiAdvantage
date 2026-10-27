@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using LtiAdvantage.DynamicRegistration;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Xunit;
@@ -75,14 +76,68 @@ namespace LtiAdvantage.IntegrationTests.DynamicRegistration
         }
 
         [Fact]
-        public async Task AcceptOpaqueRegistrationToken_WhenOverrideAllowsIt()
+        public async Task AcceptOpaqueRegistrationToken_OnlyOnce()
         {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Bearer", Controllers.DynamicRegistrationController.OpaqueRegistrationToken);
+            var token = _host.Services.GetRequiredService<Controllers.TestRegistrationTokenStore>().Issue();
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var resp = await PostAsync(MinimalTool());
+            var first = await PostAsync(MinimalTool());
+            var second = await PostAsync(MinimalTool());
+
+            Assert.Equal(HttpStatusCode.Created, first.StatusCode);
+            Assert.Equal(HttpStatusCode.Unauthorized, second.StatusCode);
+        }
+
+        [Fact]
+        public async Task ReadBody_WithoutJsonContentType()
+        {
+            AuthorizeWithRegistrationScope();
+            var json = JsonSerializer.Serialize(MinimalTool());
+
+            var resp = await _client.PostAsync(Url, new StringContent(json, Encoding.UTF8, "text/plain"));
 
             Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+        }
+
+        [Fact]
+        public async Task Answer401_WhenUnauthenticated_WhateverTheContentType()
+        {
+            var resp = await _client.PostAsync(Url, new StringContent("hello", Encoding.UTF8, "text/plain"));
+
+            Assert.Equal(HttpStatusCode.Unauthorized, resp.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("logo_uri")]
+        [InlineData("client_uri")]
+        [InlineData("messages.target_link_uri")]
+        [InlineData("messages.icon_uri")]
+        public async Task Reject_OptionalUrls_WithNonHttpsSchemes(string field)
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            var message = new MessageDescriptor { Type = "LtiDeepLinkingRequest" };
+            tool.LtiToolConfiguration.Messages = new[] { message };
+            switch (field)
+            {
+                case "logo_uri": tool.LogoUri = "javascript:alert(1)"; break;
+                case "client_uri": tool.ClientUri = "javascript:alert(1)"; break;
+                case "messages.target_link_uri": message.TargetLinkUri = "file:///etc/passwd"; break;
+                case "messages.icon_uri": message.IconUri = "javascript:alert(1)"; break;
+            }
+
+            await AssertInvalidClientMetadata(await PostAsync(tool), field);
+        }
+
+        [Fact]
+        public async Task NameTheField_WhenAValueHasTheWrongType()
+        {
+            AuthorizeWithRegistrationScope();
+            const string json = """{"client_name":"Example Tool","redirect_uris":"not-an-array"}""";
+
+            var resp = await _client.PostAsync(Url, new StringContent(json, Encoding.UTF8, "application/json"));
+
+            await AssertInvalidClientMetadata(resp, "redirect_uris");
         }
 
         [Fact]

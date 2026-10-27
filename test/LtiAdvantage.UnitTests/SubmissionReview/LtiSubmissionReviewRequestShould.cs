@@ -21,6 +21,21 @@ namespace LtiAdvantage.UnitTests.SubmissionReview
             Assert.Equal("1.3.0", version);
         }
 
+        /// <summary>
+        /// Pins the claim name to the spec text, so a wrong constant can't hide behind a round trip.
+        /// See https://www.imsglobal.org/spec/lti-sr/v1p0/#for-user-claim
+        /// </summary>
+        [Fact]
+        public void UseSpecClaimName_ForForUser()
+        {
+            var request = new LtiSubmissionReviewRequest
+            {
+                ForUser = new ForUserClaimValueType { UserId = "abc-123" }
+            };
+
+            Assert.True(request.ContainsKey("https://purl.imsglobal.org/spec/lti/claim/for_user"));
+        }
+
         [Fact]
         public void RoundTripForUserClaim()
         {

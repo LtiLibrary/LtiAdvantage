@@ -114,10 +114,7 @@ namespace LtiAdvantage.IdentityModel.Client
 
             if (string.IsNullOrWhiteSpace(issuer) || !Uri.TryCreate(issuer, UriKind.Absolute, out var issuerUri))
                 throw new InvalidOperationException("The platform OpenID configuration has no valid issuer.");
-            // https only; plain http is allowed for loopback hosts, for local development.
-            var isAllowedScheme = issuerUri.Scheme == Uri.UriSchemeHttps
-                || (issuerUri.Scheme == Uri.UriSchemeHttp && issuerUri.IsLoopback);
-            if (!isAllowedScheme)
+            if (!RegistrationUrl.IsAllowed(issuerUri))
                 throw new InvalidOperationException($"The platform issuer '{issuer}' must use https.");
             if (!string.IsNullOrEmpty(issuerUri.Query) || !string.IsNullOrEmpty(issuerUri.Fragment))
                 throw new InvalidOperationException($"The platform issuer '{issuer}' must not contain a query or fragment.");

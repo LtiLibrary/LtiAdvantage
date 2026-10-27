@@ -1389,6 +1389,25 @@
         <member name="P:LtiAdvantage.DynamicRegistration.PlatformOpenIdConfiguration.LtiPlatformConfiguration">
             <summary>The LTI extension claim. Constant: <see cref="F:LtiAdvantage.Constants.LtiClaims.LtiPlatformConfiguration"/>.</summary>
         </member>
+        <member name="T:LtiAdvantage.DynamicRegistration.RegistrationUrl">
+            <summary>
+            The URL rule shared by the tool and platform sides of Dynamic Registration:
+            absolute https URLs, with plain http allowed only for loopback hosts (local development).
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.DynamicRegistration.RegistrationUrl.IsAllowed(System.Uri)">
+            <summary>
+            True when <paramref name="uri"/> uses https, or http on a loopback host.
+            Every other scheme (<c>javascript:</c>, <c>file:</c>, <c>ftp:</c>, ...) is rejected.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.DynamicRegistration.RegistrationUrl.IsAllowed(System.String)">
+            <summary>
+            True when <paramref name="value"/> is an absolute URL that <see cref="M:LtiAdvantage.DynamicRegistration.RegistrationUrl.IsAllowed(System.Uri)"/> accepts.
+            A bare path such as <c>/login</c> is rejected, even though on Unix
+            <see cref="M:System.Uri.TryCreate(System.String,System.UriKind,System.Uri@)"/> parses it as an absolute <c>file:</c> URI.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.DynamicRegistration.ToolConfiguration">
             <summary>
             Tool-side registration request body sent to a platform's
@@ -3289,6 +3308,7 @@
             The scope to request to access this service.
             It's optional and not provided from every platform.
             If not provided, the default scope is "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly".
+            <c>null</c> when the platform did not send it.
             </summary>
         </member>
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.NamesRoleServiceClaimValueType.ServiceVersions">
@@ -3327,13 +3347,6 @@
             <summary>
             Submission Review extension on an AGS LineItem.
             See https://www.imsglobal.org/spec/lti-sr/v1p0/#submissionreview-extension
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.SubmissionReview.SubmissionReviewProperty.ReviewableStatus">
-            <summary>
-            The submission statuses for which a review is possible, e.g. <c>"Submitted"</c>,
-            <c>"Completed"</c>, <c>"Graded"</c>, or <c>"Any"</c>. If absent, the platform
-            treats it as reviewable for any status.
             </summary>
         </member>
         <member name="P:LtiAdvantage.SubmissionReview.SubmissionReviewProperty.Label">

@@ -19,6 +19,7 @@ namespace LtiAdvantage.IntegrationTests
             services.AddLtiAdvantagePolicies();
 
             services.AddSingleton<LtiAdvantage.Jwks.IJwksKeyStore, Controllers.TestJwksKeyStore>();
+            services.AddSingleton<Controllers.TestRegistrationTokenStore>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

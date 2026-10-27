@@ -123,7 +123,7 @@
             /// <summary>
             /// The user whose submission is being reviewed (Submission Review 1.0 §3.2).
             /// </summary>
-            public const string ForUser = "https://purl.imsglobal.org/spec/lti-sr/claim/for_user";
+            public const string ForUser = "https://purl.imsglobal.org/spec/lti/claim/for_user";
 
             /// <summary>
             /// Information to help the Tool present itself appropriately.

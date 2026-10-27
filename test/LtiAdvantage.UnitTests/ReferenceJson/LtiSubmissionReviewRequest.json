@@ -13,7 +13,7 @@
   "https://purl.imsglobal.org/spec/lti/claim/roles": [
     "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"
   ],
-  "https://purl.imsglobal.org/spec/lti-sr/claim/for_user": {
+  "https://purl.imsglobal.org/spec/lti/claim/for_user": {
     "user_id": "student-7",
     "name": "Jane Doe",
     "given_name": "Jane",

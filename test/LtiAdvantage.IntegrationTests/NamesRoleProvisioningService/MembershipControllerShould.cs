@@ -2,8 +2,8 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
@@ -12,21 +12,14 @@ namespace LtiAdvantage.IntegrationTests.NamesRoleProvisioningService
     public class MembershipControllerShould : IDisposable
     {
         private readonly HttpClient _client;
-        private readonly TestServer _server;
+        private readonly IHost _host;
 
         private const string MembershipUrl = "context/1234/membership";
 
         public MembershipControllerShould()
         {
-            _server = new TestServer(new WebHostBuilder()
-                .UseContentRoot(AppContext.BaseDirectory)
-                .ConfigureLogging(logging =>
-                {
-                    logging.AddConsole();
-                    logging.AddDebug();
-                })
-                .UseStartup<Startup>());
-            _client = _server.CreateClient();
+            _host = TestHostFactory.Create();
+            _client = _host.GetTestClient();
         }
 
         /// <summary>
@@ -49,7 +42,7 @@ namespace LtiAdvantage.IntegrationTests.NamesRoleProvisioningService
         public void Dispose()
         {
             _client?.Dispose();
-            _server?.Dispose();
+            _host?.Dispose();
         }
     }
 }

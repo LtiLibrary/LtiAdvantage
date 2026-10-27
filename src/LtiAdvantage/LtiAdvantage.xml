@@ -2656,6 +2656,12 @@
             </summary>
             <param name="payload"></param>
         </member>
+        <member name="P:LtiAdvantage.Lti.LtiRequest.IssuedClaims">
+            <summary>
+            The claims in this request, each tagged with the request's issuer
+            (or <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer"/> when there is none).
+            </summary>
+        </member>
         <member name="P:LtiAdvantage.Lti.LtiRequest.Audiences">
             <summary>
             REQUIRED. Audience(s) for whom this ID Token is intended i.e. the Tool.

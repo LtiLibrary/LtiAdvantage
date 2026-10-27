@@ -5,8 +5,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using LtiAdvantage.DynamicRegistration;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
@@ -16,15 +16,12 @@ namespace LtiAdvantage.IntegrationTests.DynamicRegistration
     {
         private const string Url = "lti/register";
         private readonly HttpClient _client;
-        private readonly TestServer _server;
+        private readonly IHost _host;
 
         public DynamicRegistrationControllerShould()
         {
-            _server = new TestServer(new WebHostBuilder()
-                .UseContentRoot(AppContext.BaseDirectory)
-                .ConfigureLogging(l => { l.AddConsole(); l.AddDebug(); })
-                .UseStartup<Startup>());
-            _client = _server.CreateClient();
+            _host = TestHostFactory.Create();
+            _client = _host.GetTestClient();
         }
 
         [Fact]
@@ -75,6 +72,6 @@ namespace LtiAdvantage.IntegrationTests.DynamicRegistration
             }
         };
 
-        public void Dispose() { _client?.Dispose(); _server?.Dispose(); }
+        public void Dispose() { _client?.Dispose(); _host?.Dispose(); }
     }
 }

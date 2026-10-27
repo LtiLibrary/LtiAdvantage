@@ -3,8 +3,8 @@ using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
@@ -13,15 +13,12 @@ namespace LtiAdvantage.IntegrationTests.Jwks
     public class JwksControllerShould : IDisposable
     {
         private readonly HttpClient _client;
-        private readonly TestServer _server;
+        private readonly IHost _host;
 
         public JwksControllerShould()
         {
-            _server = new TestServer(new WebHostBuilder()
-                .UseContentRoot(AppContext.BaseDirectory)
-                .ConfigureLogging(l => { l.AddConsole(); l.AddDebug(); })
-                .UseStartup<Startup>());
-            _client = _server.CreateClient();
+            _host = TestHostFactory.Create();
+            _client = _host.GetTestClient();
         }
 
         [Fact]
@@ -56,6 +53,6 @@ namespace LtiAdvantage.IntegrationTests.Jwks
             Assert.False(first.TryGetProperty("qi", out _), "qi must not be published");
         }
 
-        public void Dispose() { _client?.Dispose(); _server?.Dispose(); }
+        public void Dispose() { _client?.Dispose(); _host?.Dispose(); }
     }
 }

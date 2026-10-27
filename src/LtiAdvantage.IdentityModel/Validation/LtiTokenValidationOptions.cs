@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace LtiAdvantage.IdentityModel.Validation
 {
@@ -63,6 +64,17 @@ namespace LtiAdvantage.IdentityModel.Validation
         /// Whether the "nonce" claim must be present. Defaults to true, as LTI 1.3 requires.
         /// </summary>
         public bool RequireNonce { get; set; } = true;
+
+        /// <summary>
+        /// The deployment ids this tool has registered for this platform and client. Optional.
+        /// </summary>
+        /// <remarks>
+        /// LTI 1.3 requires a tool to check that the token's <c>deployment_id</c> is one it knows
+        /// (one client id can have several deployments). When set, a token with any other
+        /// deployment id is rejected. When null, only the claim's presence is checked, and the
+        /// caller must check the value itself.
+        /// </remarks>
+        public ICollection<string> DeploymentIds { get; set; }
 
         /// <summary>
         /// Whether the LTI "version" claim must be exactly "1.3.0". Defaults to true.

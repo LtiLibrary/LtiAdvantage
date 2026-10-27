@@ -88,6 +88,16 @@ namespace LtiAdvantage.UnitTests.Proctoring
             Assert.DoesNotContain("null", rewritten);
         }
 
+        [Fact]
+        public void NotTurnNumbersOrListsIntoActions()
+        {
+            const string json = """{"assessment_control_url":"https://platform.example.com/acs","actions":["pause,resume","3","99","resume"]}""";
+
+            var claim = JsonSerializer.Deserialize<AssessmentControlClaimValueType>(json);
+
+            Assert.Equal(new[] {AssessmentControlAction.Resume}, claim.Actions);
+        }
+
         /// <summary>Setting a nullable claim to null removes it, instead of writing "null".</summary>
         [Fact]
         public void RemoveTheClaim_WhenSetToNull()

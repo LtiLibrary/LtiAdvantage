@@ -137,8 +137,10 @@ namespace LtiAdvantage.IdentityModel.Validation
             {
                 principal = handler.ValidateToken(idToken, parameters, out validatedToken);
             }
-            catch (Exception ex) when (ex is SecurityTokenException || ex is ArgumentException || ex is FormatException)
+            catch (Exception ex) when (!(ex is OperationCanceledException && cancellationToken.IsCancellationRequested))
             {
+                // Security token failures, and anything else signature checking can throw (for
+                // example a crypto provider rejecting a platform key), are failed validations.
                 return LtiTokenValidationResult.Failure($"The id_token failed validation: {ex.Message}");
             }
 
@@ -218,9 +220,16 @@ namespace LtiAdvantage.IdentityModel.Validation
                 return LtiTokenValidationResult.Failure("The id_token has no message_type claim.");
             }
 
-            if (string.IsNullOrEmpty(jwt.Payload.GetClaimValueOrNull(Constants.LtiClaims.DeploymentId)))
+            var deploymentId = jwt.Payload.GetClaimValueOrNull(Constants.LtiClaims.DeploymentId);
+            if (string.IsNullOrEmpty(deploymentId))
             {
                 return LtiTokenValidationResult.Failure("The id_token has no deployment_id claim.");
+            }
+
+            if (_options.DeploymentIds != null && !_options.DeploymentIds.Contains(deploymentId))
+            {
+                return LtiTokenValidationResult.Failure(
+                    $"The id_token deployment_id '{deploymentId}' is not registered for this tool.");
             }
 
             return null;

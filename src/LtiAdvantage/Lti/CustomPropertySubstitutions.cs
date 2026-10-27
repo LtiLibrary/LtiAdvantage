@@ -98,10 +98,13 @@ namespace LtiAdvantage.Lti
 
             if (source != null)
             {
+                // Collect the variables and build the pattern once per launch, not per property.
+                var variables = CollectVariables();
+                var pattern = BuildPattern(variables);
+
                 foreach (var pair in source)
                 {
-                    // Substitute
-                    dest.Add(pair.Key, SubstituteCustomVariable(pair.Value));
+                    dest.Add(pair.Key, SubstituteAll(pair.Value, variables, pattern));
                 }
             }
 
@@ -130,30 +133,44 @@ namespace LtiAdvantage.Lti
         /// the order the variables were recorded in. Names are regex-escaped, and values are
         /// inserted through a match evaluator, so neither is read as regex syntax.
         /// </remarks>
-        private static string SubstituteAll(string value, IDictionary<string, string> variables)
+        private static string SubstituteAll(string value, IDictionary<string, string> variables, Regex pattern)
         {
-            if (string.IsNullOrEmpty(value) || variables.Count == 0 || value.IndexOf('$') < 0)
+            if (pattern == null || string.IsNullOrEmpty(value) || value.IndexOf('$') < 0)
             {
                 return value;
             }
 
-            var pattern = string.Join("|", variables.Keys
-                .OrderByDescending(name => name.Length)
-                .Select(Regex.Escape));
-
-            return Regex.Replace(value, pattern, match => variables[match.Value], RegexOptions.IgnoreCase);
+            // TryGetValue rather than the indexer: the regex and the dictionary must never disagree
+            // on what matched, and if they ever do, leaving the text alone beats failing the launch.
+            return pattern.Replace(value, match =>
+                variables.TryGetValue(match.Value, out var replacement) ? replacement : match.Value);
         }
 
         /// <summary>
-        /// Replace variable with value. Unknown variables are ignored.
+        /// Builds one alternation of all recorded variable names, longest first, or null if there
+        /// are none. Culture-invariant, so case folding matches the ordinal-ignore-case dictionary
+        /// for ordinary names.
+        /// </summary>
+        private static Regex BuildPattern(IDictionary<string, string> variables)
+        {
+            if (variables.Count == 0) return null;
+
+            var alternation = string.Join("|", variables.Keys
+                .OrderByDescending(name => name.Length)
+                .Select(Regex.Escape));
+
+            return new Regex(alternation, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        }
+
+        /// <summary>
+        /// Collects every variable this launch can substitute, with its value.
         /// </summary>
         /// <remarks>
-        /// Each section records its variables, and <see cref="SubstituteAll"/> then replaces them
-        /// all in one pass. Variables of sections that are not set stay as they are.
+        /// Each section that is set records its variables; <see cref="SubstituteAll"/> then
+        /// replaces them in one pass. Variables of sections that are not set stay as they are.
         /// </remarks>
-        /// <param name="value">Variable to replace.</param>
-        /// <returns>Value if variable is known.</returns>
-        private string SubstituteCustomVariable(string value)
+        /// <returns>Variable names (case-insensitive) and their values.</returns>
+        private Dictionary<string, string> CollectVariables()
         {
             var variables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
@@ -330,7 +347,7 @@ namespace LtiAdvantage.Lti
                 Add(variables, "$ToolPlatformInstance.url", ToolPlatfomInstance.Url);
             }
 
-            return SubstituteAll(value, variables);
+            return variables;
         }
     }
 

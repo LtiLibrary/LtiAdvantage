@@ -41,6 +41,23 @@ namespace LtiAdvantage.UnitTests.Lti
             Assert.Equal("$User.id / user-42", Substitute(substitutions, "$Context.title / $User.id"));
         }
 
+        /// <summary>
+        /// Text that the case-insensitive pattern matches but the variable table does not know
+        /// (here a Kelvin sign in place of 'k') must not fail the launch.
+        /// </summary>
+        [Fact]
+        public void NotThrow_OnLookalikeCharactersInAVariableName()
+        {
+            var substitutions = new CustomPropertySubstitutions
+            {
+                LtiResourceLink = new LtiResourceLink {Id = "rl-1"}
+            };
+
+            var result = Record.Exception(() => Substitute(substitutions, "$ResourceLin\u212A.id"));
+
+            Assert.Null(result);
+        }
+
         [Fact]
         public void SubstituteResourceLinkIdHistory_NotTheResourceLinkIdPrefix()
         {

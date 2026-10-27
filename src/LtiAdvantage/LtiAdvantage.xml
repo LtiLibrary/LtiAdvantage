@@ -2011,7 +2011,7 @@
             Records a variable's value, unless the variable was already recorded.
             </summary>
         </member>
-        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.SubstituteAll(System.String,System.Collections.Generic.IDictionary{System.String,System.String})">
+        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.SubstituteAll(System.String,System.Collections.Generic.IDictionary{System.String,System.String},System.Text.RegularExpressions.Regex)">
             <summary>
             Replaces every known variable in <paramref name="value"/> in a single pass.
             </summary>
@@ -2024,16 +2024,22 @@
             inserted through a match evaluator, so neither is read as regex syntax.
             </remarks>
         </member>
-        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.SubstituteCustomVariable(System.String)">
+        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.BuildPattern(System.Collections.Generic.IDictionary{System.String,System.String})">
             <summary>
-            Replace variable with value. Unknown variables are ignored.
+            Builds one alternation of all recorded variable names, longest first, or null if there
+            are none. Culture-invariant, so case folding matches the ordinal-ignore-case dictionary
+            for ordinary names.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.CollectVariables">
+            <summary>
+            Collects every variable this launch can substitute, with its value.
             </summary>
             <remarks>
-            Each section records its variables, and <see cref="M:LtiAdvantage.Lti.CustomPropertySubstitutions.SubstituteAll(System.String,System.Collections.Generic.IDictionary{System.String,System.String})"/> then replaces them
-            all in one pass. Variables of sections that are not set stay as they are.
+            Each section that is set records its variables; <see cref="M:LtiAdvantage.Lti.CustomPropertySubstitutions.SubstituteAll(System.String,System.Collections.Generic.IDictionary{System.String,System.String},System.Text.RegularExpressions.Regex)"/> then
+            replaces them in one pass. Variables of sections that are not set stay as they are.
             </remarks>
-            <param name="value">Variable to replace.</param>
-            <returns>Value if variable is known.</returns>
+            <returns>Variable names (case-insensitive) and their values.</returns>
         </member>
         <member name="T:LtiAdvantage.Lti.CourseGroup">
             <summary>
@@ -4153,6 +4159,22 @@
             <summary>
             The user's opaque identifier, matching the "sub" claim of the launch. Required.
             </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.EnumNames">
+            <summary>
+            Strict parsing of enum names from the wire.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Proctoring.EnumNames.TryParse``1(System.String,``0@)">
+            <summary>
+            Parses <paramref name="value"/> only if it is exactly one defined member name (any case).
+            </summary>
+            <remarks>
+            <see cref="M:System.Enum.TryParse``1(System.String,System.Boolean,``0@)"/> alone is not safe for values
+            that come from another system: it also accepts numbers ("3") and comma-separated lists
+            ("pause,resume", which it ORs together), so a string that names no action could still
+            come out as a real one such as Terminate, or as a value the enum does not define.
+            </remarks>
         </member>
         <member name="T:LtiAdvantage.Proctoring.LowercaseEnumConverter`1">
             <summary>

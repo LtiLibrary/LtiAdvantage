@@ -65,7 +65,7 @@ namespace LtiAdvantage.Utilities
             if (0 == values.Length)
                 return default(T);
 
-            return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(values));
+            return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(values), ReadSettings);
         }
 
         public static void SetClaimValue<T>(this JwtPayload payload, string type, T value)

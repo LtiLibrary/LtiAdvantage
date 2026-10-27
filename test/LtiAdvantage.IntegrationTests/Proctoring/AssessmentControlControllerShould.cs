@@ -82,12 +82,22 @@ namespace LtiAdvantage.IntegrationTests.Proctoring
             Assert.Equal("application/vnd.ims.lti-ap.v1.control+json", response.Content.Headers.ContentType.MediaType);
         }
 
-        [Fact]
-        public async Task Reject_AnUnrecognisedAction()
+        /// <summary>
+        /// Only an exact action name counts. Enum.TryParse alone would read "pause,resume" as
+        /// Pause|Resume = Terminate, and numbers as whatever value they name.
+        /// </summary>
+        [Theory]
+        [InlineData("extend")]
+        [InlineData("pause,resume")]
+        [InlineData("3")]
+        [InlineData("99")]
+        [InlineData(" pause")]
+        public async Task Reject_AnUnrecognisedAction(string action)
         {
             _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Ap.ControlAll);
-            var json = JsonSerializer.Serialize(FlagRequest()).Replace("\"action\":\"flag\"", "\"action\":\"extend\"");
-            Assert.Contains("\"extend\"", json);
+            var json = JsonSerializer.Serialize(FlagRequest())
+                .Replace("\"action\":\"flag\"", "\"action\":" + JsonSerializer.Serialize(action));
+            Assert.Contains(JsonSerializer.Serialize(action), json);
 
             var response = await _client.PostAsync(Url, new StringContent(json, Encoding.UTF8, "application/json"));
 

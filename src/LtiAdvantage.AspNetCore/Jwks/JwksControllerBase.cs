@@ -71,6 +71,11 @@ namespace LtiAdvantage.AspNetCore.Jwks
                 }
                 return set;
             }
+            catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+            {
+                // The caller went away; let the framework abort the response.
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An unexpected error occurred in {nameof(GetJwksAsync)}.");

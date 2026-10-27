@@ -37,7 +37,7 @@ namespace LtiAdvantage.Proctoring
         public AssessmentControlAction[] Actions
         {
             get => ActionNames?
-                .Select(name => Enum.TryParse<AssessmentControlAction>(name, true, out var action) ? action : AssessmentControlAction.Unknown)
+                .Select(name => EnumNames.TryParse<AssessmentControlAction>(name, out var action) ? action : AssessmentControlAction.Unknown)
                 .Where(action => action != AssessmentControlAction.Unknown)
                 .ToArray();
             set => ActionNames = value?

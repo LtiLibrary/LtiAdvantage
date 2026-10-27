@@ -172,11 +172,7 @@ namespace LtiAdvantage.IdentityModel.Validation
                     $"Could not fetch JWKS from {jwksUri}: {(int)response.StatusCode} {response.ReasonPhrase}.");
             }
 
-#if NET5_0_OR_GREATER
             var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-#else
-            var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-#endif
             return JsonWebKeySet.Create(body).GetSigningKeys().ToArray();
         }
 

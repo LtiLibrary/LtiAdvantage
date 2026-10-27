@@ -437,6 +437,24 @@ namespace LtiAdvantage.UnitTests.Validation
                 throw new InvalidOperationException("nonce store unavailable");
         }
 
+        /// <summary>
+        /// One client id can have several deployments; when the tool lists the ones it registered,
+        /// any other deployment id is rejected.
+        /// </summary>
+        [Fact]
+        public async Task RejectAnUnregisteredDeploymentId_WhenDeploymentsAreConfigured()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, options => options.DeploymentIds = new[] {"dep-1"});
+
+            var registered = await validator.ValidateAsync(platform.CreateIdToken(deploymentId: "dep-1"));
+            var unregistered = await validator.ValidateAsync(platform.CreateIdToken(deploymentId: "dep-2"));
+
+            Assert.True(registered.IsValid, registered.Error);
+            Assert.False(unregistered.IsValid);
+            Assert.Contains("deployment_id", unregistered.Error);
+        }
+
         [Fact]
         public void RequireTheRegistrationDetails()
         {

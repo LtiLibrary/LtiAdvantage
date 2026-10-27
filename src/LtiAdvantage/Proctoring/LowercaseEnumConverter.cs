@@ -25,9 +25,8 @@ namespace LtiAdvantage.Proctoring
 
             var value = reader.GetString();
 
-            return !string.IsNullOrEmpty(value) && Enum.TryParse<TEnum>(value, true, out var parsed)
-                ? parsed
-                : default;
+            // Only an exact, defined member name; numbers and comma lists read as unknown.
+            return EnumNames.TryParse<TEnum>(value, out var parsed) ? parsed : default;
         }
 
         public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options)

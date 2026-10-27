@@ -4,8 +4,8 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using LtiAdvantage.DynamicRegistration;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
@@ -14,15 +14,12 @@ namespace LtiAdvantage.IntegrationTests.OpenIdConnect
     public class OpenIdConfigurationControllerShould : IDisposable
     {
         private readonly HttpClient _client;
-        private readonly TestServer _server;
+        private readonly IHost _host;
 
         public OpenIdConfigurationControllerShould()
         {
-            _server = new TestServer(new WebHostBuilder()
-                .UseContentRoot(AppContext.BaseDirectory)
-                .ConfigureLogging(l => { l.AddConsole(); l.AddDebug(); })
-                .UseStartup<Startup>());
-            _client = _server.CreateClient();
+            _host = TestHostFactory.Create();
+            _client = _host.GetTestClient();
         }
 
         /// <summary>
@@ -84,7 +81,7 @@ namespace LtiAdvantage.IntegrationTests.OpenIdConnect
         public void Dispose()
         {
             _client?.Dispose();
-            _server?.Dispose();
+            _host?.Dispose();
         }
     }
 }

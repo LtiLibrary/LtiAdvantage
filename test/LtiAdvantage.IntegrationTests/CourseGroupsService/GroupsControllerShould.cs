@@ -4,8 +4,8 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using LtiAdvantage.CourseGroupsService;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
@@ -14,21 +14,14 @@ namespace LtiAdvantage.IntegrationTests.CourseGroupsService
     public class GroupsControllerShould : IDisposable
     {
         private readonly HttpClient _client;
-        private readonly TestServer _server;
+        private readonly IHost _host;
 
         private const string GroupsUrl = "context/1234/groups";
 
         public GroupsControllerShould()
         {
-            _server = new TestServer(new WebHostBuilder()
-                .UseContentRoot(AppContext.BaseDirectory)
-                .ConfigureLogging(logging =>
-                {
-                    logging.AddConsole();
-                    logging.AddDebug();
-                })
-                .UseStartup<Startup>());
-            _client = _server.CreateClient();
+            _host = TestHostFactory.Create();
+            _client = _host.GetTestClient();
         }
 
         /// <summary>
@@ -72,7 +65,7 @@ namespace LtiAdvantage.IntegrationTests.CourseGroupsService
         public void Dispose()
         {
             _client?.Dispose();
-            _server?.Dispose();
+            _host?.Dispose();
         }
     }
 }

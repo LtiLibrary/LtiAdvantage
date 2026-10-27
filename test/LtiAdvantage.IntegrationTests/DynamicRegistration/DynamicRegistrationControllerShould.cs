@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -67,17 +68,127 @@ namespace LtiAdvantage.IntegrationTests.DynamicRegistration
         }
 
         [Fact]
-        public async Task PassThroughErrorResult_FromOverride()
+        public async Task Reject_WhenUnauthenticated()
         {
-            _client.DefaultRequestHeaders.Add("x-test-scope",
-                Constants.LtiScopes.DynamicRegistration.Scope);
+            var resp = await PostAsync(MinimalTool());
+            Assert.Equal(HttpStatusCode.Unauthorized, resp.StatusCode);
+        }
+
+        [Fact]
+        public async Task AcceptOpaqueRegistrationToken_WhenOverrideAllowsIt()
+        {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer", Controllers.DynamicRegistrationController.OpaqueRegistrationToken);
+
+            var resp = await PostAsync(MinimalTool());
+
+            Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+        }
+
+        [Fact]
+        public async Task SendErrorWithoutStatus_As400()
+        {
+            AuthorizeWithRegistrationScope();
             var tool = MinimalTool();
             tool.ClientName = "reject";
 
             var resp = await PostAsync(tool);
 
-            Assert.NotEqual(HttpStatusCode.Created, resp.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
             Assert.Contains("invalid_redirect_uri", await resp.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Answer201_WhenOverrideReturnsOk()
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            tool.ClientName = "ok";
+
+            var resp = await PostAsync(tool);
+
+            Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+        }
+
+        [Fact]
+        public async Task Fail_WhenOverrideReturnsOkWithoutClientId()
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            tool.ClientName = "ok-without-client-id";
+
+            var resp = await PostAsync(tool);
+
+            Assert.Equal(HttpStatusCode.InternalServerError, resp.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("/login")]
+        [InlineData("javascript:alert(1)")]
+        [InlineData("file:///etc/passwd")]
+        [InlineData("ftp://tool.example.com/login")]
+        [InlineData("http://tool.example.com/login")]
+        public async Task Reject_NonHttpsUrls(string initiateLoginUri)
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            tool.InitiateLoginUri = initiateLoginUri;
+
+            var resp = await PostAsync(tool);
+
+            await AssertInvalidClientMetadata(resp, "initiate_login_uri");
+        }
+
+        [Fact]
+        public async Task Reject_WrongTokenEndpointAuthMethod()
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            tool.TokenEndpointAuthMethod = "client_secret_basic";
+
+            await AssertInvalidClientMetadata(await PostAsync(tool), "token_endpoint_auth_method");
+        }
+
+        [Fact]
+        public async Task Reject_MissingGrantAndResponseTypes()
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            tool.GrantTypes = new[] { "authorization_code" };
+            tool.ResponseTypes = new[] { "code" };
+
+            var resp = await PostAsync(tool);
+
+            var description = await AssertInvalidClientMetadata(resp, "grant_types");
+            Assert.Contains("client_credentials", description);
+            Assert.Contains("response_types", description);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("not json")]
+        [InlineData("null")]
+        public async Task Reject_MalformedBody_WithRegistrationError(string body)
+        {
+            AuthorizeWithRegistrationScope();
+
+            var resp = await _client.PostAsync(Url, new StringContent(body, Encoding.UTF8, "application/json"));
+
+            await AssertInvalidClientMetadata(resp, null);
+        }
+
+        private void AuthorizeWithRegistrationScope() =>
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.DynamicRegistration.Scope);
+
+        private static async Task<string> AssertInvalidClientMetadata(HttpResponseMessage resp, string expectedInDescription)
+        {
+            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+            using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            Assert.Equal("invalid_client_metadata", doc.RootElement.GetProperty("error").GetString());
+            var description = doc.RootElement.GetProperty("error_description").GetString();
+            Assert.False(string.IsNullOrWhiteSpace(description));
+            if (expectedInDescription != null) Assert.Contains(expectedInDescription, description);
+            return description;
         }
 
         private Task<HttpResponseMessage> PostAsync(ToolConfiguration tool)

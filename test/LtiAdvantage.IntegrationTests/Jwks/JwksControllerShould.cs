@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -51,6 +52,13 @@ namespace LtiAdvantage.IntegrationTests.Jwks
             Assert.False(first.TryGetProperty("dp", out _), "dp must not be published");
             Assert.False(first.TryGetProperty("dq", out _), "dq must not be published");
             Assert.False(first.TryGetProperty("qi", out _), "qi must not be published");
+
+            // Private key operations are published as their public counterparts.
+            var keyOps = first.GetProperty("key_ops").EnumerateArray().Select(o => o.GetString()).ToArray();
+            Assert.Equal(new[] { "verify" }, keyOps);
+
+            // The document may be cached briefly.
+            Assert.Equal("public, max-age=300", response.Headers.CacheControl?.ToString());
 
             // Symmetric keys MUST NOT be published.
             Assert.Equal(1, keys.GetArrayLength());

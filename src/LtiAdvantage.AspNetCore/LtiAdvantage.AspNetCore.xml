@@ -398,20 +398,51 @@
             on <c>request.Tool</c> (or return a new instance) before returning.
             </summary>
             <remarks>
-            Called only after <see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.ValidateRegistration(LtiAdvantage.DynamicRegistration.ToolConfiguration)"/> found no errors. Return the registered
-            <see cref="T:LtiAdvantage.DynamicRegistration.ToolConfiguration"/> (as a value or <see cref="T:Microsoft.AspNetCore.Mvc.ObjectResult"/>) to answer 201 Created;
-            return any other result, such as <c>BadRequest(...)</c>, to reject the registration.
+            Called only after <see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.AuthorizeRegistrationAsync(System.String)"/> allowed the request and
+            <see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.ValidateRegistration(LtiAdvantage.DynamicRegistration.ToolConfiguration)"/> found no errors.
+            <list type="bullet">
+            <item>To accept, return the registered <see cref="T:LtiAdvantage.DynamicRegistration.ToolConfiguration"/>, as a value or inside a
+            2xx (or status-less) <see cref="T:Microsoft.AspNetCore.Mvc.ObjectResult"/> such as <c>Ok(tool)</c>. The response is always
+            201 Created, and a missing <c>client_id</c> is a server error.</item>
+            <item>To reject, return an error result such as <c>BadRequest(new RegistrationError { ... })</c>.
+            It is passed through; an <see cref="T:Microsoft.AspNetCore.Mvc.ObjectResult"/> without a status code is sent as 400.</item>
+            </list>
             </remarks>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.AuthorizeRegistrationAsync(System.String)">
+            <summary>
+            Decides whether a registration request may proceed. Return <c>null</c> to allow it,
+            or a result (such as <c>Unauthorized()</c> or <c>Forbid()</c>) to reject it.
+            </summary>
+            <remarks>
+            The spec leaves the <c>registration_token</c> optional and opaque (DR §3.3), so platforms that
+            issue their own tokens (for example single-use tokens stored in a database), or accept
+            registrations without one, should override this method.
+            The default authenticates the request with the <see cref="F:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme"/>
+            scheme and requires the <see cref="F:LtiAdvantage.Constants.LtiScopes.DynamicRegistration.Scope"/> policy
+            (registered by <c>AddLtiAdvantagePolicies</c>).
+            </remarks>
+            <param name="registrationToken">
+            The Bearer token from the <c>Authorization</c> header, or <c>null</c> when none was sent.
+            </param>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.ValidateRegistration(LtiAdvantage.DynamicRegistration.ToolConfiguration)">
             <summary>
-            Checks the registration request for the metadata required by LTI Dynamic Registration 1.0 §2.2.
-            Returns one message per problem; an empty list means the request is valid.
+            Checks the registration request for the metadata required by LTI Dynamic Registration 1.0
+            (§2.2 and §3.1). Returns one message per problem; an empty list means the request is valid.
             Override to add platform-specific rules (call the base method to keep the standard checks).
             </summary>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.RegisterAsync(LtiAdvantage.DynamicRegistration.ToolConfiguration)">
             <inheritdoc />
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.RequireWebUrl(System.Collections.Generic.ICollection{System.String},System.String,System.String)">
+            <summary>
+            Requires an absolute https URL (http is allowed only for loopback hosts, for local development).
+            Other schemes, such as <c>javascript:</c> or <c>file:</c>, are rejected. A bare path such as
+            <c>/login</c> is rejected too: on Unix, <see cref="M:System.Uri.TryCreate(System.String,System.UriKind,System.Uri@)"/>
+            would otherwise treat it as an absolute <c>file:</c> URI.
+            </summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.IDynamicRegistrationController">
             <summary>The platform-side LTI Dynamic Registration endpoint.</summary>
@@ -441,6 +472,16 @@
         <member name="P:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationError.ErrorDescription">
             <summary>Human-readable description of the problem.</summary>
         </member>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationError.InvalidClientMetadata(System.String)">
+            <summary>Creates an <c>invalid_client_metadata</c> error with the given description.</summary>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationModelStateFilterAttribute">
+            <summary>
+            Turns a missing or malformed registration request body into the RFC 7591 error body
+            required by LTI Dynamic Registration 1.0 §3.6.2, instead of the default
+            <see cref="T:Microsoft.AspNetCore.Mvc.ValidationProblemDetails"/> that <see cref="T:Microsoft.AspNetCore.Mvc.ApiControllerAttribute"/> returns.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.Jwks.IJwksController">
             <summary>JWKS publication endpoint.</summary>
         </member>
@@ -469,6 +510,14 @@
             <summary>
             Returns the JSON Web Key Set containing the public keys used to verify
             signed JWTs issued by this server.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase.CacheDuration">
+            <summary>
+            How long clients and proxies may cache the JWKS document. Default 5 minutes.
+            Keep it well below the overlap during which a retired key stays published (see
+            <see cref="T:LtiAdvantage.Jwks.IJwksKeyStore"/>), so verifiers pick up a new signing key in time.
+            Return <see cref="F:System.TimeSpan.Zero"/> to disable caching.
             </summary>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase.ToPublicKey(Microsoft.IdentityModel.Tokens.JsonWebKey)">

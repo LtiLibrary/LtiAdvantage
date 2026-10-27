@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using LtiAdvantage.Jwks;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 
 namespace LtiAdvantage.AspNetCore.Jwks
 {
@@ -50,6 +52,10 @@ namespace LtiAdvantage.AspNetCore.Jwks
             try
             {
                 var keys = await _keyStore.GetPublicKeysAsync().ConfigureAwait(false);
+
+                var maxAge = (long)CacheDuration.TotalSeconds;
+                Response.Headers[HeaderNames.CacheControl] = maxAge > 0 ? $"public, max-age={maxAge}" : "no-store";
+
                 var set = new JsonWebKeySet();
                 foreach (var key in keys ?? Enumerable.Empty<JsonWebKey>())
                 {
@@ -69,6 +75,32 @@ namespace LtiAdvantage.AspNetCore.Jwks
             }
         }
 
+        private static string ToPublicKeyOperation(string operation)
+        {
+            switch (operation)
+            {
+                case "sign":
+                case "verify":
+                    return "verify";
+                case "decrypt":
+                case "encrypt":
+                    return "encrypt";
+                case "unwrapKey":
+                case "wrapKey":
+                    return "wrapKey";
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// How long clients and proxies may cache the JWKS document. Default 5 minutes.
+        /// Keep it well below the overlap during which a retired key stays published (see
+        /// <see cref="IJwksKeyStore"/>), so verifiers pick up a new signing key in time.
+        /// Return <see cref="TimeSpan.Zero"/> to disable caching.
+        /// </summary>
+        protected virtual TimeSpan CacheDuration => TimeSpan.FromMinutes(5);
+
         /// <summary>
         /// Returns a copy of <paramref name="key"/> with only its public parameters,
         /// or <c>null</c> when the key is not an RSA or EC key (for example a symmetric key).
@@ -87,7 +119,10 @@ namespace LtiAdvantage.AspNetCore.Jwks
                 X5tS256 = key.X5tS256,
                 X5u = key.X5u
             };
-            foreach (var op in key.KeyOps) publicKey.KeyOps.Add(op);
+            // key_ops describe what the published (public) key may do, so private operations are
+            // mapped to their public counterparts (sign -> verify, ...) and the rest are dropped.
+            foreach (var op in key.KeyOps.Select(ToPublicKeyOperation).Where(o => o != null).Distinct())
+                publicKey.KeyOps.Add(op);
             foreach (var cert in key.X5c) publicKey.X5c.Add(cert);
 
             switch (key.Kty)

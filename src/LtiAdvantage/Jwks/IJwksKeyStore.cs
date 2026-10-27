@@ -22,6 +22,10 @@ namespace LtiAdvantage.Jwks
         /// - Each key MUST have a stable, unique <c>Kid</c>.
         /// - Set <c>Use = "sig"</c> and <c>Alg = "RS256"</c> for LTI 1.3 signing keys.
         /// - Do NOT include private key material — only the public components (<c>N</c>, <c>E</c>).
+        ///   (<c>JwksControllerBase</c> strips private parameters anyway, as a safety net.)
+        ///
+        /// This is called on every JWKS request that is not served from an HTTP cache. If loading the
+        /// keys is expensive (database, KMS), cache them in the implementation.
         /// </summary>
         Task<IReadOnlyList<JsonWebKey>> GetPublicKeysAsync();
     }

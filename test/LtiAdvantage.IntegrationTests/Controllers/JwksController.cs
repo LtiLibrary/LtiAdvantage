@@ -25,6 +25,7 @@ namespace LtiAdvantage.IntegrationTests.Controllers
                 new RsaSecurityKey(rsa.ExportParameters(includePrivateParameters: true)) { KeyId = "test-kid-1" });
             jwk.Use = "sig";
             jwk.Alg = "RS256";
+            jwk.KeyOps.Add("sign");
 
             var symmetric = new JsonWebKey { Kty = "oct", Kid = "test-oct", K = Base64UrlEncoder.Encode(new byte[32]) };
 

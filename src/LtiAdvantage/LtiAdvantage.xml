@@ -1454,6 +1454,10 @@
              - Each key MUST have a stable, unique <c>Kid</c>.
              - Set <c>Use = "sig"</c> and <c>Alg = "RS256"</c> for LTI 1.3 signing keys.
              - Do NOT include private key material — only the public components (<c>N</c>, <c>E</c>).
+               (<c>JwksControllerBase</c> strips private parameters anyway, as a safety net.)
+            
+             This is called on every JWKS request that is not served from an HTTP cache. If loading the
+             keys is expensive (database, KMS), cache them in the implementation.
              </summary>
         </member>
         <member name="T:LtiAdvantage.Lti.ContextClaimValueType">
@@ -2842,19 +2846,39 @@
             </summary>
             <param name="payload"></param>
         </member>
-        <member name="P:LtiAdvantage.Lti.LtiResourceLinkRequest.AssignmentGradeServices">
+        <member name="T:LtiAdvantage.Lti.LtiServiceLaunchRequest">
+            <inheritdoc />
+            <summary>
+            Base for platform-to-tool launches that happen in the context of a resource link and can
+            advertise the platform's services to the tool: <see cref="T:LtiAdvantage.Lti.LtiResourceLinkRequest"/> and
+            <see cref="T:LtiAdvantage.Lti.LtiSubmissionReviewRequest"/>.
+            </summary>
+            <remarks>
+            The service claims live here rather than on <see cref="T:LtiAdvantage.Lti.LtiRequest"/> on purpose: they are the
+            platform telling the tool what it may call, so messages that do not travel platform to tool,
+            such as the deep linking response, must not inherit them.
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiServiceLaunchRequest.#ctor">
+            <summary>Create an empty instance.</summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiServiceLaunchRequest.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <summary>Create an instance with the claims.</summary>
+            <param name="claims">A list of claims.</param>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.AssignmentGradeServices">
             <summary>
             The Assignment and Grade Services claim.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.Lti.LtiResourceLinkRequest.NamesRoleService">
+        <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.NamesRoleService">
             <summary>
             The Names and Roles Provisioning Service claim.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.Lti.LtiResourceLinkRequest.ResourceLink">
+        <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.ResourceLink">
             <summary>
-            The required https://purl.imsglobal.org/spec/lti/claim/resource_link claim composes
+            The https://purl.imsglobal.org/spec/lti/claim/resource_link claim composes
             properties for the resource link from which the launch message occurs.
             <example>
             {
@@ -2891,15 +2915,6 @@
             claims in payload.
             </summary>
             <param name="payload"></param>
-        </member>
-        <member name="P:LtiAdvantage.Lti.LtiSubmissionReviewRequest.AssignmentGradeServices">
-            <summary>The Assignment and Grade Services claim (the lineitem under review).</summary>
-        </member>
-        <member name="P:LtiAdvantage.Lti.LtiSubmissionReviewRequest.NamesRoleService">
-            <summary>The Names and Roles Provisioning Service claim.</summary>
-        </member>
-        <member name="P:LtiAdvantage.Lti.LtiSubmissionReviewRequest.ResourceLink">
-            <summary>The resource_link claim (same shape as in LtiResourceLinkRequest).</summary>
         </member>
         <member name="P:LtiAdvantage.Lti.LtiSubmissionReviewRequest.ForUser">
             <summary>The for_user claim (the user whose submission is being reviewed).</summary>

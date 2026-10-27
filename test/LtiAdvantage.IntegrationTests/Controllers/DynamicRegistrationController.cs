@@ -15,6 +15,11 @@ namespace LtiAdvantage.IntegrationTests.Controllers
 
         protected override Task<ActionResult<ToolConfiguration>> OnRegisterAsync(RegisterToolRequest request)
         {
+            // Lets tests check that an error result from the override is not turned into 201 Created.
+            if (request.Tool.ClientName == "reject")
+                return Task.FromResult<ActionResult<ToolConfiguration>>(
+                    new ObjectResult(new { error = "invalid_redirect_uri" }));
+
             request.Tool.ClientId = Guid.NewGuid().ToString();
             return Task.FromResult<ActionResult<ToolConfiguration>>(
                 new ObjectResult(request.Tool) { StatusCode = 201 });

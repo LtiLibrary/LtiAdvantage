@@ -397,6 +397,18 @@
             Persist the registration. Implementations MUST set <see cref="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.ClientId"/>
             on <c>request.Tool</c> (or return a new instance) before returning.
             </summary>
+            <remarks>
+            Called only after <see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.ValidateRegistration(LtiAdvantage.DynamicRegistration.ToolConfiguration)"/> found no errors. Return the registered
+            <see cref="T:LtiAdvantage.DynamicRegistration.ToolConfiguration"/> (as a value or <see cref="T:Microsoft.AspNetCore.Mvc.ObjectResult"/>) to answer 201 Created;
+            return any other result, such as <c>BadRequest(...)</c>, to reject the registration.
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.ValidateRegistration(LtiAdvantage.DynamicRegistration.ToolConfiguration)">
+            <summary>
+            Checks the registration request for the metadata required by LTI Dynamic Registration 1.0 §2.2.
+            Returns one message per problem; an empty list means the request is valid.
+            Override to add platform-specific rules (call the base method to keep the standard checks).
+            </summary>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.RegisterAsync(LtiAdvantage.DynamicRegistration.ToolConfiguration)">
             <inheritdoc />
@@ -417,6 +429,18 @@
         <member name="P:LtiAdvantage.AspNetCore.DynamicRegistration.RegisterToolRequest.Tool">
             <summary>The submitted tool configuration. The override should populate <see cref="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.ClientId"/>.</summary>
         </member>
+        <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationError">
+            <summary>
+            Error body returned when a registration request is rejected
+            (RFC 7591 §3.2.2 format, used by LTI Dynamic Registration 1.0 §3.6.2).
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationError.Error">
+            <summary>Error code, e.g. <c>invalid_client_metadata</c> or <c>invalid_redirect_uri</c>.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationError.ErrorDescription">
+            <summary>Human-readable description of the problem.</summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.Jwks.IJwksController">
             <summary>JWKS publication endpoint.</summary>
         </member>
@@ -428,6 +452,11 @@
             Publishes the platform's (or tool's) JWKS at a well-known URL so that
             peers can verify signed JWTs. Anonymous; unauthenticated.
             </summary>
+            <remarks>
+            Only public key parameters are published. Whatever the <see cref="T:LtiAdvantage.Jwks.IJwksKeyStore"/> returns,
+            private parameters (<c>d</c>, <c>p</c>, <c>q</c>, <c>dp</c>, <c>dq</c>, <c>qi</c>) are never
+            copied, and symmetric (<c>oct</c>) keys are skipped.
+            </remarks>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase.#ctor(LtiAdvantage.Jwks.IJwksKeyStore,Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.Jwks.JwksControllerBase})">
             <summary>
@@ -440,6 +469,12 @@
             <summary>
             Returns the JSON Web Key Set containing the public keys used to verify
             signed JWTs issued by this server.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase.ToPublicKey(Microsoft.IdentityModel.Tokens.JsonWebKey)">
+            <summary>
+            Returns a copy of <paramref name="key"/> with only its public parameters,
+            or <c>null</c> when the key is not an RSA or EC key (for example a symmetric key).
             </summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.Lti.ServiceResponse">

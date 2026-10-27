@@ -65,5 +65,35 @@ namespace LtiAdvantage.UnitTests.AssignmentGradeServices
             Assert.Equal("https://tool.example.com/review", roundTripped.SubmissionReviewExtension.Url);
             Assert.Equal("1", roundTripped.SubmissionReviewExtension.Custom["a"]);
         }
+
+        /// <summary>
+        /// The spec's submissionReview example, including reviewableStatus and label, must survive a round trip.
+        /// See https://www.imsglobal.org/spec/lti-sr/v1p0/#submissionreview-extension
+        /// </summary>
+        [Fact]
+        public void RoundTripSubmissionReview_ReviewableStatusAndLabel()
+        {
+            const string json = """
+                {
+                  "scoreMaximum": 60,
+                  "label": "Chapter 5 Test",
+                  "submissionReview": {
+                    "reviewableStatus": ["Submitted"],
+                    "label": "Open My Tool Viewer",
+                    "url": "https://platform.example.com/act/849023/sub",
+                    "custom": { "action": "review", "a_id": "23942" }
+                  }
+                }
+                """;
+
+            var lineItem = JsonSerializer.Deserialize<LineItem>(json);
+            var roundTripped = JsonSerializer.Deserialize<LineItem>(JsonSerializer.Serialize(lineItem));
+
+            var review = roundTripped.SubmissionReviewExtension;
+            Assert.Equal(new[] { "Submitted" }, review.ReviewableStatus);
+            Assert.Equal("Open My Tool Viewer", review.Label);
+            Assert.Equal("https://platform.example.com/act/849023/sub", review.Url);
+            Assert.Equal("review", review.Custom["action"]);
+        }
     }
 }

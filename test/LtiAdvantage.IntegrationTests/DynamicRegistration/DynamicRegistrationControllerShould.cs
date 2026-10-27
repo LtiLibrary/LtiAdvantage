@@ -49,6 +49,37 @@ namespace LtiAdvantage.IntegrationTests.DynamicRegistration
             Assert.Equal("Example Tool", registered.ClientName);
         }
 
+        [Fact]
+        public async Task Reject_InvalidClientMetadata_With400()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope",
+                Constants.LtiScopes.DynamicRegistration.Scope);
+
+            var resp = await PostAsync(new ToolConfiguration { ClientName = "Example Tool" });
+
+            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+            using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            Assert.Equal("invalid_client_metadata", doc.RootElement.GetProperty("error").GetString());
+            var description = doc.RootElement.GetProperty("error_description").GetString();
+            Assert.Contains("initiate_login_uri", description);
+            Assert.Contains("redirect_uris", description);
+            Assert.Contains("jwks_uri", description);
+        }
+
+        [Fact]
+        public async Task PassThroughErrorResult_FromOverride()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope",
+                Constants.LtiScopes.DynamicRegistration.Scope);
+            var tool = MinimalTool();
+            tool.ClientName = "reject";
+
+            var resp = await PostAsync(tool);
+
+            Assert.NotEqual(HttpStatusCode.Created, resp.StatusCode);
+            Assert.Contains("invalid_redirect_uri", await resp.Content.ReadAsStringAsync());
+        }
+
         private Task<HttpResponseMessage> PostAsync(ToolConfiguration tool)
         {
             var json = JsonSerializer.Serialize(tool);

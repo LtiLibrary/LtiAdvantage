@@ -51,6 +51,9 @@ namespace LtiAdvantage.IntegrationTests.Jwks
             Assert.False(first.TryGetProperty("dp", out _), "dp must not be published");
             Assert.False(first.TryGetProperty("dq", out _), "dq must not be published");
             Assert.False(first.TryGetProperty("qi", out _), "qi must not be published");
+
+            // Symmetric keys MUST NOT be published.
+            Assert.Equal(1, keys.GetArrayLength());
         }
 
         public void Dispose() { _client?.Dispose(); _host?.Dispose(); }

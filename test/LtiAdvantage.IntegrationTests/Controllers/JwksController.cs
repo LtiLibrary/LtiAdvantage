@@ -16,20 +16,19 @@ namespace LtiAdvantage.IntegrationTests.Controllers
 
     public class TestJwksKeyStore : IJwksKeyStore
     {
+        // Deliberately returns a key WITH private parameters and a symmetric key, to prove the
+        // controller publishes only public RSA/EC parameters whatever the store hands it.
         public Task<IReadOnlyList<JsonWebKey>> GetPublicKeysAsync()
         {
             using var rsa = RSA.Create(2048);
-            var rsaParams = rsa.ExportParameters(includePrivateParameters: false);
-            var jwk = new JsonWebKey
-            {
-                Kty = "RSA",
-                Use = "sig",
-                Alg = "RS256",
-                Kid = "test-kid-1",
-                N = Base64UrlEncoder.Encode(rsaParams.Modulus),
-                E = Base64UrlEncoder.Encode(rsaParams.Exponent),
-            };
-            return Task.FromResult<IReadOnlyList<JsonWebKey>>(new[] { jwk });
+            var jwk = JsonWebKeyConverter.ConvertFromRSASecurityKey(
+                new RsaSecurityKey(rsa.ExportParameters(includePrivateParameters: true)) { KeyId = "test-kid-1" });
+            jwk.Use = "sig";
+            jwk.Alg = "RS256";
+
+            var symmetric = new JsonWebKey { Kty = "oct", Kid = "test-oct", K = Base64UrlEncoder.Encode(new byte[32]) };
+
+            return Task.FromResult<IReadOnlyList<JsonWebKey>>(new[] { jwk, symmetric });
         }
     }
 }

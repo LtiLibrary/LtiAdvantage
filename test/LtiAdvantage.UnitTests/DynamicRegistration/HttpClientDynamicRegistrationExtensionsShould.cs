@@ -239,6 +239,66 @@ namespace LtiAdvantage.UnitTests.DynamicRegistration
             Assert.False(sent, "the registration token must not be sent");
         }
 
+        [Theory]
+        [InlineData("http://169.254.169.254/latest/meta-data/")]
+        [InlineData("file:///etc/passwd")]
+        [InlineData("/relative/path")]
+        public async Task CheckConfigurationUrl_BeforeFetchingIt(string url)
+        {
+            var sent = false;
+            using var client = new HttpClient(new StubHandler((req, ct) =>
+            {
+                sent = true;
+                return JsonResponse(HttpStatusCode.OK, "{}");
+            }));
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => client.GetPlatformOpenIdConfigurationAsync(url));
+
+            Assert.False(sent, "no request may be made to an unchecked URL");
+        }
+
+        [Fact]
+        public async Task RejectOversizedResponse_WithContentLength()
+        {
+            var huge = new string(' ', HttpClientDynamicRegistrationExtensions.MaxResponseBytes + 1);
+            using var client = new HttpClient(new StubHandler((req, ct) => JsonResponse(HttpStatusCode.OK, huge)));
+
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                client.GetPlatformOpenIdConfigurationAsync("https://platform.example.com/.well-known/openid-configuration"));
+
+            Assert.Contains("larger than", ex.Message);
+        }
+
+        [Fact]
+        public async Task RejectOversizedResponse_WithoutContentLength()
+        {
+            using var client = new HttpClient(new StubHandler((req, ct) => new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new UnknownLengthContent(HttpClientDynamicRegistrationExtensions.MaxResponseBytes + 1)
+            }));
+
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                client.GetPlatformOpenIdConfigurationAsync("https://platform.example.com/.well-known/openid-configuration"));
+
+            Assert.Contains("larger than", ex.Message);
+        }
+
+        /// <summary>Content that does not announce its length, like a chunked response.</summary>
+        private sealed class UnknownLengthContent : HttpContent
+        {
+            private readonly int _length;
+            public UnknownLengthContent(int length) => _length = length;
+
+            protected override Task SerializeToStreamAsync(System.IO.Stream stream, System.Net.TransportContext context) =>
+                stream.WriteAsync(new byte[_length], 0, _length);
+
+            protected override bool TryComputeLength(out long length)
+            {
+                length = 0;
+                return false;
+            }
+        }
+
         private static HttpResponseMessage JsonResponse(HttpStatusCode status, string body) =>
             new HttpResponseMessage(status) { Content = new StringContent(body, Encoding.UTF8, "application/json") };
 

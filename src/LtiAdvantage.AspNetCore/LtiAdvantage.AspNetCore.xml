@@ -434,10 +434,16 @@
             The Bearer token from the <c>Authorization</c> header, or <c>null</c> when none was sent.
             </param>
         </member>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.BearerUnauthorized(System.String)">
+            <summary>
+            A 401 with the <c>WWW-Authenticate: Bearer</c> challenge required by RFC 6750 §3. When a token
+            was sent it adds <c>error="invalid_token"</c>; when none was sent it adds no error code (§3.1).
+            </summary>
+        </member>
         <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.ValidateRegistration(LtiAdvantage.DynamicRegistration.ToolConfiguration)">
             <summary>
             Checks the registration request for the metadata required by LTI Dynamic Registration 1.0
-            (§2.2 and §3.1). Returns one message per problem; an empty list means the request is valid.
+            (§2.2 and §3.1). Returns one message per problem; an empty list (or <c>null</c>) means the request is valid.
             Override to add platform-specific rules (call the base method to keep the standard checks).
             </summary>
         </member>
@@ -454,6 +460,9 @@
         </member>
         <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.OptionalWebUrl(System.Collections.Generic.ICollection{System.String},System.String,System.String)">
             <summary>Like <see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.RequireWebUrl(System.Collections.Generic.ICollection{System.String},System.String,System.String)"/>, but the value may be absent.</summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.IsBareHost(System.String)">
+            <summary>True for <c>tool.example.com</c> or <c>tool.example.com:8443</c>; false for URLs or paths.</summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.IDynamicRegistrationController">
             <summary>The platform-side LTI Dynamic Registration endpoint.</summary>

@@ -196,6 +196,76 @@ namespace LtiAdvantage.IntegrationTests.DynamicRegistration
             await AssertInvalidClientMetadata(await PostAsync(tool), "messages.type");
         }
 
+        [Fact]
+        public async Task SendBearerChallenge_WhenNoTokenGiven()
+        {
+            var resp = await PostAsync(MinimalTool());
+
+            Assert.Equal(HttpStatusCode.Unauthorized, resp.StatusCode);
+            Assert.Equal("Bearer", resp.Headers.WwwAuthenticate.ToString());
+        }
+
+        [Fact]
+        public async Task SendInvalidTokenChallenge_WhenTokenIsRejected()
+        {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "unknown-token");
+
+            var resp = await PostAsync(MinimalTool());
+
+            Assert.Equal(HttpStatusCode.Unauthorized, resp.StatusCode);
+            Assert.Equal("Bearer error=\"invalid_token\"", resp.Headers.WwwAuthenticate.ToString());
+        }
+
+        [Fact]
+        public async Task TreatNullFromValidationOverride_AsNoErrors()
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            tool.ClientName = "validation-returns-null";
+
+            var resp = await PostAsync(tool);
+
+            Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("https://tool.example.com")]
+        [InlineData("tool.example.com/path")]
+        [InlineData("user@tool.example.com")]
+        public async Task Reject_DomainThatIsNotABareHost(string domain)
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            tool.LtiToolConfiguration.Domain = domain;
+
+            await AssertInvalidClientMetadata(await PostAsync(tool), "domain");
+        }
+
+        [Fact]
+        public async Task Accept_DomainWithPort()
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            tool.LtiToolConfiguration.Domain = "tool.example.com:8443";
+            tool.LtiToolConfiguration.SecondaryDomains = new[] { "cdn.tool.example.com" };
+
+            Assert.Equal(HttpStatusCode.Created, (await PostAsync(tool)).StatusCode);
+        }
+
+        [Fact]
+        public async Task LeaveUnsetFieldsOut_OfTheRegistrationResponse()
+        {
+            AuthorizeWithRegistrationScope();
+
+            var resp = await PostAsync(MinimalTool());
+
+            Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+            using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            Assert.True(doc.RootElement.TryGetProperty("client_id", out _));
+            Assert.False(doc.RootElement.TryGetProperty("logo_uri", out _), "unset logo_uri must not be written as null");
+            Assert.False(doc.RootElement.TryGetProperty("client_uri", out _), "unset client_uri must not be written as null");
+        }
+
         [Theory]
         [InlineData("return-null")]
         [InlineData("no-client-id")]

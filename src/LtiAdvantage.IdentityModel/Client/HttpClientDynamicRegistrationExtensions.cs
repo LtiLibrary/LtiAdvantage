@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -30,6 +31,15 @@ namespace LtiAdvantage.IdentityModel.Client
         /// Per LTI Dynamic Registration 1.0 §3.4 and §3.5.1, the configuration URL must be the platform's
         /// <c>issuer</c> with a path appended, and must not contain a fragment. If it does not match, the
         /// registration must be aborted; this method throws <see cref="InvalidOperationException"/>.
+        /// <para>
+        /// The URL arrives through a browser redirect, so anyone can send one. It is checked before it is
+        /// fetched (absolute https, http only for loopback, no fragment), but that cannot stop https URLs
+        /// that point at internal hosts. In production, pass an <see cref="HttpClient"/> whose handler
+        /// refuses private and link-local addresses (for example with
+        /// <c>SocketsHttpHandler.ConnectCallback</c>), and only start registrations from an authenticated
+        /// administrator session.
+        /// </para>
+        /// <para>Responses larger than 1 MB are rejected without being read in full.</para>
         /// </remarks>
         /// <param name="client">The HTTP client.</param>
         /// <param name="openIdConfigurationUrl">The URL passed by the platform in the registration init launch.</param>
@@ -45,7 +55,16 @@ namespace LtiAdvantage.IdentityModel.Client
 
             const string operation = "Fetching the platform OpenID configuration";
 
-            using var response = await client.GetAsync(openIdConfigurationUrl, cancellationToken).ConfigureAwait(false);
+            // Check the URL before making any request with it.
+            if (!RegistrationUrl.IsAllowed(openIdConfigurationUrl))
+                throw new InvalidOperationException(
+                    $"The OpenID configuration URL '{openIdConfigurationUrl}' must be an absolute https URL.");
+            if (openIdConfigurationUrl.Contains('#'))
+                throw new InvalidOperationException("The OpenID configuration URL must not contain a fragment.");
+
+            using var response = await client
+                .GetAsync(openIdConfigurationUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+                .ConfigureAwait(false);
             var config = await ReadJsonOrThrowAsync<PlatformOpenIdConfiguration>(response, operation, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -107,7 +126,9 @@ namespace LtiAdvantage.IdentityModel.Client
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", registrationAccessToken);
             }
 
-            using var response = await client.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            using var response = await client
+                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+                .ConfigureAwait(false);
             var registered = await ReadJsonOrThrowAsync<ToolConfiguration>(response, operation, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -159,10 +180,36 @@ namespace LtiAdvantage.IdentityModel.Client
         private static string Truncate(string body) =>
             body.Length <= MaxErrorBodyLength ? body : body.Substring(0, MaxErrorBodyLength) + "… (truncated)";
 
+        /// <summary>
+        /// Largest platform response accepted, in bytes (1 MB). Registration documents are a few KB;
+        /// anything far larger is refused without being read in full.
+        /// </summary>
+        public const int MaxResponseBytes = 1024 * 1024;
+
+        private static async Task<string> ReadBodyAsync(
+            HttpResponseMessage response, string operation, CancellationToken cancellationToken)
+        {
+            if (response.Content.Headers.ContentLength > MaxResponseBytes)
+                throw new InvalidOperationException($"{operation} failed: the platform response is larger than {MaxResponseBytes} bytes.");
+
+            using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            using var buffer = new MemoryStream();
+            var chunk = new byte[16 * 1024];
+            int read;
+            while ((read = await stream.ReadAsync(chunk, 0, chunk.Length, cancellationToken).ConfigureAwait(false)) > 0)
+            {
+                if (buffer.Length + read > MaxResponseBytes)
+                    throw new InvalidOperationException($"{operation} failed: the platform response is larger than {MaxResponseBytes} bytes.");
+                buffer.Write(chunk, 0, read);
+            }
+
+            return Encoding.UTF8.GetString(buffer.GetBuffer(), 0, (int)buffer.Length);
+        }
+
         private static async Task<T> ReadJsonOrThrowAsync<T>(
             HttpResponseMessage response, string operation, CancellationToken cancellationToken) where T : class
         {
-            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            var body = await ReadBodyAsync(response, operation, cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
                 throw new HttpRequestException(

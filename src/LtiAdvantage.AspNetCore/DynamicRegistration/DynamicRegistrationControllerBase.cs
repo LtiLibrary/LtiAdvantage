@@ -35,6 +35,11 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public abstract class DynamicRegistrationControllerBase : ControllerBase, IDynamicRegistrationController
     {
+        private static readonly JsonSerializerOptions ResponseJsonOptions = new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        };
+
         private readonly IWebHostEnvironment _env;
         private readonly ILogger<DynamicRegistrationControllerBase> _logger;
 
@@ -86,15 +91,12 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
                     "Dynamic registration rejected: no '{Scheme}' authentication scheme is registered. " +
                     "Register one or override {Method}.",
                     JwtBearerDefaults.AuthenticationScheme, nameof(AuthorizeRegistrationAsync));
-                return Unauthorized();
+                return BearerUnauthorized(registrationToken);
             }
 
-            var authentication = await HttpContext.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme)
-                .ConfigureAwait(false);
-            if (!authentication.Succeeded) return Unauthorized();
-
             var policies = HttpContext.RequestServices.GetRequiredService<IAuthorizationPolicyProvider>();
-            if (await policies.GetPolicyAsync(Constants.LtiScopes.DynamicRegistration.Scope).ConfigureAwait(false) == null)
+            var policy = await policies.GetPolicyAsync(Constants.LtiScopes.DynamicRegistration.Scope).ConfigureAwait(false);
+            if (policy == null)
             {
                 _logger.LogWarning(
                     "Dynamic registration rejected: no '{Policy}' authorization policy is registered. " +
@@ -103,16 +105,31 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
                 return StatusCode(StatusCodes.Status403Forbidden);
             }
 
+            var authentication = await HttpContext.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme)
+                .ConfigureAwait(false);
+            if (!authentication.Succeeded) return BearerUnauthorized(registrationToken);
+
             var authorizationService = HttpContext.RequestServices.GetRequiredService<IAuthorizationService>();
-            var authorization = await authorizationService
-                .AuthorizeAsync(authentication.Principal, Constants.LtiScopes.DynamicRegistration.Scope)
+            var authorization = await authorizationService.AuthorizeAsync(authentication.Principal, policy)
                 .ConfigureAwait(false);
             return authorization.Succeeded ? null : StatusCode(StatusCodes.Status403Forbidden);
         }
 
         /// <summary>
+        /// A 401 with the <c>WWW-Authenticate: Bearer</c> challenge required by RFC 6750 §3. When a token
+        /// was sent it adds <c>error="invalid_token"</c>; when none was sent it adds no error code (§3.1).
+        /// </summary>
+        protected ActionResult BearerUnauthorized(string registrationToken)
+        {
+            Response.Headers[HeaderNames.WWWAuthenticate] = registrationToken == null
+                ? "Bearer"
+                : "Bearer error=\"invalid_token\"";
+            return Unauthorized();
+        }
+
+        /// <summary>
         /// Checks the registration request for the metadata required by LTI Dynamic Registration 1.0
-        /// (§2.2 and §3.1). Returns one message per problem; an empty list means the request is valid.
+        /// (§2.2 and §3.1). Returns one message per problem; an empty list (or <c>null</c>) means the request is valid.
         /// Override to add platform-specific rules (call the base method to keep the standard checks).
         /// </summary>
         protected virtual IList<string> ValidateRegistration(ToolConfiguration tool)
@@ -145,6 +162,10 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
             else
             {
                 if (string.IsNullOrWhiteSpace(lti.Domain)) errors.Add("domain is required.");
+                else if (!IsBareHost(lti.Domain)) errors.Add("domain must be a host name (optionally with a port), without scheme or path.");
+                foreach (var secondary in lti.SecondaryDomains ?? Enumerable.Empty<string>())
+                    if (!IsBareHost(secondary))
+                        errors.Add("secondary_domains must be host names (optionally with a port), without scheme or path.");
                 RequireWebUrl(errors, "target_link_uri", lti.TargetLinkUri);
 
                 foreach (var message in lti.Messages ?? Enumerable.Empty<MessageDescriptor>())
@@ -186,7 +207,7 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
                     return BadRequest(RegistrationError.InvalidClientMetadata(readError));
 
                 var errors = ValidateRegistration(tool);
-                if (errors.Count > 0)
+                if (errors != null && errors.Count > 0)
                 {
                     // §3.6.2: reject with 400 and a JSON error body (RFC 7591 error format).
                     return BadRequest(RegistrationError.InvalidClientMetadata(string.Join(" ", errors)));
@@ -201,7 +222,8 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
                     throw new InvalidOperationException(
                         $"{nameof(OnRegisterAsync)} must return the registered tool configuration with a client_id.");
 
-                return StatusCode(StatusCodes.Status201Created, registered);
+                // Leave unset fields out instead of writing explicit nulls, which strict tools reject.
+                return new JsonResult(registered, ResponseJsonOptions) { StatusCode = StatusCodes.Status201Created };
             }
             catch (RegistrationRejectedException ex)
             {
@@ -275,6 +297,15 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
         {
             if (!string.IsNullOrWhiteSpace(value) && !RegistrationUrl.IsAllowed(value))
                 errors.Add($"{name} must be an absolute https URL.");
+        }
+
+        /// <summary>True for <c>tool.example.com</c> or <c>tool.example.com:8443</c>; false for URLs or paths.</summary>
+        private static bool IsBareHost(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value) || value.IndexOfAny(new[] { '/', '?', '#', '@', ' ' }) >= 0) return false;
+            return Uri.TryCreate("https://" + value, UriKind.Absolute, out var uri)
+                && string.Equals(uri.Authority, value, StringComparison.OrdinalIgnoreCase)
+                && Uri.CheckHostName(uri.Host) != UriHostNameType.Unknown;
         }
 
         private static void RequireValues(ICollection<string> errors, string name, IList<string> actual, params string[] required)

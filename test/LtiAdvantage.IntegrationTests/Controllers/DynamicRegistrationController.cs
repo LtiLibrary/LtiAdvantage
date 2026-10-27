@@ -34,6 +34,8 @@ namespace LtiAdvantage.IntegrationTests.Controllers
         {
             if (tool.ClientName == "reject-in-validation")
                 throw new RegistrationRejectedException("invalid_redirect_uri", "Domain not allowed.");
+            if (tool.ClientName == "validation-returns-null")
+                return null;
             return base.ValidateRegistration(tool);
         }
 

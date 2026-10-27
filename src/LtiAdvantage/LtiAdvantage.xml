@@ -1831,6 +1831,9 @@
             Copies the public half of a key, leaving every private component behind.
             </summary>
         </member>
+        <member name="M:LtiAdvantage.Jwks.InMemoryJwksKeyStore.DefaultEcAlgorithm(System.String)">
+            <summary>The JWS algorithm that goes with an EC curve (RFC 7518 §3.4); null if unknown.</summary>
+        </member>
         <member name="T:LtiAdvantage.Lti.ContextClaimValueType">
             <summary>
             Properties of the context from which the launch originated (for example, course id and title).
@@ -4110,6 +4113,13 @@
         <member name="P:LtiAdvantage.Proctoring.AssessmentControlUser.Sub">
             <summary>
             The user's opaque identifier, matching the "sub" claim of the launch. Required.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.LowercaseEnumConverter`1">
+            <summary>
+            Reads an enum from a case-insensitive string and writes it in lowercase. Null, empty and
+            unrecognized values read as <c>default(TEnum)</c>, which must be the enum's "unknown"
+            member (value 0); that member is written as JSON null.
             </summary>
         </member>
         <member name="T:LtiAdvantage.Proctoring.ProctoringSettingsClaimValueType">

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
@@ -62,8 +63,10 @@ namespace LtiAdvantage.IdentityModel.Validation
         /// <param name="cancellationToken">Optional cancellation token.</param>
         /// <returns>
         /// The outcome. Failures are reported on the result rather than thrown, because an
-        /// invalid launch is an expected condition rather than a fault; exceptions still escape
-        /// if the JWKS cannot be fetched at all.
+        /// invalid launch is an expected condition rather than a fault. That includes the case
+        /// where the platform's JWKS cannot be fetched: the token's key id is chosen by whoever
+        /// sent it, so a fetch failure must not surface as an exception. Only cancellation of
+        /// <paramref name="cancellationToken"/> is thrown.
         /// </returns>
         public async Task<LtiTokenValidationResult> ValidateAsync(string idToken,
             CancellationToken cancellationToken = default)
@@ -96,9 +99,19 @@ namespace LtiAdvantage.IdentityModel.Validation
                 return LtiTokenValidationResult.Failure($"The id_token header could not be read: {ex.Message}");
             }
 
-            var keys = await _jwksCache
-                .GetSigningKeysAsync(_options.JwksUri, keyId, cancellationToken)
-                .ConfigureAwait(false);
+            IReadOnlyCollection<SecurityKey> keys;
+            try
+            {
+                keys = await _jwksCache
+                    .GetSigningKeysAsync(_options.JwksUri, keyId, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex) when (!(ex is OperationCanceledException && cancellationToken.IsCancellationRequested))
+            {
+                // Fetch failures, timeouts and malformed JWKS documents.
+                return LtiTokenValidationResult.Failure(
+                    $"The platform's signing keys could not be fetched: {ex.Message}");
+            }
 
             var parameters = new TokenValidationParameters
             {
@@ -152,23 +165,33 @@ namespace LtiAdvantage.IdentityModel.Validation
 
         private LtiTokenValidationResult ValidateLtiClaims(JwtSecurityToken jwt)
         {
-            // When the platform addresses more than one audience, OpenID Connect requires azp to
-            // say which one the token was issued for. Without this check a token minted for a
+            // OpenID Connect Core §3.1.3.7: with more than one audience, azp is required; and
+            // whenever azp is present, it must be this client. Without this a token minted for a
             // different tool in the same aud list would be accepted.
-            if (jwt.Payload.Aud.Count > 1)
+            var authorizedParty = jwt.Payload.Azp;
+            if (jwt.Payload.Aud.Count > 1 && string.IsNullOrEmpty(authorizedParty))
             {
-                var authorizedParty = jwt.Payload.Azp;
-                if (string.IsNullOrEmpty(authorizedParty))
-                {
-                    return LtiTokenValidationResult.Failure(
-                        "The id_token has multiple audiences but no azp claim.");
-                }
+                return LtiTokenValidationResult.Failure(
+                    "The id_token has multiple audiences but no azp claim.");
+            }
 
-                if (!string.Equals(authorizedParty, _options.ClientId, StringComparison.Ordinal))
-                {
-                    return LtiTokenValidationResult.Failure(
-                        "The id_token azp claim is not this tool's client id.");
-                }
+            if (!string.IsNullOrEmpty(authorizedParty)
+                && !string.Equals(authorizedParty, _options.ClientId, StringComparison.Ordinal))
+            {
+                return LtiTokenValidationResult.Failure(
+                    "The id_token azp claim is not this tool's client id.");
+            }
+
+            // iat is required (OIDC Core §2, which LTI 1.3 builds on) and must not be in the future.
+            // TokenValidationParameters only checks nbf and exp, so this is done here.
+            if (!jwt.Payload.ContainsKey(JwtRegisteredClaimNames.Iat))
+            {
+                return LtiTokenValidationResult.Failure("The id_token has no iat claim.");
+            }
+
+            if (jwt.Payload.IssuedAt > DateTime.UtcNow + _options.ClockSkew)
+            {
+                return LtiTokenValidationResult.Failure("The id_token iat claim is in the future.");
             }
 
             if (_options.RequireLtiVersion)

@@ -13,6 +13,13 @@ namespace LtiAdvantage.Utilities
     /// </summary>
     internal static class JwtExtensions
     {
+        // Platforms are not consistent about quoting numbers (the Proctoring spec's own examples
+        // send attempt_number both as 1 and as "1"), so claim values accept both when read.
+        private static readonly JsonSerializerOptions ReadSettings = new JsonSerializerOptions
+        {
+            NumberHandling = JsonNumberHandling.AllowReadingFromString
+        };
+
         private static readonly JsonSerializerOptions Settings = new JsonSerializerOptions
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -43,7 +50,7 @@ namespace LtiAdvantage.Utilities
 
             if (payload.TryGetValue(type, out var value))
             {
-                return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value));
+                return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value), ReadSettings);
             }
 
             return default(T);
@@ -66,6 +73,13 @@ namespace LtiAdvantage.Utilities
             if (payload.ContainsKey(type))
             {
                 payload.Remove(type);
+            }
+
+            // Setting a claim to null removes it; an absent claim and a "null" one are not the same
+            // to a strict receiver.
+            if (value == null)
+            {
+                return;
             }
 
             if (typeof(T) == typeof(string))

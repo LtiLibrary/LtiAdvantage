@@ -29,7 +29,8 @@ namespace LtiAdvantage.IdentityModel.Validation
         public string JwksUri { get; set; }
 
         /// <summary>
-        /// Tolerance applied to the "exp" and "iat" claims. Defaults to 5 minutes, matching the
+        /// Tolerance applied to the "exp", "nbf" and "iat" claims ("iat" may not be later than now
+        /// plus this). Defaults to 5 minutes, matching the
         /// default in <c>Microsoft.IdentityModel</c>.
         /// </summary>
         public TimeSpan ClockSkew { get; set; } = TimeSpan.FromMinutes(5);

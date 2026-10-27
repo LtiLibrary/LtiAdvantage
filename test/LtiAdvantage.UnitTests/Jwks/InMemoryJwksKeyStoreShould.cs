@@ -99,6 +99,39 @@ namespace LtiAdvantage.UnitTests.Jwks
         }
 
         /// <summary>
+        /// A symmetric key has no public half; published, it would carry no key material at all.
+        /// </summary>
+        [Fact]
+        public void RejectKeysWithoutAPublicHalf()
+        {
+            var symmetric = new JsonWebKey { Kty = "oct", Kid = "hmac", K = Base64UrlEncoder.Encode(new byte[32]) };
+            Assert.Throws<ArgumentException>(() => new InMemoryJwksKeyStore(symmetric));
+
+            var noModulus = new JsonWebKey { Kty = "RSA", Kid = "rsa", E = "AQAB" };
+            Assert.Throws<ArgumentException>(() => new InMemoryJwksKeyStore(noModulus));
+        }
+
+        /// <summary>An EC key without alg gets the algorithm for its curve, not RS256.</summary>
+        [Theory]
+        [InlineData("P-256", "ES256")]
+        [InlineData("P-384", "ES384")]
+        public async Task DefaultTheAlgorithm_FromTheCurve(string curveName, string expectedAlg)
+        {
+            var curve = curveName == "P-256" ? ECCurve.NamedCurves.nistP256 : ECCurve.NamedCurves.nistP384;
+            using var ec = ECDsa.Create(curve);
+            var q = ec.ExportParameters(includePrivateParameters: false).Q;
+            var key = new JsonWebKey
+            {
+                Kty = "EC", Kid = "ec-1", Crv = curveName,
+                X = Base64UrlEncoder.Encode(q.X), Y = Base64UrlEncoder.Encode(q.Y)
+            };
+
+            var published = (await new InMemoryJwksKeyStore(key).GetPublicKeysAsync()).Single();
+
+            Assert.Equal(expectedAlg, published.Alg);
+        }
+
+        /// <summary>
         /// Rotation means serving the retiring key alongside the current one until every token
         /// signed with it has expired.
         /// </summary>

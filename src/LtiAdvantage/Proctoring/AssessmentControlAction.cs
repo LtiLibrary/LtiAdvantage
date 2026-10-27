@@ -7,7 +7,7 @@ namespace LtiAdvantage.Proctoring
     /// Assessment Control Service.
     /// See https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-actions.
     /// </summary>
-    [JsonConverter(typeof(AssessmentControlActionConverter))]
+    [JsonConverter(typeof(LowercaseEnumConverter<AssessmentControlAction>))]
     public enum AssessmentControlAction
     {
         /// <summary>

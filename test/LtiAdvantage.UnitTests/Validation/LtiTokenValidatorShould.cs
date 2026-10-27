@@ -270,6 +270,118 @@ namespace LtiAdvantage.UnitTests.Validation
             Assert.Equal(1, platform.FetchCount);
         }
 
+        /// <summary>
+        /// A JWKS outage must not take every launch down with it: keys fetched earlier are still
+        /// served, and failed refreshes are rate limited like successful ones.
+        /// </summary>
+        [Fact]
+        public async Task KeepServingCachedKeys_WhileTheJwksEndpointIsDown()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, options =>
+            {
+                options.JwksCacheDuration = TimeSpan.Zero; // every call wants a refresh
+                options.MinimumRefreshInterval = TimeSpan.FromMinutes(5);
+            });
+
+            Assert.True((await validator.ValidateAsync(platform.CreateIdToken())).IsValid);
+            platform.JwksDown = true;
+
+            for (var i = 0; i < 5; i++)
+            {
+                var result = await validator.ValidateAsync(platform.CreateIdToken());
+                Assert.True(result.IsValid, result.Error);
+            }
+
+            // Only the first fetch: the cache entry is within the minimum interval.
+            Assert.Equal(1, platform.FetchCount);
+        }
+
+        [Fact]
+        public async Task KeepServingCachedKeys_WhenARefreshFails()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, options =>
+            {
+                options.JwksCacheDuration = TimeSpan.Zero;
+                options.MinimumRefreshInterval = TimeSpan.Zero;
+            });
+
+            Assert.True((await validator.ValidateAsync(platform.CreateIdToken())).IsValid);
+            platform.JwksDown = true;
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken());
+
+            Assert.True(result.IsValid, result.Error);
+            Assert.Equal(2, platform.FetchCount);
+        }
+
+        /// <summary>
+        /// The key id comes from whoever sent the token, so a JWKS fetch failure it triggers must
+        /// come back as a failed validation, not an exception (which would be a 500 at the launch
+        /// endpoint), and must not be retried on every token.
+        /// </summary>
+        [Fact]
+        public async Task ReportAFailure_NotAnException_WhenTheJwksCannotBeFetched()
+        {
+            var platform = new FakePlatform("key-1") { JwksDown = true };
+            var validator = CreateValidator(platform, options =>
+                options.MinimumRefreshInterval = TimeSpan.FromMinutes(5));
+
+            for (var i = 0; i < 5; i++)
+            {
+                var result = await validator.ValidateAsync(platform.CreateIdToken());
+                Assert.False(result.IsValid);
+                Assert.Contains("signing keys could not be fetched", result.Error);
+            }
+
+            Assert.Equal(1, platform.FetchCount);
+        }
+
+        /// <summary>
+        /// OpenID Connect Core 3.1.3.7: whenever azp is present it must be this client, even with
+        /// a single audience.
+        /// </summary>
+        [Fact]
+        public async Task RejectAWrongAzp_EvenWithASingleAudience()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken(azp: "other-tool"));
+
+            Assert.False(result.IsValid);
+            Assert.Contains("azp", result.Error);
+        }
+
+        [Fact]
+        public async Task RejectATokenWithoutIat()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken(includeIssuedAt: false));
+
+            Assert.False(result.IsValid);
+            Assert.Contains("iat", result.Error);
+        }
+
+        [Fact]
+        public async Task RejectAnIatInTheFuture_BeyondTheClockSkew()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, options => options.ClockSkew = TimeSpan.FromMinutes(5));
+
+            var withinSkew = await validator.ValidateAsync(
+                platform.CreateIdToken(issuedAt: DateTime.UtcNow.AddMinutes(2)));
+            var beyondSkew = await validator.ValidateAsync(
+                platform.CreateIdToken(issuedAt: DateTime.UtcNow.AddMinutes(30), expires: DateTime.UtcNow.AddMinutes(40)));
+
+            Assert.True(withinSkew.IsValid, withinSkew.Error);
+            Assert.False(beyondSkew.IsValid);
+            Assert.Contains("iat", beyondSkew.Error);
+        }
+
         [Fact]
         public void RequireTheRegistrationDetails()
         {
@@ -322,6 +434,9 @@ namespace LtiAdvantage.UnitTests.Validation
 
             public int FetchCount { get; private set; }
 
+            /// <summary>While true, the JWKS endpoint answers 503.</summary>
+            public bool JwksDown { get; set; }
+
             public void RotateKey(string keyId) => _keyId = keyId;
 
             public HttpClient CreateClient() => new(new StubHandler(this));
@@ -334,15 +449,17 @@ namespace LtiAdvantage.UnitTests.Validation
                 string version = "1.3.0",
                 string messageType = "LtiResourceLinkRequest",
                 string deploymentId = "dep-1",
-                DateTime? expires = null)
+                DateTime? expires = null,
+                DateTime? issuedAt = null,
+                bool includeIssuedAt = true)
             {
                 var payload = new JwtPayload
                 {
                     ["iss"] = issuer,
                     ["sub"] = "user-1",
-                    ["iat"] = EpochTime.GetIntDate(DateTime.UtcNow),
                     ["exp"] = EpochTime.GetIntDate(expires ?? DateTime.UtcNow.AddMinutes(5))
                 };
+                if (includeIssuedAt) payload["iat"] = EpochTime.GetIntDate(issuedAt ?? DateTime.UtcNow);
 
                 payload["aud"] = audiences == null ? new[] {ClientId} : audiences;
                 if (azp != null) payload["azp"] = azp;
@@ -382,6 +499,9 @@ namespace LtiAdvantage.UnitTests.Validation
                 {
                     Assert.Equal(JwksUri, request.RequestUri.ToString());
                     _platform.FetchCount++;
+
+                    if (_platform.JwksDown)
+                        return Task.FromResult(new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
 
                     return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                     {

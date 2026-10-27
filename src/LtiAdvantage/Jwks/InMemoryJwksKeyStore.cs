@@ -105,11 +105,31 @@ namespace LtiAdvantage.Jwks
         {
             if (key == null) throw new ArgumentException("A published key must not be null.", nameof(key));
 
+            // Only asymmetric signing keys can be published: a symmetric (oct) key has no public
+            // half, so it would go out with no key material at all.
+            string defaultAlg;
+            switch (key.Kty)
+            {
+                case JsonWebAlgorithmsKeyTypes.RSA:
+                    if (string.IsNullOrEmpty(key.N) || string.IsNullOrEmpty(key.E))
+                        throw new ArgumentException($"RSA key '{key.Kid}' has no public modulus or exponent.", nameof(key));
+                    defaultAlg = SecurityAlgorithms.RsaSha256;
+                    break;
+                case JsonWebAlgorithmsKeyTypes.EllipticCurve:
+                    if (string.IsNullOrEmpty(key.Crv) || string.IsNullOrEmpty(key.X) || string.IsNullOrEmpty(key.Y))
+                        throw new ArgumentException($"EC key '{key.Kid}' has no curve or public point.", nameof(key));
+                    defaultAlg = DefaultEcAlgorithm(key.Crv);
+                    break;
+                default:
+                    throw new ArgumentException(
+                        $"Key '{key.Kid}' has type '{key.Kty}'; only RSA and EC keys can be published.", nameof(key));
+            }
+
             var publicKey = new JsonWebKey
             {
                 Kty = key.Kty,
                 Use = string.IsNullOrEmpty(key.Use) ? "sig" : key.Use,
-                Alg = string.IsNullOrEmpty(key.Alg) ? SecurityAlgorithms.RsaSha256 : key.Alg,
+                Alg = string.IsNullOrEmpty(key.Alg) ? defaultAlg : key.Alg,
                 Kid = key.Kid,
 
                 // RSA public components.
@@ -133,6 +153,18 @@ namespace LtiAdvantage.Jwks
             // D, P, Q, DP, DQ, QI, K and Oth are deliberately not copied. Publishing any of them
             // would hand out the signing key.
             return publicKey;
+        }
+
+        /// <summary>The JWS algorithm that goes with an EC curve (RFC 7518 §3.4); null if unknown.</summary>
+        private static string DefaultEcAlgorithm(string curve)
+        {
+            switch (curve)
+            {
+                case JsonWebKeyECTypes.P256: return SecurityAlgorithms.EcdsaSha256;
+                case JsonWebKeyECTypes.P384: return SecurityAlgorithms.EcdsaSha384;
+                case JsonWebKeyECTypes.P521: return SecurityAlgorithms.EcdsaSha512;
+                default: return null;
+            }
         }
     }
 }

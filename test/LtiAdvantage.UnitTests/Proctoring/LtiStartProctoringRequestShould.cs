@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using LtiAdvantage.Lti;
 using LtiAdvantage.Proctoring;
 using Xunit;
@@ -55,6 +56,33 @@ namespace LtiAdvantage.UnitTests.Proctoring
         /// The attempt_number claim is a JSON number in the specification's example, so the
         /// typed setter must not write it as a quoted string.
         /// </summary>
+        /// <summary>
+        /// The spec's own examples quote attempt_number in some places ("1") and not in others (1),
+        /// so the claim must read either way.
+        /// </summary>
+        [Fact]
+        public void ReadAQuotedAttemptNumber()
+        {
+            var json = JsonNode.Parse(TestUtils.LoadReferenceJsonFile("LtiStartProctoringRequest"));
+            json[Constants.LtiClaims.AttemptNumber] = "2";
+
+            var request = JsonSerializer.Deserialize<LtiStartProctoringRequest>(json.ToJsonString());
+
+            Assert.Equal(2, request.AttemptNumber);
+        }
+
+        /// <summary>Setting a nullable claim to null removes it, instead of writing "null".</summary>
+        [Fact]
+        public void RemoveTheClaim_WhenSetToNull()
+        {
+            var request = new LtiStartProctoringRequest {AttemptNumber = 3};
+
+            request.AttemptNumber = null;
+
+            Assert.False(request.ContainsKey(Constants.LtiClaims.AttemptNumber));
+            Assert.Null(request.AttemptNumber);
+        }
+
         [Fact]
         public void WriteAttemptNumberAsJsonNumber()
         {

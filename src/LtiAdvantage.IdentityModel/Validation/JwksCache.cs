@@ -17,6 +17,11 @@ namespace LtiAdvantage.IdentityModel.Validation
     /// for a key id it does not hold, rate limited by
     /// <see cref="LtiTokenValidationOptions.MinimumRefreshInterval"/> so that a stream of tokens
     /// with bogus key ids cannot be used to hammer the platform.
+    /// <para>
+    /// A failed refresh does not throw away keys that were fetched before: the cache keeps serving
+    /// them, so a JWKS outage at the platform does not block every launch. Failed attempts count
+    /// toward the rate limit too, so an outage cannot turn into a fetch per incoming token.
+    /// </para>
     /// </remarks>
     public class JwksCache
     {
@@ -24,6 +29,9 @@ namespace LtiAdvantage.IdentityModel.Validation
         private readonly TimeSpan _cacheDuration;
         private readonly TimeSpan _minimumRefreshInterval;
         private readonly Dictionary<string, Entry> _entries = new();
+
+        // When the last fetch of a URL that has no cached keys failed, so retries are rate limited.
+        private readonly Dictionary<string, DateTimeOffset> _failedFirstFetches = new();
         private readonly SemaphoreSlim _lock = new(1, 1);
 
         /// <summary>
@@ -70,7 +78,34 @@ namespace LtiAdvantage.IdentityModel.Validation
                     return entry.Keys;
                 }
 
-                var keys = await FetchAsync(jwksUri, cancellationToken).ConfigureAwait(false);
+                if (entry == null
+                    && _failedFirstFetches.TryGetValue(jwksUri, out var failedAt)
+                    && now - failedAt < _minimumRefreshInterval)
+                {
+                    throw new HttpRequestException(
+                        $"The JWKS at {jwksUri} could not be fetched recently; not retrying until " +
+                        $"{failedAt + _minimumRefreshInterval:O}.");
+                }
+
+                IReadOnlyCollection<SecurityKey> keys;
+                try
+                {
+                    keys = await FetchAsync(jwksUri, cancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception) when (!cancellationToken.IsCancellationRequested)
+                {
+                    if (entry == null)
+                    {
+                        _failedFirstFetches[jwksUri] = now;
+                        throw;
+                    }
+
+                    // Keep serving the keys we have, and wait the minimum interval before retrying.
+                    entry.LastAttemptAt = now;
+                    return entry.Keys;
+                }
+
+                _failedFirstFetches.Remove(jwksUri);
                 _entries[jwksUri] = new Entry(keys, now);
                 return keys;
             }
@@ -82,16 +117,19 @@ namespace LtiAdvantage.IdentityModel.Validation
 
         private bool ShouldRefresh(Entry entry, string requiredKeyId, DateTimeOffset now)
         {
+            // Never fetch more often than the minimum interval, counting failed attempts too.
+            if (now - entry.LastAttemptAt < _minimumRefreshInterval)
+            {
+                return false;
+            }
+
             if (now - entry.FetchedAt >= _cacheDuration)
             {
                 return true;
             }
 
-            // A key id we do not hold usually means the peer rotated. Refetch, but not more
-            // often than the minimum interval.
-            return requiredKeyId != null
-                   && !entry.HasKeyId(requiredKeyId)
-                   && now - entry.FetchedAt >= _minimumRefreshInterval;
+            // A key id we do not hold usually means the peer rotated.
+            return requiredKeyId != null && !entry.HasKeyId(requiredKeyId);
         }
 
         private async Task<IReadOnlyCollection<SecurityKey>> FetchAsync(string jwksUri,
@@ -120,6 +158,7 @@ namespace LtiAdvantage.IdentityModel.Validation
             {
                 Keys = keys;
                 FetchedAt = fetchedAt;
+                LastAttemptAt = fetchedAt;
                 _keyIds = new HashSet<string>(keys
                     .Select(k => k.KeyId)
                     .Where(id => !string.IsNullOrEmpty(id)), StringComparer.Ordinal);
@@ -128,6 +167,9 @@ namespace LtiAdvantage.IdentityModel.Validation
             public IReadOnlyCollection<SecurityKey> Keys { get; }
 
             public DateTimeOffset FetchedAt { get; }
+
+            /// <summary>When a fetch was last attempted, successful or not.</summary>
+            public DateTimeOffset LastAttemptAt { get; set; }
 
             public bool HasKeyId(string keyId) => _keyIds.Contains(keyId);
         }

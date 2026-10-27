@@ -14,6 +14,7 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
 
         /// <summary>Human-readable description of the problem.</summary>
         [JsonPropertyName("error_description")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string ErrorDescription { get; set; }
 
         /// <summary>Creates an <c>invalid_client_metadata</c> error with the given description.</summary>

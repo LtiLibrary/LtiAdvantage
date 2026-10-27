@@ -410,7 +410,8 @@
             <see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.ValidateRegistration(LtiAdvantage.DynamicRegistration.ToolConfiguration)"/> found no errors. Any <c>client_id</c> the tool sent has
             already been cleared, so the platform always chooses it.
             <list type="bullet">
-            <item>To reject the registration, throw <see cref="T:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationRejectedException"/>.</item>
+            <item>To reject the registration, throw <see cref="T:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationRejectedException"/>. It can also be
+            thrown from <see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.AuthorizeRegistrationAsync(System.String)"/> and <see cref="M:LtiAdvantage.AspNetCore.DynamicRegistration.DynamicRegistrationControllerBase.ValidateRegistration(LtiAdvantage.DynamicRegistration.ToolConfiguration)"/>.</item>
             <item>Returning <c>null</c>, or a configuration without a <c>client_id</c>, is a server error (500).</item>
             </list>
             </remarks>
@@ -498,11 +499,14 @@
         <member name="M:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationRejectedException.#ctor(System.String,System.String,System.Int32)">
             <summary>Rejects the registration.</summary>
             <param name="error">Error code, e.g. <c>invalid_client_metadata</c> or <c>invalid_redirect_uri</c>.</param>
-            <param name="description">Human-readable description, sent to the tool.</param>
+            <param name="description">Optional human-readable description, sent to the tool.</param>
             <param name="statusCode">HTTP status code; must be a 4xx code. Default 400.</param>
         </member>
         <member name="P:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationRejectedException.Error">
             <summary>The error code.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationRejectedException.Description">
+            <summary>The description sent to the tool, or <c>null</c> when none was given.</summary>
         </member>
         <member name="P:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationRejectedException.StatusCode">
             <summary>The HTTP status code to answer with.</summary>
@@ -549,8 +553,70 @@
             <summary>
             Returns a copy of <paramref name="key"/> with only its public parameters,
             or <c>null</c> when the key is not an RSA or EC key (for example a symmetric key), or is
-            missing public parameters (<c>n</c>/<c>e</c> or <c>crv</c>/<c>x</c>/<c>y</c>) that verifiers need.
+            missing public parameters (<c>n</c>/<c>e</c> or <c>crv</c>/<c>x</c>/<c>y</c>) that verifiers need,
+            or is restricted by <c>key_ops</c> to operations that have no public counterpart.
             </summary>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.Jwks.JwksDocument">
+            <summary>
+            The JWKS document published by <see cref="T:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase"/> (RFC 7517 §5).
+            </summary>
+            <remarks>
+            Used instead of <see cref="T:Microsoft.IdentityModel.Tokens.JsonWebKeySet"/> because IdentityModel's serializer writes empty
+            <c>key_ops</c>, <c>x5c</c> and <c>oth</c> arrays for every key, which strict verifiers can reject.
+            This type writes only the public members that are set.
+            </remarks>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.JwksDocument.Keys">
+            <summary>The published public keys.</summary>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey">
+            <summary>A public JSON Web Key as published in a <see cref="T:LtiAdvantage.AspNetCore.Jwks.JwksDocument"/>.</summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.From(Microsoft.IdentityModel.Tokens.JsonWebKey)">
+            <summary>Copies the public members of <paramref name="key"/>; empty lists are left out.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.Kty">
+            <summary>Key type (<c>RSA</c> or <c>EC</c>).</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.Kid">
+            <summary>Key ID.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.Use">
+            <summary>Public key use, e.g. <c>sig</c>.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.Alg">
+            <summary>Algorithm, e.g. <c>RS256</c>.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.KeyOps">
+            <summary>Permitted public operations, e.g. <c>verify</c>.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.N">
+            <summary>RSA modulus.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.E">
+            <summary>RSA public exponent.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.Crv">
+            <summary>EC curve.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.X">
+            <summary>EC x coordinate.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.Y">
+            <summary>EC y coordinate.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.X5c">
+            <summary>X.509 certificate chain (public certificates).</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.X5t">
+            <summary>X.509 SHA-1 thumbprint.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.X5tS256">
+            <summary>X.509 SHA-256 thumbprint.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Jwks.PublishedJsonWebKey.X5u">
+            <summary>X.509 URL.</summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.Lti.ServiceResponse">
             <summary>

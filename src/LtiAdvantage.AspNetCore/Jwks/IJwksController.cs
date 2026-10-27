@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace LtiAdvantage.AspNetCore.Jwks
 {
@@ -8,6 +7,6 @@ namespace LtiAdvantage.AspNetCore.Jwks
     public interface IJwksController
     {
         /// <summary>Returns the JSON Web Key Set.</summary>
-        Task<ActionResult<JsonWebKeySet>> GetJwksAsync();
+        Task<ActionResult<JwksDocument>> GetJwksAsync();
     }
 }

@@ -50,6 +50,14 @@ namespace LtiAdvantage.IdentityModel.Client
                 .ConfigureAwait(false);
 
             ValidateIssuer(config.Issuer, openIdConfigurationUrl);
+
+            // The registration token is sent to this endpoint, so it must not go out in clear text.
+            // (Its host is not checked against the issuer: some platforms use a shared issuer, such as
+            // https://canvas.instructure.com, with endpoints on each institution's own domain.)
+            if (!string.IsNullOrWhiteSpace(config.RegistrationEndpoint) && !RegistrationUrl.IsAllowed(config.RegistrationEndpoint))
+                throw new InvalidOperationException(
+                    $"The platform registration_endpoint '{config.RegistrationEndpoint}' must be an absolute https URL.");
+
             return config;
         }
 
@@ -58,7 +66,10 @@ namespace LtiAdvantage.IdentityModel.Client
         /// Returns the platform-assigned <see cref="ToolConfiguration"/> (echoed config + <c>client_id</c>).
         /// </summary>
         /// <param name="client">The HTTP client.</param>
-        /// <param name="registrationEndpoint">The platform's registration endpoint URL.</param>
+        /// <param name="registrationEndpoint">
+        /// The platform's registration endpoint URL. Must be https (http only for loopback hosts),
+        /// since the registration token is sent to it.
+        /// </param>
         /// <param name="registrationAccessToken">
         /// The <c>registration_token</c> from the registration init launch, sent as a Bearer token.
         /// It is optional in the spec: pass <c>null</c> or empty when the platform did not provide one,
@@ -78,6 +89,10 @@ namespace LtiAdvantage.IdentityModel.Client
             if (client == null) throw new ArgumentNullException(nameof(client));
             if (string.IsNullOrWhiteSpace(registrationEndpoint))
                 throw new ArgumentException("URL is required", nameof(registrationEndpoint));
+            if (!RegistrationUrl.IsAllowed(registrationEndpoint))
+                throw new ArgumentException(
+                    "The registration endpoint must be an absolute https URL, so the registration token is not sent in clear text.",
+                    nameof(registrationEndpoint));
             if (tool == null) throw new ArgumentNullException(nameof(tool));
 
             const string operation = "Dynamic Registration";
@@ -126,8 +141,11 @@ namespace LtiAdvantage.IdentityModel.Client
             var sameAuthority = string.Equals(issuerUri.Scheme, configUri.Scheme, StringComparison.OrdinalIgnoreCase)
                 && string.Equals(issuerUri.Host, configUri.Host, StringComparison.OrdinalIgnoreCase)
                 && issuerUri.Port == configUri.Port;
+            // ...and something must be appended: the issuer itself is not a configuration URL.
             var pathUnderIssuer = configPath.StartsWith(issuerPath, StringComparison.Ordinal)
-                && (configPath.Length == issuerPath.Length || configPath[issuerPath.Length] == '/');
+                && configPath.Length > issuerPath.Length
+                && configPath[issuerPath.Length] == '/'
+                && configPath.Substring(issuerPath.Length).Trim('/').Length > 0;
 
             if (!sameAuthority || !pathUnderIssuer)
                 throw new InvalidOperationException(

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using LtiAdvantage.AspNetCore.DynamicRegistration;
 using LtiAdvantage.DynamicRegistration;
@@ -29,6 +30,13 @@ namespace LtiAdvantage.IntegrationTests.Controllers
                 : base.AuthorizeRegistrationAsync(registrationToken);
         }
 
+        protected override IList<string> ValidateRegistration(ToolConfiguration tool)
+        {
+            if (tool.ClientName == "reject-in-validation")
+                throw new RegistrationRejectedException("invalid_redirect_uri", "Domain not allowed.");
+            return base.ValidateRegistration(tool);
+        }
+
         // The client name selects a behavior, so tests can exercise how the base handles each outcome.
         protected override Task<ToolConfiguration> OnRegisterAsync(RegisterToolRequest request)
         {
@@ -36,6 +44,8 @@ namespace LtiAdvantage.IntegrationTests.Controllers
             {
                 case "reject":
                     throw new RegistrationRejectedException("invalid_redirect_uri", "Redirect URI not allowed.");
+                case "reject-without-description":
+                    throw new RegistrationRejectedException("invalid_client_metadata", null);
                 case "return-null":
                     return Task.FromResult<ToolConfiguration>(null);
                 case "keep-client-id":

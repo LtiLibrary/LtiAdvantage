@@ -60,8 +60,18 @@ namespace LtiAdvantage.IntegrationTests.Jwks
             // The document may be cached briefly.
             Assert.Equal("public, max-age=300", response.Headers.CacheControl?.ToString());
 
-            // Symmetric keys and incomplete keys MUST NOT be published.
-            Assert.Equal(1, keys.GetArrayLength());
+            // Symmetric keys, incomplete keys and keys without a public use MUST NOT be published.
+            var kids = keys.EnumerateArray().Select(k => k.GetProperty("kid").GetString()).ToArray();
+            Assert.Equal(new[] { "test-kid-1", "test-kid-2" }, kids);
+
+            // Members that are not set are left out, not written as empty arrays.
+            var second = keys[1];
+            Assert.False(second.TryGetProperty("key_ops", out _), "unset key_ops must not be published");
+            foreach (var key in keys.EnumerateArray())
+            {
+                Assert.False(key.TryGetProperty("oth", out _), "oth must not be published");
+                Assert.False(key.TryGetProperty("x5c", out _), "empty x5c must not be published");
+            }
         }
 
         public void Dispose() { _client?.Dispose(); _host?.Dispose(); }

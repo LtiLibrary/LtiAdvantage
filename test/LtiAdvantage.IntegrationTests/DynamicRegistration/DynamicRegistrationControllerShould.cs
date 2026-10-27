@@ -155,6 +155,47 @@ namespace LtiAdvantage.IntegrationTests.DynamicRegistration
             Assert.Equal("Redirect URI not allowed.", doc.RootElement.GetProperty("error_description").GetString());
         }
 
+        [Fact]
+        public async Task Answer400_WhenValidationOverrideRejects()
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            tool.ClientName = "reject-in-validation";
+
+            var resp = await PostAsync(tool);
+
+            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+            using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            Assert.Equal("invalid_redirect_uri", doc.RootElement.GetProperty("error").GetString());
+        }
+
+        [Fact]
+        public async Task LeaveOutDescription_WhenRejectionHasNone()
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            tool.ClientName = "reject-without-description";
+
+            var resp = await PostAsync(tool);
+
+            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+            var body = await resp.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(body);
+            Assert.Equal("invalid_client_metadata", doc.RootElement.GetProperty("error").GetString());
+            Assert.False(doc.RootElement.TryGetProperty("error_description", out _));
+            Assert.DoesNotContain("RegistrationRejectedException", body);
+        }
+
+        [Fact]
+        public async Task Reject_MessageWithoutType()
+        {
+            AuthorizeWithRegistrationScope();
+            var tool = MinimalTool();
+            tool.LtiToolConfiguration.Messages = new[] { new MessageDescriptor { TargetLinkUri = "https://tool.example.com/dl" } };
+
+            await AssertInvalidClientMetadata(await PostAsync(tool), "messages.type");
+        }
+
         [Theory]
         [InlineData("return-null")]
         [InlineData("no-client-id")]

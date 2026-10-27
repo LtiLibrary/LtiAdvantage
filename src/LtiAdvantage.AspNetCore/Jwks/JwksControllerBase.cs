@@ -44,10 +44,10 @@ namespace LtiAdvantage.AspNetCore.Jwks
         [HttpGet]
         [AllowAnonymous]
         [Produces(Constants.MediaTypes.Jwks)]
-        [ProducesResponseType(typeof(JsonWebKeySet), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(JwksDocument), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [Route(".well-known/jwks.json", Name = Constants.ServiceEndpoints.Jwks.JwksService)]
-        public async Task<ActionResult<JsonWebKeySet>> GetJwksAsync()
+        public async Task<ActionResult<JwksDocument>> GetJwksAsync()
         {
             _logger.LogDebug($"Entering {nameof(GetJwksAsync)}.");
             try
@@ -57,17 +57,17 @@ namespace LtiAdvantage.AspNetCore.Jwks
                 var maxAge = (long)CacheDuration.TotalSeconds;
                 Response.Headers[HeaderNames.CacheControl] = maxAge > 0 ? $"public, max-age={maxAge}" : "no-store";
 
-                var set = new JsonWebKeySet();
+                var set = new JwksDocument();
                 foreach (var key in keys ?? Enumerable.Empty<JsonWebKey>())
                 {
                     var publicKey = ToPublicKey(key);
                     if (publicKey == null)
                     {
                         _logger.LogWarning(
-                            "Skipping JWKS key {Kid}: it is not an RSA or EC key with all its public parameters.", key?.Kid);
+                            "Skipping JWKS key {Kid}: it is not an RSA or EC key with all its public parameters, or none of its key_ops has a public counterpart.", key?.Kid);
                         continue;
                     }
-                    set.Keys.Add(publicKey);
+                    set.Keys.Add(PublishedJsonWebKey.From(publicKey));
                 }
                 return set;
             }
@@ -117,7 +117,8 @@ namespace LtiAdvantage.AspNetCore.Jwks
         /// <summary>
         /// Returns a copy of <paramref name="key"/> with only its public parameters,
         /// or <c>null</c> when the key is not an RSA or EC key (for example a symmetric key), or is
-        /// missing public parameters (<c>n</c>/<c>e</c> or <c>crv</c>/<c>x</c>/<c>y</c>) that verifiers need.
+        /// missing public parameters (<c>n</c>/<c>e</c> or <c>crv</c>/<c>x</c>/<c>y</c>) that verifiers need,
+        /// or is restricted by <c>key_ops</c> to operations that have no public counterpart.
         /// </summary>
         public static JsonWebKey ToPublicKey(JsonWebKey key)
         {
@@ -135,8 +136,11 @@ namespace LtiAdvantage.AspNetCore.Jwks
             };
             // key_ops describe what the published (public) key may do, so private operations are
             // mapped to their public counterparts (sign -> verify, ...) and the rest are dropped.
-            foreach (var op in key.KeyOps.Select(ToPublicKeyOperation).Where(o => o != null).Distinct())
-                publicKey.KeyOps.Add(op);
+            // If the key is restricted to operations that have no public counterpart (e.g. deriveKey),
+            // it is skipped: publishing it without key_ops would widen what it may be used for.
+            var publicOps = key.KeyOps.Select(ToPublicKeyOperation).Where(o => o != null).Distinct().ToList();
+            if (key.KeyOps.Count > 0 && publicOps.Count == 0) return null;
+            foreach (var op in publicOps) publicKey.KeyOps.Add(op);
             foreach (var cert in key.X5c) publicKey.X5c.Add(cert);
 
             switch (key.Kty)

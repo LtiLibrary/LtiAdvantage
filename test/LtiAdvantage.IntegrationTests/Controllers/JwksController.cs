@@ -32,7 +32,23 @@ namespace LtiAdvantage.IntegrationTests.Controllers
             // An RSA key without its modulus is useless to verifiers and must be skipped.
             var incomplete = new JsonWebKey { Kty = "RSA", Kid = "test-incomplete", E = "AQAB" };
 
-            return Task.FromResult<IReadOnlyList<JsonWebKey>>(new[] { jwk, symmetric, incomplete });
+            // A public key without key_ops: published without an empty key_ops array.
+            using var rsa2 = RSA.Create(2048);
+            var publicOnly = JsonWebKeyConverter.ConvertFromRSASecurityKey(
+                new RsaSecurityKey(rsa2.ExportParameters(includePrivateParameters: false)) { KeyId = "test-kid-2" });
+
+            // An EC key restricted to key agreement: no public counterpart, so it must be skipped
+            // rather than published without restrictions.
+            using var ec = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+            var ecParams = ec.ExportParameters(includePrivateParameters: false);
+            var deriveOnly = new JsonWebKey
+            {
+                Kty = "EC", Kid = "test-derive", Crv = "P-256",
+                X = Base64UrlEncoder.Encode(ecParams.Q.X), Y = Base64UrlEncoder.Encode(ecParams.Q.Y)
+            };
+            deriveOnly.KeyOps.Add("deriveKey");
+
+            return Task.FromResult<IReadOnlyList<JsonWebKey>>(new[] { jwk, symmetric, incomplete, publicOnly, deriveOnly });
         }
     }
 }

@@ -166,6 +166,9 @@ namespace LtiAdvantage.UnitTests.DynamicRegistration
         [InlineData("https://platform.example.com/tenant1", "https://platform.example.com/tenant1evil/.well-known/openid-configuration")]
         // Issuer must use https.
         [InlineData("http://platform.example.com", "http://platform.example.com/.well-known/openid-configuration")]
+        // The configuration URL must append a path to the issuer, not be the issuer itself.
+        [InlineData("https://lms.example.com/tenant", "https://lms.example.com/tenant")]
+        [InlineData("https://platform.example.com/", "https://platform.example.com/")]
         // Only http(s), even on loopback.
         [InlineData("ftp://localhost/x", "ftp://localhost/x/.well-known/openid-configuration")]
         // URL must not contain a fragment.
@@ -206,6 +209,34 @@ namespace LtiAdvantage.UnitTests.DynamicRegistration
 
             Assert.True(ex.Message.Length < 1_000, $"message length {ex.Message.Length}");
             Assert.Contains("truncated", ex.Message);
+        }
+
+        [Fact]
+        public async Task RejectPlatformConfiguration_WithCleartextRegistrationEndpoint()
+        {
+            using var client = new HttpClient(new StubHandler((req, ct) => JsonResponse(HttpStatusCode.OK,
+                """{"issuer":"https://platform.example.com","registration_endpoint":"http://platform.example.com/register"}""")));
+
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                client.GetPlatformOpenIdConfigurationAsync("https://platform.example.com/.well-known/openid-configuration"));
+
+            Assert.Contains("registration_endpoint", ex.Message);
+        }
+
+        [Fact]
+        public async Task RefuseToSendToken_ToCleartextRegistrationEndpoint()
+        {
+            var sent = false;
+            using var client = new HttpClient(new StubHandler((req, ct) =>
+            {
+                sent = true;
+                return JsonResponse(HttpStatusCode.Created, """{"client_id":"client-9"}""");
+            }));
+
+            await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.RegisterToolAsync("http://platform.example.com/register", "tok", new ToolConfiguration()));
+
+            Assert.False(sent, "the registration token must not be sent");
         }
 
         private static HttpResponseMessage JsonResponse(HttpStatusCode status, string body) =>

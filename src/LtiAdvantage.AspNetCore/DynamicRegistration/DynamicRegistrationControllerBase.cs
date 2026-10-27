@@ -54,7 +54,8 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
         /// <see cref="ValidateRegistration"/> found no errors. Any <c>client_id</c> the tool sent has
         /// already been cleared, so the platform always chooses it.
         /// <list type="bullet">
-        /// <item>To reject the registration, throw <see cref="RegistrationRejectedException"/>.</item>
+        /// <item>To reject the registration, throw <see cref="RegistrationRejectedException"/>. It can also be
+        /// thrown from <see cref="AuthorizeRegistrationAsync"/> and <see cref="ValidateRegistration"/>.</item>
         /// <item>Returning <c>null</c>, or a configuration without a <c>client_id</c>, is a server error (500).</item>
         /// </list>
         /// </remarks>
@@ -149,6 +150,7 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
                 foreach (var message in lti.Messages ?? Enumerable.Empty<MessageDescriptor>())
                 {
                     if (message == null) continue;
+                    if (string.IsNullOrWhiteSpace(message.Type)) errors.Add("messages.type is required.");
                     OptionalWebUrl(errors, "messages.target_link_uri", message.TargetLinkUri);
                     OptionalWebUrl(errors, "messages.icon_uri", message.IconUri);
                 }
@@ -193,21 +195,18 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
                 // The platform assigns the client_id; never keep one chosen by the tool.
                 tool.ClientId = null;
 
-                ToolConfiguration registered;
-                try
-                {
-                    registered = await OnRegisterAsync(new RegisterToolRequest(tool)).ConfigureAwait(false);
-                }
-                catch (RegistrationRejectedException ex)
-                {
-                    return StatusCode(ex.StatusCode, new RegistrationError { Error = ex.Error, ErrorDescription = ex.Message });
-                }
+                var registered = await OnRegisterAsync(new RegisterToolRequest(tool)).ConfigureAwait(false);
 
                 if (registered == null || string.IsNullOrWhiteSpace(registered.ClientId))
                     throw new InvalidOperationException(
                         $"{nameof(OnRegisterAsync)} must return the registered tool configuration with a client_id.");
 
                 return StatusCode(StatusCodes.Status201Created, registered);
+            }
+            catch (RegistrationRejectedException ex)
+            {
+                // Thrown by any step: AuthorizeRegistrationAsync, ValidateRegistration or OnRegisterAsync.
+                return StatusCode(ex.StatusCode, new RegistrationError { Error = ex.Error, ErrorDescription = ex.Description });
             }
             catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
             {

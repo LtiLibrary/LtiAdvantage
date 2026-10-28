@@ -15,6 +15,8 @@ namespace LtiAdvantage.IntegrationTests.Controllers
 
         protected override Task<ActionResult<ResultContainer>> OnGetResultsAsync(GetResultsRequest request)
         {
+            // Echo the filter so tests can check how the query string was bound.
+            Response.Headers["x-user-id"] = request.UserId ?? "";
             var result = (ActionResult<ResultContainer>) new ObjectResult(new ResultContainer());
             return Task.FromResult(result);
         }

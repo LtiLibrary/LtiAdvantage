@@ -48,7 +48,10 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
         /// <param name="contextId">The context id.</param>
         /// <param name="limit">Optional limit to the number of members to return.</param>
         /// <param name="rlid">Optional resource link filter for members with access to resource link.</param>
-        /// <param name="role">Optional role filter for members that have the specified role.</param>
+        /// <param name="role">
+        /// Optional role filter for members that have the specified role. Accepts the full role URI,
+        /// the simple context role name (<c>Learner</c>) or the enum name (<c>ContextLearner</c>).
+        /// </param>
         /// <param name="groups">
         /// Optional Course Groups Service 1.0 request for each member's group enrollments.
         /// Only honoured when the caller also holds the Course Groups scope
@@ -68,7 +71,8 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
         [Route("context/{contextId}/membership", Name = Constants.ServiceEndpoints.Nrps.MembershipService)]
         [Route("context/{contextId}/membership.{format}")]
         public async Task<ActionResult<MembershipContainer>> GetMembershipAsync([Required] string contextId,
-            int? limit = null, string rlid = null, Role? role = null, bool groups = false)
+            int? limit = null, string rlid = null,
+            [FromQuery] [ModelBinder(typeof(RoleModelBinder))] Role? role = null, bool groups = false)
         {
             var includeGroups = groups && await CallerHoldsGroupsScopeAsync().ConfigureAwait(false);
             var request = new GetMembershipRequest(contextId, limit, rlid, role, includeGroups) { CancellationToken = HttpContext.RequestAborted };

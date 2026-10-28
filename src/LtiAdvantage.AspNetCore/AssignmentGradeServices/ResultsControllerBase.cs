@@ -46,7 +46,7 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
         /// </summary>
         /// <param name="contextId">The context id.</param>
         /// <param name="lineItemId">The line item id.</param>
-        /// <param name="userId">Optional user id filter.</param>
+        /// <param name="userId">Optional user id filter (<c>user_id</c>).</param>
         /// <param name="limit">Optional limit to the number of results returned.</param>
         /// <returns>The results.</returns>
         [HttpGet]
@@ -59,9 +59,12 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
         [Route("context/{contextId}/lineitems/{lineItemId}/results", Name = Constants.ServiceEndpoints.Ags.ResultsService)]
         [Route("context/{contextId}/lineitems/{lineItemId}/results.{format}")]
         public async Task<ActionResult<ResultContainer>> GetResultsAsync([Required] string contextId, [Required] string lineItemId, 
-            [FromQuery(Name = "userId")] string userId = null, 
+            [FromQuery(Name = "user_id")] string userId = null, 
             [FromQuery] int? limit = null)
         {
+            // Before 4.0.1 this was bound as userId; keep accepting it.
+            userId ??= Request.LegacyQueryValue("user_id", "userId");
+
             var request = new GetResultsRequest(contextId, lineItemId, userId, limit) { CancellationToken = HttpContext.RequestAborted };
             return await OnGetResultsAsync(request).ConfigureAwait(false);
         }

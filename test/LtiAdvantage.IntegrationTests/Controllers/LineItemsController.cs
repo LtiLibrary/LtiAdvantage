@@ -33,6 +33,10 @@ namespace LtiAdvantage.IntegrationTests.Controllers
 
         protected override Task<ActionResult<LineItemContainer>> OnGetLineItemsAsync(GetLineItemsRequest request)
         {
+            // Echo the filters so tests can check how the query string was bound.
+            Response.Headers["x-resource-link-id"] = request.ResourceLinkId ?? "";
+            Response.Headers["x-resource-id"] = request.ResourceId ?? "";
+            Response.Headers["x-tag"] = request.Tag ?? "";
             var result = (ActionResult<LineItemContainer>) new ObjectResult(new LineItemContainer());
             return Task.FromResult(result);
         }

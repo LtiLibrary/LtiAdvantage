@@ -3773,6 +3773,22 @@
             <summary>
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Lti.RoleExtensions">
+            <summary>
+            Helpers for <see cref="T:LtiAdvantage.Lti.Role"/> values.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.RoleExtensions.TryParse(System.String,LtiAdvantage.Lti.Role@)">
+            <summary>
+            Parses a role the way LTI messages and services spell it: the full role URI
+            (<c>http://purl.imsglobal.org/vocab/lis/v2/membership#Learner</c>), the simple name
+            the specs allow for context roles (<c>Learner</c>), or the enum name (<c>ContextLearner</c>, any case).
+            Role URIs and simple names are matched exactly.
+            </summary>
+            <param name="value">The role to parse.</param>
+            <param name="role">The parsed role, or <see cref="F:LtiAdvantage.Lti.Role.Unknown"/> when parsing fails.</param>
+            <returns>True when <paramref name="value"/> names a known role.</returns>
+        </member>
         <member name="T:LtiAdvantage.NamesRoleProvisioningService.Context">
             <summary>
             The context of a membership container.

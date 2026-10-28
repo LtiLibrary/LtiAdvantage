@@ -137,8 +137,8 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
         /// Returns the line items in a context.
         /// </summary>
         /// <param name="contextId">The context id.</param>
-        /// <param name="resourceLinkId">Optional resource link id filter.</param>
-        /// <param name="resourceId">Optional resource id filter.</param>
+        /// <param name="resourceLinkId">Optional resource link id filter (<c>resource_link_id</c>).</param>
+        /// <param name="resourceId">Optional resource id filter (<c>resource_id</c>).</param>
         /// <param name="tag">Optional tag filter.</param>
         /// <param name="limit">Optional limit on number of line items to return.</param>
         /// <returns>The line items.</returns>
@@ -153,11 +153,15 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
         [Route("context/{contextId}/lineitems", Name = Constants.ServiceEndpoints.Ags.LineItemsService)]
         [Route("context/{contextId}/lineitems.{format}")]
         public async Task<ActionResult<LineItemContainer>> GetLineItemsAsync([Required] string contextId,
-            [FromQuery(Name = "resourceLinkId")] string resourceLinkId = null,
-            [FromQuery(Name = "resourceId")] string resourceId = null,
+            [FromQuery(Name = "resource_link_id")] string resourceLinkId = null,
+            [FromQuery(Name = "resource_id")] string resourceId = null,
             [FromQuery] string tag = null,
             [FromQuery] int? limit = null)
         {
+            // Before 4.0.1 these were bound as resourceLinkId and resourceId; keep accepting them.
+            resourceLinkId ??= Request.LegacyQueryValue("resource_link_id", "resourceLinkId");
+            resourceId ??= Request.LegacyQueryValue("resource_id", "resourceId");
+
             var request = new GetLineItemsRequest(contextId, resourceLinkId, resourceId, tag, limit) { CancellationToken = HttpContext.RequestAborted };
             return await OnGetLineItemsAsync(request).ConfigureAwait(false);
         }

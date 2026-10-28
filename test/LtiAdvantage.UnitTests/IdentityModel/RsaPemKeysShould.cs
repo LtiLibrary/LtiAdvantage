@@ -54,17 +54,42 @@ namespace LtiAdvantage.UnitTests.IdentityModel
             Assert.ThrowsAny<CryptographicException>(() => RsaPemKeys.SigningCredentialsFromPem(pair.PublicKey, "k1"));
         }
 
-#pragma warning disable CS0618 // PemHelper is obsolete but must keep working.
+        /// <summary>A stored key may be the private key followed by its public key; both reads still work.</summary>
+        [Fact]
+        public void ReadAPemThatHoldsBothKeys()
+        {
+            var pair = RsaPemKeys.GenerateKeyPair();
+            var both = pair.PrivateKey + "\n" + pair.PublicKey;
+
+            Assert.NotNull(RsaPemKeys.SigningCredentialsFromPem(both, "k1"));
+            Assert.NotNull(RsaPemKeys.PublicKeyFromPem(both));
+            Assert.NotNull(RsaPemKeys.PublicKeyFromPem(pair.PrivateKey));
+        }
+
+        [Fact]
+        public async Task ReportAnUnreadableKey_OnTheTokenResponse()
+        {
+            var handler = new CapturingHandler();
+
+            var response = await AccessTokenUtil.GetAccessTokenAsync(new HttpClient(handler), "https://platform.example.com",
+                new[] {"s"}, "client-1", "https://platform.example.com/token", "not a key", "k1");
+
+            Assert.True(response.IsError);
+            Assert.Null(handler.Request);
+        }
+
+#pragma warning disable LTIADV001, LTIADV002 // Obsolete members must keep working.
         [Fact]
         public void KeepTheObsoletePemHelperWorking()
         {
             var pair = PemHelper.GenerateRsaKeyPair();
 
+            Assert.False(string.IsNullOrEmpty(pair.KeyId));
             Assert.Null(PemHelper.SigningCredentialsFromPemString(pair.PrivateKey).Key.KeyId);
             Assert.Equal(pair.KeyId, PemHelper.SigningCredentialsFromPemString(pair.PrivateKey, pair.KeyId).Key.KeyId);
             Assert.NotNull(PemHelper.PublicKeyFromPemString(pair.PublicKey));
         }
-#pragma warning restore CS0618
+#pragma warning restore LTIADV001, LTIADV002
 
         /// <summary>The client assertion's iat is a NumericDate number and the header carries the kid.</summary>
         [Fact]

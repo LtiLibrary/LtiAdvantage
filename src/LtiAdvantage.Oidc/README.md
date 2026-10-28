@@ -9,7 +9,7 @@ of client-credentials grant.
 
 ## .NET Standard
 
-This library targets `netstandard2.0`.
+This library targets `net10.0`.
 
 ## Getting Started
 

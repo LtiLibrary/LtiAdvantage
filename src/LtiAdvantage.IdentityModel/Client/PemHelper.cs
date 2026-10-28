@@ -11,7 +11,7 @@ namespace LtiAdvantage.IdentityModel.Client
     /// Kept for compatibility; use <see cref="RsaPemKeys"/>, which also sets the key id. The class
     /// name clashes with the <c>PemHelper</c> many apps have.
     /// </remarks>
-    [Obsolete("Use RsaPemKeys, which sets the key id (kid) on signing credentials.")]
+    [Obsolete("Use RsaPemKeys, which sets the key id (kid) on signing credentials.", DiagnosticId = "LTIADV001")]
     public static class PemHelper
     {
         /// <summary>
@@ -48,7 +48,7 @@ namespace LtiAdvantage.IdentityModel.Client
         public static RsaKeyPair GenerateRsaKeyPair()
         {
             var pair = RsaPemKeys.GenerateKeyPair();
-            return new RsaKeyPair {PrivateKey = pair.PrivateKey, PublicKey = pair.PublicKey};
+            return new RsaKeyPair {KeyId = pair.KeyId, PrivateKey = pair.PrivateKey, PublicKey = pair.PublicKey};
         }
 
         /// <summary>

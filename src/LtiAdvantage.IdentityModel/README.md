@@ -6,7 +6,7 @@ for client-credentials grant.
 
 ## .NET Standard
 
-This library targets `netstandard2.0` and uses [IdentityModel](https://github.com/IdentityModel/IdentityModel2).
+This library targets `net10.0` and uses [IdentityModel](https://github.com/IdentityModel/IdentityModel2).
 
 ## Getting Started
 

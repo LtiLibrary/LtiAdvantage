@@ -10,7 +10,8 @@ namespace LtiAdvantage.IdentityModel.Client
     /// </summary>
     /// <remarks>
     /// Reads PKCS#1 (<c>BEGIN RSA PRIVATE KEY</c>), PKCS#8 (<c>BEGIN PRIVATE KEY</c>) and
-    /// SubjectPublicKeyInfo (<c>BEGIN PUBLIC KEY</c>) keys. Generated private keys are PKCS#1,
+    /// SubjectPublicKeyInfo (<c>BEGIN PUBLIC KEY</c>) keys. When the text holds several keys, the
+    /// first one of the kind needed is used. Encrypted keys are not supported. Generated private keys are PKCS#1,
     /// the format the IMS reference implementation and earlier versions of this library use.
     /// </remarks>
     public static class RsaPemKeys
@@ -49,14 +50,39 @@ namespace LtiAdvantage.IdentityModel.Client
         internal static string NewKeyId() =>
             Base64UrlEncoder.Encode(RandomNumberGenerator.GetBytes(8));
 
+        private static readonly string[] PrivateLabels = {"RSA PRIVATE KEY", "PRIVATE KEY"};
+        private static readonly string[] PublicLabels = {"PUBLIC KEY", "RSA PUBLIC KEY"};
+
         private static RSAParameters ImportParameters(string pem, bool includePrivate)
         {
             if (string.IsNullOrWhiteSpace(pem)) throw new ArgumentException("A PEM key is required.", nameof(pem));
 
             using var rsa = RSA.Create();
-            rsa.ImportFromPem(pem);
+            // RSA.ImportFromPem refuses text with more than one key, but a stored key may be the
+            // private key followed by its public key. Import the first block of the kind needed
+            // (for a public key, a private key's public half will do).
+            rsa.ImportFromPem(FindBlock(pem, includePrivate ? PrivateLabels : PublicLabels)
+                              ?? (includePrivate ? null : FindBlock(pem, PrivateLabels))
+                              ?? pem);
             // Throws when a private key is asked for but the PEM only holds a public one.
             return rsa.ExportParameters(includePrivate);
+        }
+
+        private static string FindBlock(string pem, string[] labels)
+        {
+            var remaining = pem.AsMemory();
+            while (PemEncoding.TryFind(remaining.Span, out var fields))
+            {
+                var label = remaining.Span[fields.Label].ToString();
+                if (Array.IndexOf(labels, label) >= 0)
+                {
+                    return remaining.Span[fields.Location].ToString();
+                }
+
+                remaining = remaining.Slice(fields.Location.End.GetOffset(remaining.Length));
+            }
+
+            return null;
         }
     }
 

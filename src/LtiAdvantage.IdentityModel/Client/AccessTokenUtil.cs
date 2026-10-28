@@ -2,6 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using IdentityModel;
@@ -28,7 +29,8 @@ namespace LtiAdvantage.IdentityModel.Client
         /// <param name="privateKey">The tool's private key.</param>
         /// <returns>The token response.</returns>
         [Obsolete("Pass an HttpClient (for example from IHttpClientFactory) and the key id: " +
-                  "GetAccessTokenAsync(client, issuer, scopes, clientId, accessTokenUrl, privateKey, keyId).")]
+                  "GetAccessTokenAsync(client, issuer, scopes, clientId, accessTokenUrl, privateKey, keyId).",
+            DiagnosticId = "LTIADV002")]
         public static Task<TokenResponse> GetAccessTokenAsync(string issuer, string[] scopes, string clientId,
             string accessTokenUrl, string privateKey) =>
             GetAccessTokenAsync(SharedHttpClient, issuer, scopes, clientId, accessTokenUrl, privateKey, null);
@@ -82,7 +84,16 @@ namespace LtiAdvantage.IdentityModel.Client
                 return ProtocolResponse.FromException<TokenResponse>(new ArgumentNullException(nameof(privateKey)));
             }
 
-            var jwt = CreateClientAssertion(clientId, accessTokenUrl, privateKey, keyId, DateTime.UtcNow);
+            string jwt;
+            try
+            {
+                jwt = CreateClientAssertion(clientId, accessTokenUrl, privateKey, keyId);
+            }
+            catch (Exception ex) when (ex is ArgumentException || ex is CryptographicException)
+            {
+                // An unreadable key is a bad input like the others: report it on the response.
+                return ProtocolResponse.FromException<TokenResponse>(ex);
+            }
 
             return await client.RequestClientCredentialsTokenWithJwtAsync(
                     new JwtClientCredentialsTokenRequest
@@ -98,9 +109,10 @@ namespace LtiAdvantage.IdentityModel.Client
         /// <summary>
         /// Builds the signed JWT the tool sends as its client credentials.
         /// </summary>
-        internal static string CreateClientAssertion(string clientId, string accessTokenUrl, string privateKey,
-            string keyId, DateTime now)
+        private static string CreateClientAssertion(string clientId, string accessTokenUrl, string privateKey,
+            string keyId)
         {
+            var now = DateTime.UtcNow;
             // iat, nbf and exp are NumericDate numbers (RFC 7519), not strings.
             var payload = new JwtPayload();
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, clientId));

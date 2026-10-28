@@ -128,7 +128,7 @@ namespace LtiAdvantage.UnitTests.Lti
         {
             var substitutions = new CustomPropertySubstitutions
             {
-                CourseGroup = new CourseGroup {Id = "group-1"},
+                CourseGroup = new LtiCourseGroup {Id = "group-1"},
                 LisMembership = new LisMembership {CourseGroupIds = "group-1,group-2"}
             };
 

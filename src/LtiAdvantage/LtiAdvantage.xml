@@ -2109,7 +2109,7 @@
             </remarks>
             <returns>Variable names (case-insensitive) and their values.</returns>
         </member>
-        <member name="T:LtiAdvantage.Lti.CourseGroup">
+        <member name="T:LtiAdvantage.Lti.LtiCourseGroup">
             <summary>
             Substitution values for Course Groups Service variables.
             </summary>
@@ -2118,7 +2118,7 @@
             See https://www.imsglobal.org/spec/lti-gs/v1p0#custom-parameter-substitutions.
             </remarks>
         </member>
-        <member name="P:LtiAdvantage.Lti.CourseGroup.Id">
+        <member name="P:LtiAdvantage.Lti.LtiCourseGroup.Id">
             <summary>
             The id of any one context group associated with the launch, or an empty string when
             the launch is not associated with a group.

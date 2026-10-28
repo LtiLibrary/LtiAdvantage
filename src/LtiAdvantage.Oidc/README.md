@@ -9,8 +9,7 @@ of client-credentials grant.
 
 ## .NET Standard
 
-This library targets `netstandard2.0` and uses [BouncyCastle.NetCore](https://github.com/chrishaly/bc-csharp) to read PEM formatted keys
-for compatibility with the [IMS LTI Reference Implementation](https://github.com/IMSGlobal/lti-reference-implementation).
+This library targets `net10.0`.
 
 ## Getting Started
 

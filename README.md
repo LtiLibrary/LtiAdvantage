@@ -7,6 +7,16 @@
 - [LtiAdvantage.IntegrationTests](https://github.com/LtiLibrary/LtiAdvantage/tree/master/test/LtiAdvantage.IntegrationTests) integration tests.
 - [LtiAdvantage.UnitTests](https://github.com/LtiLibrary/LtiAdvantage/tree/master/test/LtiAdvantage.UnitTests) unit tests.
 
+### 4.2.0 (unreleased)
+
+4.2.0 is binary compatible with 4.1.0: code built against 4.1.0 runs without recompiling.
+
+#### Fixed and added
+
+- `LtiDeepLinkingRequest` reads and writes the AGS, NRPS and Course Groups service claims. The AGS specification says the endpoint claim belongs in any LTI message whose context gives the tool access to the services, and a tool often creates line items while handling a deep linking request (#264).
+- New shared bases: `LtiPlatformLaunchRequest` declares the service claims once for the resource link, submission review and deep linking requests, and `LtiProctoringRequest` declares `ResourceLink`, `AttemptNumber` and `ProctoringSettings` once for the three proctoring messages. Code that sets these claims can now work with the base type instead of switching on the message type (#264).
+- The proctoring messages still carry no service claims: the Proctoring Services specification lists the optional claims for each message, and no service claim is among them (#264).
+
 ### 4.1.0
 
 4.1.0 replaces 4.0.0, which is deprecated on NuGet. It fixes what building the samples against 4.0.0

@@ -14,7 +14,7 @@ namespace LtiAdvantage.Lti
     /// (https://www.imsglobal.org/spec/proctoring/v1p0#lti-start-proctoring-message).
     /// </summary>
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    public class LtiStartProctoringRequest : LtiRequest
+    public class LtiStartProctoringRequest : LtiProctoringRequest
     {
         /// <inheritdoc />
         /// <summary>
@@ -46,22 +46,6 @@ namespace LtiAdvantage.Lti
         {
         }
 
-        /// <summary>The resource_link claim identifying the assessment. Required.</summary>
-        public ResourceLinkClaimValueType ResourceLink
-        {
-            get => this.GetClaimValue<ResourceLinkClaimValueType>(Constants.LtiClaims.ResourceLink);
-            set => this.SetClaimValue(Constants.LtiClaims.ResourceLink, value);
-        }
-
-        /// <summary>
-        /// The attempt this proctoring session covers, starting at 1. Required.
-        /// </summary>
-        public int? AttemptNumber
-        {
-            get => this.GetClaimValue<int?>(Constants.LtiClaims.AttemptNumber);
-            set => this.SetClaimValue(Constants.LtiClaims.AttemptNumber, value);
-        }
-
         /// <summary>
         /// The platform URL the proctoring tool submits the
         /// <see cref="LtiStartAssessmentRequest"/> to once the candidate is verified. Required.
@@ -90,15 +74,6 @@ namespace LtiAdvantage.Lti
         {
             get => this.GetClaimValue<AssessmentControlClaimValueType>(Constants.LtiClaims.Acs);
             set => this.SetClaimValue(Constants.LtiClaims.Acs, value);
-        }
-
-        /// <summary>
-        /// Opaque proctoring configuration the platform holds on the tool's behalf.
-        /// </summary>
-        public ProctoringSettingsClaimValueType ProctoringSettings
-        {
-            get => this.GetClaimValue<ProctoringSettingsClaimValueType>(Constants.LtiClaims.ProctoringSettings);
-            set => this.SetClaimValue(Constants.LtiClaims.ProctoringSettings, value);
         }
     }
 }

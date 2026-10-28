@@ -3184,19 +3184,6 @@
             </summary>
             <param name="payload"></param>
         </member>
-        <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.ResourceLink">
-            <summary>The resource_link claim identifying the assessment. Required.</summary>
-        </member>
-        <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.AttemptNumber">
-            <summary>
-            The attempt that just ended, starting at 1. Required.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.ProctoringSettings">
-            <summary>
-            Opaque proctoring configuration the platform holds on the tool's behalf.
-            </summary>
-        </member>
         <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.ErrorMessage">
             <summary>
             A message about the assessment intended for the end user.
@@ -3248,6 +3235,89 @@
         <member name="P:LtiAdvantage.Lti.LtiMigrationClaimValueType.ResourceLinkId">
             <summary>
             LTI 1.1 resource link ID.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Lti.LtiPlatformLaunchRequest">
+            <inheritdoc />
+            <summary>
+            Base for platform-to-tool launches that can advertise the platform's services to the tool:
+            the resource link launches (through <see cref="T:LtiAdvantage.Lti.LtiServiceLaunchRequest"/>) and
+            <see cref="T:LtiAdvantage.DeepLinking.LtiDeepLinkingRequest"/>.
+            </summary>
+            <remarks>
+            <para>
+            The service claims live here rather than on <see cref="T:LtiAdvantage.Lti.LtiRequest"/> on purpose: they are the
+            platform telling the tool what it may call, so messages that travel tool to platform, such as
+            <see cref="T:LtiAdvantage.Lti.LtiStartAssessmentRequest"/>, must not inherit them.
+            </para>
+            <para>
+            Deep linking is included because the AGS specification says the endpoint claim must be in
+            any LTI message whose context gives the tool access to the services, and a tool often creates
+            line items while handling a deep linking request. The proctoring messages are not included:
+            the Proctoring Services specification lists the optional claims for those messages, and no
+            service claim is among them.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiPlatformLaunchRequest.#ctor">
+            <summary>Create an empty instance.</summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiPlatformLaunchRequest.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <summary>Create an instance with the claims.</summary>
+            <param name="claims">A list of claims.</param>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiPlatformLaunchRequest.AssignmentGradeServices">
+            <summary>
+            The Assignment and Grade Services claim.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiPlatformLaunchRequest.CourseGroupsService">
+            <summary>
+            The Course Groups Service claim, present when the platform exposes the groups
+            (and optionally the group sets) endpoint for this context.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiPlatformLaunchRequest.NamesRoleService">
+            <summary>
+            The Names and Roles Provisioning Service claim.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Lti.LtiProctoringRequest">
+            <inheritdoc />
+            <summary>
+            Base for the three Proctoring Services messages: <see cref="T:LtiAdvantage.Lti.LtiStartProctoringRequest"/>,
+            <see cref="T:LtiAdvantage.Lti.LtiStartAssessmentRequest"/> and <see cref="T:LtiAdvantage.Lti.LtiEndAssessmentRequest"/>.
+            Declares the claims they share about the attempt being proctored.
+            (https://www.imsglobal.org/spec/proctoring/v1p0#messages)
+            </summary>
+            <remarks>
+            This base does not derive from <see cref="T:LtiAdvantage.Lti.LtiPlatformLaunchRequest"/>, so the proctoring
+            messages carry no service claims. The specification lists the optional claims for each
+            message and none of them is a service claim, and the Start Assessment message travels
+            tool to platform, so it could not advertise a platform service anyway.
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiProctoringRequest.#ctor">
+            <summary>Create an empty instance.</summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiProctoringRequest.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <summary>Create an instance with the claims.</summary>
+            <param name="claims">A list of claims.</param>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiProctoringRequest.ResourceLink">
+            <summary>
+            The resource_link claim identifying the assessment. Required on the Start Proctoring
+            and Start Assessment messages.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiProctoringRequest.AttemptNumber">
+            <summary>
+            The candidate's attempt number, starting at 1. Required on every proctoring message.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiProctoringRequest.ProctoringSettings">
+            <summary>
+            Opaque proctoring configuration the platform holds on the tool's behalf. Optional.
             </summary>
         </member>
         <member name="T:LtiAdvantage.Lti.LtiRequest">
@@ -3465,15 +3535,11 @@
         <member name="T:LtiAdvantage.Lti.LtiServiceLaunchRequest">
             <inheritdoc />
             <summary>
-            Base for platform-to-tool launches that happen in the context of a resource link and can
-            advertise the platform's services to the tool: <see cref="T:LtiAdvantage.Lti.LtiResourceLinkRequest"/> and
-            <see cref="T:LtiAdvantage.Lti.LtiSubmissionReviewRequest"/>.
+            Base for platform-to-tool launches that happen in the context of a resource link:
+            <see cref="T:LtiAdvantage.Lti.LtiResourceLinkRequest"/> and <see cref="T:LtiAdvantage.Lti.LtiSubmissionReviewRequest"/>.
+            Adds the resource link claim to the service claims declared on
+            <see cref="T:LtiAdvantage.Lti.LtiPlatformLaunchRequest"/>.
             </summary>
-            <remarks>
-            The service claims live here rather than on <see cref="T:LtiAdvantage.Lti.LtiRequest"/> on purpose: they are the
-            platform telling the tool what it may call, so messages that do not travel platform to tool,
-            such as the deep linking response, must not inherit them.
-            </remarks>
         </member>
         <member name="M:LtiAdvantage.Lti.LtiServiceLaunchRequest.#ctor">
             <summary>Create an empty instance.</summary>
@@ -3492,22 +3558,6 @@
               ...
             }
             </example>
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.AssignmentGradeServices">
-            <summary>
-            The Assignment and Grade Services claim.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.CourseGroupsService">
-            <summary>
-            The Course Groups Service claim, present when the platform exposes the groups
-            (and optionally the group sets) endpoint for this context.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.NamesRoleService">
-            <summary>
-            The Names and Roles Provisioning Service claim.
             </summary>
         </member>
         <member name="T:LtiAdvantage.Lti.LtiStartAssessmentRequest">
@@ -3546,14 +3596,6 @@
             </summary>
             <param name="payload"></param>
         </member>
-        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.ResourceLink">
-            <summary>The resource_link claim identifying the assessment. Required.</summary>
-        </member>
-        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.AttemptNumber">
-            <summary>
-            The attempt this proctoring session covers, starting at 1. Required.
-            </summary>
-        </member>
         <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.SessionData">
             <summary>
             The opaque value the platform issued on the
@@ -3569,12 +3611,6 @@
         <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.VerifiedUser">
             <summary>
             The user identity attributes the tool verified at check-in.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.ProctoringSettings">
-            <summary>
-            Opaque proctoring configuration the tool asks the platform to store for later
-            launches of this attempt.
             </summary>
         </member>
         <member name="T:LtiAdvantage.Lti.LtiStartProctoringRequest">
@@ -3607,14 +3643,6 @@
             </summary>
             <param name="payload"></param>
         </member>
-        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.ResourceLink">
-            <summary>The resource_link claim identifying the assessment. Required.</summary>
-        </member>
-        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.AttemptNumber">
-            <summary>
-            The attempt this proctoring session covers, starting at 1. Required.
-            </summary>
-        </member>
         <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.StartAssessmentUrl">
             <summary>
             The platform URL the proctoring tool submits the
@@ -3631,11 +3659,6 @@
             <summary>
             The Assessment Control Service claim, present when the platform lets the proctoring
             tool pause, resume, terminate, update or flag the attempt.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.ProctoringSettings">
-            <summary>
-            Opaque proctoring configuration the platform holds on the tool's behalf.
             </summary>
         </member>
         <member name="T:LtiAdvantage.Lti.LtiSubmissionReviewRequest">

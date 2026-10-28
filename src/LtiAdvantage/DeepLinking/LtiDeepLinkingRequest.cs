@@ -10,7 +10,7 @@ namespace LtiAdvantage.DeepLinking
     /// <summary>
     /// LTI Deep Linking request.
     /// </summary>
-    public class LtiDeepLinkingRequest : LtiRequest
+    public class LtiDeepLinkingRequest : LtiPlatformLaunchRequest
     {
         /// <inheritdoc />
         /// <summary>

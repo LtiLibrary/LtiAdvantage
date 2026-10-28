@@ -3,6 +3,9 @@
     "type": "link",
     "title": "My Home Page",
     "url": "https://something.example.com/page.html",
+    "embed": {
+      "html": "<iframe src=\"https://something.example.com/page.html\"></iframe>"
+    },
     "icon": {
       "url": "https://lti.example.com/image.jpg",
       "width": 100,
@@ -49,7 +52,12 @@
       "scoreMaximum": 87,
       "label": "Chapter 12 quiz",
       "resourceId": "xyzpdq1234",
-      "tag": "originality"
+      "tag": "originality",
+      "gradesReleased": true,
+      "submissionReview": {
+        "label": "Open My Submission",
+        "url": "https://lti.example.com/review"
+      }
     },
     "custom": {
       "quiz_id": "az-123",

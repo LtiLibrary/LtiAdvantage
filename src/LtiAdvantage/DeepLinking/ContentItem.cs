@@ -33,7 +33,13 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// HTML embed code.
         /// </summary>
+        /// <remarks>
+        /// Written as the spec's <c>"embed": {"html": "..."}</c> object. A plain string, as
+        /// 4.0.0 wrote it, is still read.
+        /// See https://www.imsglobal.org/spec/lti-dl/v2p0#link.
+        /// </remarks>
         [JsonPropertyName("embed")]
+        [JsonConverter(typeof(EmbedHtmlConverter))]
         public string Embed { get; set; }
 
         /// <inheritdoc />

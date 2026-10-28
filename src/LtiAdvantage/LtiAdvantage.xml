@@ -141,6 +141,12 @@
             Optional tag.
             </summary>
         </member>
+        <member name="P:LtiAdvantage.AssignmentGradeServices.LineItem.GradesReleased">
+            <summary>
+            Optional. Whether the platform may release this line item's grades to learners.
+            See https://www.imsglobal.org/spec/lti-ags/v2p0.
+            </summary>
+        </member>
         <member name="P:LtiAdvantage.AssignmentGradeServices.LineItem.SubmissionReviewExtension">
             <summary>
             Submission Review extension. When present, the platform uses
@@ -1000,6 +1006,11 @@
             <summary>
             HTML embed code.
             </summary>
+            <remarks>
+            Written as the spec's <c>"embed": {"html": "..."}</c> object. A plain string, as
+            4.0.0 wrote it, is still read.
+            See https://www.imsglobal.org/spec/lti-dl/v2p0#link.
+            </remarks>
         </member>
         <member name="P:LtiAdvantage.DeepLinking.ContentItem.ExpiresAt">
             <inheritdoc />
@@ -1150,6 +1161,12 @@
         <member name="P:LtiAdvantage.DeepLinking.DeepLinkingSettingsClaimValueType.Title">
             <summary>
             Default title or alt text for items returned.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.DeepLinking.EmbedHtmlConverter">
+            <summary>
+            Reads and writes a content item's <c>embed</c> property, an object with an <c>html</c>
+            member, as the HTML string it carries.
             </summary>
         </member>
         <member name="T:LtiAdvantage.DeepLinking.FileItem">
@@ -1416,6 +1433,19 @@
         <member name="P:LtiAdvantage.DeepLinking.LineItemProperty.Tag">
             <summary>
             Optional tag.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.LineItemProperty.GradesReleased">
+            <summary>
+            Optional. Whether the platform may release this line item's grades to learners.
+            See https://www.imsglobal.org/spec/lti-dl/v2p0#lti-resource-link.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.DeepLinking.LineItemProperty.SubmissionReview">
+            <summary>
+            Optional Submission Review 1.0 settings, so the line item created from this
+            deep-linked item supports submission review from the start.
+            See https://www.imsglobal.org/spec/lti-sr/v1p0.
             </summary>
         </member>
         <member name="T:LtiAdvantage.DeepLinking.LinkItem">
@@ -3003,6 +3033,18 @@
             <summary>
             The Tool is being launched within a new browser window or tab.
             </summary>
+        </member>
+        <member name="F:LtiAdvantage.Lti.DocumentTarget.Embed">
+            <summary>
+            The content is embedded in the platform's page (for example a deep linking
+            <c>link</c> item with <c>embed</c> HTML).
+            See https://www.imsglobal.org/spec/lti-dl/v2p0#deep-linking-settings.
+            </summary>
+            <remarks>
+            Only for deep linking's <c>accept_presentation_document_targets</c>. A launch's
+            <c>launch_presentation.document_target</c> is <c>iframe</c> or <c>window</c>, so do not
+            copy this value into <see cref="P:LtiAdvantage.Lti.LaunchPresentationClaimValueType.DocumentTarget"/>.
+            </remarks>
         </member>
         <member name="T:LtiAdvantage.Lti.LaunchPresentationClaimValueType">
             <summary>

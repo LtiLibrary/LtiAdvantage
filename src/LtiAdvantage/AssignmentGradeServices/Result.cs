@@ -17,12 +17,14 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// The endpoint url for this result.
         /// </summary>
         [JsonPropertyName("id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Id { get; set; }
 
         /// <summary>
         /// A comment associated with this result.
         /// </summary>
         [JsonPropertyName("comment")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Comment { get; set; }
 
         /// <summary>
@@ -35,18 +37,21 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// The line item result.
         /// </summary>
         [JsonPropertyName("resultScore")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? ResultScore { get; set; }
 
         /// <summary>
         /// The line item.
         /// </summary>
         [JsonPropertyName("scoreOf")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string ScoreOf { get; set; }
 
         /// <summary>
         /// The user id.
         /// </summary>
         [JsonPropertyName("userId")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string UserId { get; set; }
     }
 }

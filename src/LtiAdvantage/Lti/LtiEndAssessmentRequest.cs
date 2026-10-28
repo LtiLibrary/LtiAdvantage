@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using LtiAdvantage.Proctoring;
 using LtiAdvantage.Utilities;
 
 namespace LtiAdvantage.Lti

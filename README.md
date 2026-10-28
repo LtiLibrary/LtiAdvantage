@@ -9,7 +9,11 @@
 
 ### 4.2.0 (unreleased)
 
-4.2.0 is binary compatible with 4.1.0: code built against 4.1.0 runs without recompiling.
+4.2.0 is binary compatible with 4.1.0: code built against 4.1.0 runs without recompiling. One
+case behaves differently: some claim properties moved to a new base class, so reflection that uses
+`BindingFlags.DeclaredOnly`, or that reads `PropertyInfo.DeclaringType`, sees them on the base.
+Those properties are the service claims on the resource link and submission review requests, and
+`ResourceLink`, `AttemptNumber` and `ProctoringSettings` on the proctoring messages.
 
 #### Fixed and added
 

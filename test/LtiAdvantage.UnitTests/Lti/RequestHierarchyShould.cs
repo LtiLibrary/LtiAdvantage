@@ -46,10 +46,16 @@ namespace LtiAdvantage.UnitTests.Lti
         [InlineData(nameof(LtiServiceLaunchRequest.CourseGroupsService))]
         public void DeclareEachServiceClaimOnce(string property)
         {
-            Assert.Equal(typeof(LtiPlatformLaunchRequest),
-                typeof(LtiResourceLinkRequest).GetProperty(property)!.DeclaringType);
-            Assert.Equal(typeof(LtiPlatformLaunchRequest),
-                typeof(LtiDeepLinkingRequest).GetProperty(property)!.DeclaringType);
+            foreach (var messageType in new[]
+                     {
+                         typeof(LtiResourceLinkRequest),
+                         typeof(LtiSubmissionReviewRequest),
+                         typeof(LtiDeepLinkingRequest)
+                     })
+            {
+                Assert.Equal(typeof(LtiPlatformLaunchRequest),
+                    messageType.GetProperty(property)!.DeclaringType);
+            }
         }
 
         [Theory]
@@ -58,10 +64,16 @@ namespace LtiAdvantage.UnitTests.Lti
         [InlineData(nameof(LtiProctoringRequest.ProctoringSettings))]
         public void DeclareTheSharedProctoringClaimsOnce(string property)
         {
-            Assert.Equal(typeof(LtiProctoringRequest),
-                typeof(LtiStartProctoringRequest).GetProperty(property)!.DeclaringType);
-            Assert.Equal(typeof(LtiProctoringRequest),
-                typeof(LtiEndAssessmentRequest).GetProperty(property)!.DeclaringType);
+            foreach (var messageType in new[]
+                     {
+                         typeof(LtiStartProctoringRequest),
+                         typeof(LtiStartAssessmentRequest),
+                         typeof(LtiEndAssessmentRequest)
+                     })
+            {
+                Assert.Equal(typeof(LtiProctoringRequest),
+                    messageType.GetProperty(property)!.DeclaringType);
+            }
         }
 
         [Fact]

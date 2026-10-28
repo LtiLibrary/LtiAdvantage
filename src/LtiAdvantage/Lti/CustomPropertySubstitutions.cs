@@ -24,7 +24,7 @@ namespace LtiAdvantage.Lti
         /// <summary>
         /// Substitution values for Course Groups Service variables.
         /// </summary>
-        public CourseGroup CourseGroup { get; set; }
+        public LtiCourseGroup CourseGroup { get; set; }
 
         /// <summary>
         /// Substitution values for LIS Course Offering variables.
@@ -379,7 +379,7 @@ namespace LtiAdvantage.Lti
     /// Added by Course Groups Service 1.0.
     /// See https://www.imsglobal.org/spec/lti-gs/v1p0#custom-parameter-substitutions.
     /// </remarks>
-    public class CourseGroup
+    public class LtiCourseGroup
     {
         /// <summary>
         /// The id of any one context group associated with the launch, or an empty string when

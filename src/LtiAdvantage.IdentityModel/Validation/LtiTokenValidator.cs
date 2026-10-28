@@ -51,9 +51,25 @@ namespace LtiAdvantage.IdentityModel.Validation
         /// <c>IHttpClientFactory</c> so socket handling and DNS refresh are managed for you.
         /// </param>
         public LtiTokenValidator(LtiTokenValidationOptions options, HttpClient client)
+            : this(options, CreateCache(options, client))
+        {
+        }
+
+        /// <summary>
+        /// Constructs a validator that uses a shared <see cref="JwksCache"/>.
+        /// </summary>
+        /// <remarks>
+        /// Use this when several validators (for example one per client id or deployment) trust
+        /// the same platform JWKS URL, so they share one set of fetches, refreshes and rate limits.
+        /// The cache's own durations apply; the cache settings in <paramref name="options"/> are
+        /// ignored.
+        /// </remarks>
+        /// <param name="options">The registration details and validation settings.</param>
+        /// <param name="jwksCache">The shared key cache.</param>
+        public LtiTokenValidator(LtiTokenValidationOptions options, JwksCache jwksCache)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
-            if (client == null) throw new ArgumentNullException(nameof(client));
+            _jwksCache = jwksCache ?? throw new ArgumentNullException(nameof(jwksCache));
 
             if (string.IsNullOrWhiteSpace(options.Issuer))
                 throw new ArgumentException($"{nameof(options.Issuer)} is required", nameof(options));
@@ -66,7 +82,14 @@ namespace LtiAdvantage.IdentityModel.Validation
                     $"{nameof(options.NonceStore)} is required to reject replayed tokens. Supply one, or set " +
                     $"{nameof(options.AllowNonceReuse)} to accept tokens without replay detection.", nameof(options));
 
-            _jwksCache = new JwksCache(client, options.JwksCacheDuration, options.MinimumRefreshInterval);
+        }
+
+        private static JwksCache CreateCache(LtiTokenValidationOptions options, HttpClient client)
+        {
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            if (client == null) throw new ArgumentNullException(nameof(client));
+            return new JwksCache(client, options.JwksCacheDuration, options.MinimumRefreshInterval,
+                options.MaximumKeyStaleness);
         }
 
         /// <summary>

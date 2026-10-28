@@ -52,6 +52,12 @@ namespace LtiAdvantage.IdentityModel.Validation
         public TimeSpan MinimumRefreshInterval { get; set; } = TimeSpan.FromMinutes(5);
 
         /// <summary>
+        /// How long after the last successful JWKS fetch the keys may still be used while
+        /// refreshes fail. Defaults to 7 days; see <see cref="JwksCache"/>.
+        /// </summary>
+        public TimeSpan MaximumKeyStaleness { get; set; } = TimeSpan.FromDays(7);
+
+        /// <summary>
         /// Records used nonces so a replayed token is rejected.
         /// </summary>
         /// <remarks>

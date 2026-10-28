@@ -120,7 +120,8 @@ namespace LtiAdvantage.Jwks
                 else if (ops.All(op => op == "encrypt" || op == "wrapKey")) publicKey.Use = "enc";
                 // Mixed operations: leave use unset rather than contradict key_ops.
             }
-            if (string.IsNullOrEmpty(publicKey.Alg))
+            // A signing algorithm only makes sense for a signing key; leave alg unset otherwise.
+            if (string.IsNullOrEmpty(publicKey.Alg) && publicKey.Use == "sig")
             {
                 publicKey.Alg = publicKey.Kty == JsonWebAlgorithmsKeyTypes.RSA
                     ? SecurityAlgorithms.RsaSha256

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
 
@@ -47,6 +48,9 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
         /// <param name="role">Optional role filter for members that have the specified role.</param>
         /// <param name="groups">
         /// Optional Course Groups Service 1.0 request for each member's group enrollments.
+        /// Only honoured when the caller also holds the Course Groups scope
+        /// (<see cref="Constants.LtiScopes.Gs.ContextGroupReadonly"/>); otherwise the request is
+        /// served without groups, so a tool granted only NRPS cannot read group data.
         /// See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
         /// </param>
         /// <returns>The members.</returns>
@@ -69,7 +73,8 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
 
                 try
                 {
-                    var request = new GetMembershipRequest(contextId, limit, rlid, role, groups);
+                    var includeGroups = groups && await CallerHoldsGroupsScopeAsync().ConfigureAwait(false);
+                    var request = new GetMembershipRequest(contextId, limit, rlid, role, includeGroups);
                     return await OnGetMembershipAsync(request).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
@@ -87,13 +92,35 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
                         Status = StatusCodes.Status500InternalServerError,
                         Detail = _env.IsDevelopment()
                             ? ex.Message + ex.StackTrace
-                            : ex.Message
+                            : null // Exception messages can reveal configuration; Development only.
                     });
                 }
             }
             finally
             {
                 _logger.LogDebug($"Exiting {nameof(GetMembershipAsync)}.");
+            }
+        }
+
+        /// <summary>
+        /// Whether the caller's token also grants the Course Groups Service scope.
+        /// </summary>
+        private async Task<bool> CallerHoldsGroupsScopeAsync()
+        {
+            var authorization = HttpContext.RequestServices.GetService<IAuthorizationService>();
+            if (authorization == null) return false;
+
+            try
+            {
+                var result = await authorization
+                    .AuthorizeAsync(User, Constants.LtiScopes.Gs.ContextGroupReadonly)
+                    .ConfigureAwait(false);
+                return result.Succeeded;
+            }
+            catch (InvalidOperationException)
+            {
+                // No policy for the scope (AddLtiAdvantagePolicies not called): not granted.
+                return false;
             }
         }
     }

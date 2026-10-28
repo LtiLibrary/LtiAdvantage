@@ -315,7 +315,7 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(OnAddLineItemAsync)}.");
+                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(UpdateLineItemAsync)}.");
                     return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
                     {
                         Title = "An unexpected error occurred",

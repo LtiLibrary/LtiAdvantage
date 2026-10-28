@@ -499,6 +499,49 @@ namespace LtiAdvantage.UnitTests.Validation
             Assert.Equal(1, platform.FetchCount);
         }
 
+        /// <summary>
+        /// Stale keys are only served up to a maximum age: past it, a revoked key must stop being
+        /// trusted even if the JWKS still cannot be fetched.
+        /// </summary>
+        [Fact]
+        public async Task StopTrustingStaleKeys_AfterTheMaximumStaleness()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, options =>
+            {
+                options.JwksCacheDuration = TimeSpan.Zero;
+                options.MinimumRefreshInterval = TimeSpan.Zero;
+                options.MaximumKeyStaleness = TimeSpan.Zero;
+            });
+
+            Assert.True((await validator.ValidateAsync(platform.CreateIdToken())).IsValid);
+            platform.JwksDown = true;
+            await Task.Delay(20);
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken());
+
+            Assert.False(result.IsValid);
+        }
+
+        /// <summary>Validators for several client ids on one platform can share one key cache.</summary>
+        [Fact]
+        public async Task ShareAJwksCache_BetweenValidators()
+        {
+            var platform = new FakePlatform("key-1");
+            var cache = new JwksCache(platform.CreateClient(), TimeSpan.FromHours(1), TimeSpan.FromMinutes(5));
+            LtiTokenValidator ValidatorFor(string clientId) => new(new LtiTokenValidationOptions
+            {
+                Issuer = Issuer, ClientId = clientId, JwksUri = JwksUri, AllowNonceReuse = true
+            }, cache);
+
+            var first = await ValidatorFor(ClientId).ValidateAsync(platform.CreateIdToken());
+            var second = await ValidatorFor("client-2").ValidateAsync(platform.CreateIdToken(audiences: new[] {"client-2"}));
+
+            Assert.True(first.IsValid, first.Error);
+            Assert.True(second.IsValid, second.Error);
+            Assert.Equal(1, platform.FetchCount);
+        }
+
         [Fact]
         public void RequireTheRegistrationDetails()
         {
@@ -508,7 +551,11 @@ namespace LtiAdvantage.UnitTests.Validation
             Assert.Throws<ArgumentNullException>(() => new LtiTokenValidator(new LtiTokenValidationOptions
             {
                 Issuer = Issuer, ClientId = ClientId, JwksUri = JwksUri
-            }, null));
+            }, (HttpClient) null));
+            Assert.Throws<ArgumentNullException>(() => new LtiTokenValidator(new LtiTokenValidationOptions
+            {
+                Issuer = Issuer, ClientId = ClientId, JwksUri = JwksUri
+            }, (JwksCache) null));
 
             Assert.Throws<ArgumentException>(() => new LtiTokenValidator(new LtiTokenValidationOptions
             {

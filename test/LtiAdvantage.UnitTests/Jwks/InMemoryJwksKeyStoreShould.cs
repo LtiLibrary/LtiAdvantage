@@ -139,6 +139,23 @@ namespace LtiAdvantage.UnitTests.Jwks
             var published = (await new InMemoryJwksKeyStore(key).GetPublicKeysAsync()).Single();
 
             Assert.Equal(expectedUse, published.Use);
+            // A signing algorithm only for signing keys.
+            if (expectedUse == "sig") Assert.Equal("RS256", published.Alg);
+        }
+
+        [Fact]
+        public async Task NotGiveAnEncryptionKeyASigningAlgorithm()
+        {
+            using var rsa = RSA.Create(2048);
+            var key = InMemoryJwksKeyStore.CreateRsaKey(rsa, "key-1");
+            key.Use = null;
+            key.Alg = null;
+            key.KeyOps.Add("decrypt");
+
+            var published = (await new InMemoryJwksKeyStore(key).GetPublicKeysAsync()).Single();
+
+            Assert.Equal("enc", published.Use);
+            Assert.Null(published.Alg);
         }
 
         /// <summary>An EC key without alg gets the algorithm for its curve, not RS256.</summary>

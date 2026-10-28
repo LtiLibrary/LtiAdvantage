@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 ﻿using System.Threading.Tasks;
 using LtiAdvantage.AspNetCore.NamesRoleProvisioningService;
 using LtiAdvantage.NamesRoleProvisioningService;
@@ -15,7 +16,13 @@ namespace LtiAdvantage.IntegrationTests.Controllers
 
         protected override Task<ActionResult<MembershipContainer>> OnGetMembershipAsync(GetMembershipRequest request)
         {
-            var result = (ActionResult<MembershipContainer>) new ObjectResult(new MembershipContainer());
+            // One member; with group enrollments only when the base class passed IncludeGroups.
+            var member = new Member {UserId = "user-1"};
+            if (request.IncludeGroups)
+                member.GroupEnrollments = new[] {new LtiAdvantage.CourseGroupsService.GroupEnrollment {GroupId = "group-1"}};
+
+            var result = (ActionResult<MembershipContainer>) new ObjectResult(
+                new MembershipContainer {Members = new List<Member> {member}});
             return Task.FromResult(result);
         }
     }

@@ -21,6 +21,8 @@ namespace LtiAdvantage.IdentityModel.Validation
     /// A failed refresh does not throw away keys that were fetched before: the cache keeps serving
     /// them, so a JWKS outage at the platform does not block every launch. Failed attempts count
     /// toward the rate limit too, so an outage cannot turn into a fetch per incoming token.
+    /// Stale keys are only served up to a maximum age (7 days by default); after that they are
+    /// dropped, so a revoked key cannot stay trusted through a long outage.
     /// </para>
     /// </remarks>
     public class JwksCache
@@ -44,12 +46,23 @@ namespace LtiAdvantage.IdentityModel.Validation
         /// The shortest interval between two fetches of the same URL, which bounds how often an
         /// unknown key id can trigger a refresh.
         /// </param>
-        public JwksCache(HttpClient client, TimeSpan cacheDuration, TimeSpan minimumRefreshInterval)
+        /// <param name="maximumStaleness">
+        /// How long after their last successful fetch keys may still be served while refreshes
+        /// fail. Defaults to 7 days. After that the keys are dropped, so a key the platform has
+        /// revoked cannot stay trusted indefinitely just because its JWKS cannot be reached.
+        /// </param>
+        public JwksCache(HttpClient client, TimeSpan cacheDuration, TimeSpan minimumRefreshInterval,
+            TimeSpan? maximumStaleness = null)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _cacheDuration = cacheDuration;
             _minimumRefreshInterval = minimumRefreshInterval;
+            _maximumStaleness = maximumStaleness ?? TimeSpan.FromDays(7);
         }
+
+        private readonly TimeSpan _maximumStaleness;
+
+        private bool IsTooStale(Entry entry, DateTimeOffset now) => now - entry.FetchedAt > _maximumStaleness;
 
         /// <summary>
         /// Returns the signing keys published at <paramref name="jwksUri"/>.
@@ -76,6 +89,12 @@ namespace LtiAdvantage.IdentityModel.Validation
             {
                 var now = DateTimeOffset.UtcNow;
                 _entries.TryGetValue(jwksUri, out var entry);
+                if (entry != null && IsTooStale(entry, now))
+                {
+                    // Too old to trust any longer: behave as if nothing was ever fetched.
+                    _entries.Remove(jwksUri);
+                    entry = null;
+                }
 
                 var needsFreshKeys = entry == null
                     || now - entry.FetchedAt >= _cacheDuration
@@ -144,7 +163,7 @@ namespace LtiAdvantage.IdentityModel.Validation
             {
                 lock (_gate)
                 {
-                    if (_entries.TryGetValue(jwksUri, out var entry))
+                    if (_entries.TryGetValue(jwksUri, out var entry) && !IsTooStale(entry, startedAt))
                     {
                         // Keep serving the keys we have; the next attempt waits the minimum interval.
                         entry.LastAttemptAt = startedAt;

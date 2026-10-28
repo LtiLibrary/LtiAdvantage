@@ -888,9 +888,17 @@
             <param name="role">Optional role filter for members that have the specified role.</param>
             <param name="groups">
             Optional Course Groups Service 1.0 request for each member's group enrollments.
+            Only honoured when the caller also holds the Course Groups scope
+            (<see cref="F:LtiAdvantage.Constants.LtiScopes.Gs.ContextGroupReadonly"/>); otherwise the request is
+            served without groups, so a tool granted only NRPS cannot read group data.
             See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
             </param>
             <returns>The members.</returns>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.MembershipControllerBase.CallerHoldsGroupsScopeAsync">
+            <summary>
+            Whether the caller's token also grants the Course Groups Service scope.
+            </summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.OpenIdConnect.IOpenIdConfigurationController">
             <summary>

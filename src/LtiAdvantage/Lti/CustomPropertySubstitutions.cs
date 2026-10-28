@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -155,12 +156,19 @@ namespace LtiAdvantage.Lti
         {
             if (variables.Count == 0) return null;
 
+            // Ordinal tie-break keeps the alternation (and so the cache key) stable.
             var alternation = string.Join("|", variables.Keys
                 .OrderByDescending(name => name.Length)
+                .ThenBy(name => name, StringComparer.Ordinal)
                 .Select(Regex.Escape));
 
-            return new Regex(alternation, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+            // The alternation only depends on which sections are set, so there are few distinct
+            // patterns; cache them rather than parsing one per launch.
+            return Patterns.GetOrAdd(alternation,
+                a => new Regex(a, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant));
         }
+
+        private static readonly ConcurrentDictionary<string, Regex> Patterns = new ConcurrentDictionary<string, Regex>();
 
         /// <summary>
         /// Collects every variable this launch can substitute, with its value.

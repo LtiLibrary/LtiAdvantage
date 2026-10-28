@@ -54,6 +54,24 @@ namespace LtiAdvantage.IntegrationTests.NamesRoleProvisioningService
             Assert.DoesNotContain("group_enrollments", await response.Content.ReadAsStringAsync());
         }
 
+        /// <summary>
+        /// Group enrollments are Course Groups data: a tool holding only the NRPS scope must not
+        /// get them by adding ?groups=true.
+        /// </summary>
+        [Theory]
+        [InlineData(Constants.LtiScopes.Nrps.MembershipReadonly, false)]
+        [InlineData(Constants.LtiScopes.Nrps.MembershipReadonly + " " + Constants.LtiScopes.Gs.ContextGroupReadonly, true)]
+        public async Task IncludeGroups_OnlyWithTheGroupsScope(string scopes, bool expectGroups)
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", scopes);
+
+            var response = await _client.GetAsync(MembershipUrl + "?groups=true");
+
+            response.EnsureSuccessStatusCode();
+            var body = await response.Content.ReadAsStringAsync();
+            Assert.Equal(expectGroups, body.Contains("group_enrollments"));
+        }
+
         public void Dispose()
         {
             _client?.Dispose();

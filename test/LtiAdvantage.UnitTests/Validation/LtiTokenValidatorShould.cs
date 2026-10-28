@@ -249,6 +249,48 @@ namespace LtiAdvantage.UnitTests.Validation
         }
 
         /// <summary>
+        /// A JWKS fetched before the peer published its key is empty. Once the key appears, a
+        /// token with its kid must trigger a refetch instead of failing until the cache expires.
+        /// </summary>
+        [Fact]
+        public async Task RefetchTheJwks_AfterCachingAnEmptyKeySet()
+        {
+            var platform = new FakePlatform("key-1") {PublishNoKeys = true};
+            var validator = CreateValidator(platform, options =>
+            {
+                options.JwksCacheDuration = TimeSpan.FromHours(24);
+                options.MinimumRefreshInterval = TimeSpan.Zero;
+            });
+
+            Assert.False((await validator.ValidateAsync(platform.CreateIdToken())).IsValid);
+            Assert.Equal(1, platform.FetchCount);
+
+            platform.PublishNoKeys = false;
+
+            var afterPublish = await validator.ValidateAsync(platform.CreateIdToken());
+
+            Assert.True(afterPublish.IsValid, afterPublish.Error);
+            Assert.Equal(2, platform.FetchCount);
+        }
+
+        /// <summary>The refetch of an empty key set is still rate limited.</summary>
+        [Fact]
+        public async Task NotRefetchAnEmptyKeySet_MoreOftenThanTheMinimumInterval()
+        {
+            var platform = new FakePlatform("key-1") {PublishNoKeys = true};
+            var validator = CreateValidator(platform, options =>
+            {
+                options.JwksCacheDuration = TimeSpan.FromHours(24);
+                options.MinimumRefreshInterval = TimeSpan.FromMinutes(5);
+            });
+
+            for (var i = 0; i < 5; i++)
+                Assert.False((await validator.ValidateAsync(platform.CreateIdToken())).IsValid);
+
+            Assert.Equal(1, platform.FetchCount);
+        }
+
+        /// <summary>
         /// The early refresh is rate limited, so a stream of tokens carrying bogus key ids
         /// cannot be turned into a stream of requests against the platform.
         /// </summary>
@@ -734,6 +776,9 @@ namespace LtiAdvantage.UnitTests.Validation
             /// <summary>While true, the JWKS endpoint answers 503.</summary>
             public bool JwksDown { get; set; }
 
+            /// <summary>When true, the JWKS answers with an empty key set (the key is not published yet).</summary>
+            public bool PublishNoKeys { get; set; }
+
             /// <summary>When false, the JWKS lists the key without a kid (tokens still carry one).</summary>
             public bool PublishKeyIds { get; set; } = true;
 
@@ -784,6 +829,8 @@ namespace LtiAdvantage.UnitTests.Validation
 
             private string CreateJwks()
             {
+                if (PublishNoKeys) return "{\"keys\":[]}";
+
                 // Publish public components only, as a real platform must.
                 var publicKey = new RsaSecurityKey(_rsa.ExportParameters(false)) {KeyId = PublishKeyIds ? _keyId : null};
                 var jwk = JsonWebKeyConverter.ConvertFromRSASecurityKey(publicKey);

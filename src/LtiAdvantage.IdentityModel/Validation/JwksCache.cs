@@ -103,8 +103,13 @@ namespace LtiAdvantage.IdentityModel.Validation
                 // A key id we do not hold usually means the peer rotated. (Only meaningful when the
                 // peer names its keys: if none has a kid, every token would look like a rotation
                 // and the cache would degrade into polling.)
+                //
+                // An empty set counts as missing too: the peer may not have published its key yet
+                // (for example a tool registered before its JWKS was up). Without this, an unknown
+                // kid could never refetch, because an empty set has no key ids to compare against.
                 var keyMissing = entry != null
-                    && requiredKeyId != null && entry.HasKeyIds && !entry.HasKeyId(requiredKeyId);
+                    && (entry.Keys.Count == 0
+                        || (requiredKeyId != null && entry.HasKeyIds && !entry.HasKeyId(requiredKeyId)));
                 var expired = entry != null && now - entry.FetchedAt >= _cacheDuration;
 
                 if (entry != null && !keyMissing)

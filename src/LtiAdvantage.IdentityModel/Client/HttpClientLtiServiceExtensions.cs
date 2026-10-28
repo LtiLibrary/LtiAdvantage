@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LtiAdvantage.AssignmentGradeServices;
 using LtiAdvantage.CourseGroupsService;
+using LtiAdvantage.DynamicRegistration;
 using LtiAdvantage.Lti;
 using LtiAdvantage.NamesRoleProvisioningService;
 using LtiAdvantage.Utilities;
@@ -34,13 +35,19 @@ namespace LtiAdvantage.IdentityModel.Client
     /// <see cref="InvalidOperationException"/>.
     /// </para>
     /// <para>
-    /// An error status throws <see cref="LtiServiceException"/> with what the platform said.
+    /// Service URLs must be https (http only to loopback), because the token goes with them.
+    /// An error status throws <see cref="LtiServiceException"/> with what the platform said; a
+    /// success body that is not the expected JSON, or larger than <see cref="MaxResponseChars"/>,
+    /// throws <see cref="InvalidOperationException"/>.
     /// </para>
     /// </remarks>
     public static class HttpClientLtiServiceExtensions
     {
         /// <summary>The most pages a list call reads before it gives up.</summary>
         public const int MaxPages = 1000;
+
+        /// <summary>The largest response body read, in characters (16 MB).</summary>
+        public const int MaxResponseChars = 16 * 1024 * 1024;
 
         private static readonly JsonSerializerOptions WriteOptions = new JsonSerializerOptions
         {
@@ -254,7 +261,9 @@ namespace LtiAdvantage.IdentityModel.Client
                 using var response = await client.SendAsync(request, cancellationToken).ConfigureAwait(false);
                 await response.EnsureLtiSuccessAsync(cancellationToken).ConfigureAwait(false);
                 pages.Add(await ReadAsync<T>(response, cancellationToken).ConfigureAwait(false));
-                next = response.GetNextPageUrl();
+                // Resolve relative links against the page just read, even if the handler left
+                // RequestMessage unset.
+                next = response.GetNextPageUrl(next);
             }
 
             return pages;
@@ -296,18 +305,31 @@ namespace LtiAdvantage.IdentityModel.Client
 
         private static async Task<T> ReadAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken)
         {
-            var json = response.Content == null
-                ? null
-                : await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            return string.IsNullOrWhiteSpace(json) ? default : JsonSerializer.Deserialize<T>(json, ReadOptions);
+            var json = await HttpResponseMessageLtiExtensions
+                .ReadBoundedAsync(response.Content, MaxResponseChars, truncate: false, cancellationToken)
+                .ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return default;
+            }
+
+            try
+            {
+                return JsonSerializer.Deserialize<T>(json, ReadOptions);
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException(
+                    $"The platform's response from {response.RequestMessage?.RequestUri} is not the expected JSON.", ex);
+            }
         }
 
         private static Uri ToAbsoluteUri(string url, string name)
         {
             if (string.IsNullOrWhiteSpace(url)) throw new ArgumentException("A service URL is required.", name);
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)
-                || (uri.Scheme != Uri.UriSchemeHttps && uri.Scheme != Uri.UriSchemeHttp))
-                throw new ArgumentException($"'{url}' is not an absolute http(s) URL.", name);
+            // The bearer token goes with the request, so no clear-text http except to loopback.
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || !RegistrationUrl.IsAllowed(uri))
+                throw new ArgumentException($"'{url}' is not an absolute https URL.", name);
             return uri;
         }
 

@@ -134,6 +134,7 @@ namespace LtiAdvantage.UnitTests.IdentityModel
         [InlineData("<https://a.example/1>; rel=\"prev\", <https://a.example/3>; rel=\"last next\"", "https://a.example/3")]
         [InlineData("<https://a.example/2>; title=\"x\"; REL=next", "https://a.example/2")]
         [InlineData("<https://a.example/2>; rel=\"prev\"", null)]
+        [InlineData("<https://a.example/2>; title=\"Page 2, of 5\"; rel=\"next\"", "https://a.example/2")]
         public void FindTheNextLink(string header, string expected)
         {
             var response = new HttpResponseMessage(HttpStatusCode.OK)
@@ -143,6 +144,40 @@ namespace LtiAdvantage.UnitTests.IdentityModel
             response.Headers.TryAddWithoutValidation("Link", header);
 
             Assert.Equal(expected, response.GetNextPageUrl()?.AbsoluteUri);
+        }
+
+        [Fact]
+        public async Task RefuseClearTextHttp_ExceptToLoopback()
+        {
+            var handler = new StubHandler(_ => Json("[]"));
+            var client = new HttpClient(handler);
+
+            await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.GetLineItemsAsync("t", "http://platform.example.com/context/1/lineitems"));
+            Assert.Empty(handler.Requests);
+            await client.GetLineItemsAsync("t", "http://localhost:5000/context/1/lineitems");
+        }
+
+        [Fact]
+        public async Task FollowARelativeLink_WhenTheHandlerLeavesRequestMessageUnset()
+        {
+            var calls = 0;
+            var handler = new StubHandler(_ => ++calls == 1
+                ? Json("[{\"label\":\"A\",\"scoreMaximum\":1}]", "</context/1/lineitems?page=2>; rel=next")
+                : Json("[{\"label\":\"B\",\"scoreMaximum\":1}]")) {SetRequestMessage = false};
+
+            var items = await new HttpClient(handler).GetLineItemsAsync("t", LineItems);
+
+            Assert.Equal(new[] {"A", "B"}, items.Select(i => i.Label));
+        }
+
+        [Fact]
+        public async Task ThrowInvalidOperation_ForASuccessBodyThatIsNotJson()
+        {
+            var handler = new StubHandler(_ => Json("<html>login</html>"));
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                new HttpClient(handler).GetLineItemsAsync("t", LineItems));
         }
 
         private static HttpResponseMessage Json(string json, string link = null)
@@ -162,13 +197,15 @@ namespace LtiAdvantage.UnitTests.IdentityModel
 
             public List<string> Bodies { get; } = new();
 
+            public bool SetRequestMessage { get; set; } = true;
+
             protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
                 CancellationToken cancellationToken)
             {
                 Requests.Add(request);
                 if (request.Content != null) Bodies.Add(await request.Content.ReadAsStringAsync(cancellationToken));
                 var response = _respond(request);
-                response.RequestMessage = request;
+                if (SetRequestMessage) response.RequestMessage = request;
                 return response;
             }
         }

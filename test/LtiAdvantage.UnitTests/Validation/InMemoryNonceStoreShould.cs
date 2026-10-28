@@ -50,6 +50,15 @@ namespace LtiAdvantage.UnitTests.Validation
         }
 
         [Fact]
+        public async Task NotOverflow_ForAFarFutureExpiry()
+        {
+            var store = new InMemoryNonceStore();
+
+            Assert.True(await store.TryConsumeAsync("n-1", DateTime.MaxValue));
+            Assert.False(await store.TryConsumeAsync("n-1", DateTime.MaxValue));
+        }
+
+        [Fact]
         public async Task LetOnlyOneOfManyConcurrentCallsWin()
         {
             var store = new InMemoryNonceStore();

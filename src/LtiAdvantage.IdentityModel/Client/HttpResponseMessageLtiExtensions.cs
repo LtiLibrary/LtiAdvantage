@@ -16,8 +16,9 @@ namespace LtiAdvantage.IdentityModel.Client
     {
         private const int MaxBodyLength = 4096;
 
+        // Parameters run to the next comma outside quotes (RFC 8288 allows title="a, b").
         private static readonly Regex LinkValue = new Regex(
-            "<(?<url>[^>]*)>(?<params>[^,]*)", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+            "<(?<url>[^>]*)>(?<params>(?:[^,\"]|\"[^\"]*\")*)", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         private static readonly Regex RelParam = new Regex(
             "(?:^|;)\\s*rel\\s*=\\s*(?:\"(?<rel>[^\"]*)\"|(?<rel>[^;\\s]+))",
@@ -28,6 +29,16 @@ namespace LtiAdvantage.IdentityModel.Client
         /// the request URL, or null when there is no next page.
         /// </summary>
         public static Uri GetNextPageUrl(this HttpResponseMessage response)
+        {
+            if (response == null) throw new ArgumentNullException(nameof(response));
+            return GetNextPageUrl(response, response.RequestMessage?.RequestUri);
+        }
+
+        /// <summary>
+        /// Returns the <c>rel="next"</c> URL from the response's <c>Link</c> header, resolved against
+        /// <paramref name="baseUrl"/>, or null when there is no next page.
+        /// </summary>
+        public static Uri GetNextPageUrl(this HttpResponseMessage response, Uri baseUrl)
         {
             if (response == null) throw new ArgumentNullException(nameof(response));
             if (!response.Headers.TryGetValues("Link", out var values))
@@ -45,7 +56,6 @@ namespace LtiAdvantage.IdentityModel.Client
                 }
 
                 var url = link.Groups["url"].Value.Trim();
-                var baseUrl = response.RequestMessage?.RequestUri;
                 // Only http(s) counts as absolute: on Unix "/path" would otherwise parse as a file URI.
                 if (Uri.TryCreate(url, UriKind.Absolute, out var absolute)
                     && (absolute.Scheme == Uri.UriSchemeHttps || absolute.Scheme == Uri.UriSchemeHttp))
@@ -53,7 +63,12 @@ namespace LtiAdvantage.IdentityModel.Client
                     return absolute;
                 }
 
-                return baseUrl != null && Uri.TryCreate(baseUrl, url, out var resolved) ? resolved : null;
+                if (baseUrl != null && Uri.TryCreate(baseUrl, url, out var resolved))
+                {
+                    return resolved;
+                }
+
+                // Unresolvable: another next link may still work.
             }
 
             return null;
@@ -72,13 +87,8 @@ namespace LtiAdvantage.IdentityModel.Client
                 return;
             }
 
-            var body = response.Content == null
-                ? string.Empty
-                : await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            if (body.Length > MaxBodyLength)
-            {
-                body = body.Substring(0, MaxBodyLength);
-            }
+            var body = await ReadBoundedAsync(response.Content, MaxBodyLength, truncate: true, cancellationToken)
+                .ConfigureAwait(false) ?? string.Empty;
 
             string title = null, detail = null, type = null;
             if (!string.IsNullOrWhiteSpace(body))
@@ -114,6 +124,40 @@ namespace LtiAdvantage.IdentityModel.Client
 
             var message = string.IsNullOrWhiteSpace(said) ? status : $"{status} · {said}";
             throw new LtiServiceException(message, response.StatusCode, title, detail, type, body, challenge);
+        }
+
+        /// <summary>
+        /// Reads at most <paramref name="maxChars"/> characters of the body without buffering more.
+        /// Longer bodies are cut (<paramref name="truncate"/>) or rejected.
+        /// </summary>
+        internal static async Task<string> ReadBoundedAsync(HttpContent content, int maxChars, bool truncate,
+            CancellationToken cancellationToken)
+        {
+            if (content == null)
+            {
+                return null;
+            }
+
+            using var stream = await content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            using var reader = new System.IO.StreamReader(stream, System.Text.Encoding.UTF8,
+                detectEncodingFromByteOrderMarks: true);
+            var text = new System.Text.StringBuilder();
+            var chunk = new char[8192];
+            int read;
+            while ((read = await reader.ReadAsync(chunk.AsMemory(), cancellationToken).ConfigureAwait(false)) > 0)
+            {
+                if (text.Length + read > maxChars)
+                {
+                    if (!truncate)
+                        throw new InvalidOperationException($"The platform response is larger than {maxChars} characters.");
+                    text.Append(chunk, 0, maxChars - text.Length);
+                    break;
+                }
+
+                text.Append(chunk, 0, read);
+            }
+
+            return text.ToString();
         }
 
         private static string GetString(JsonElement element, string name)

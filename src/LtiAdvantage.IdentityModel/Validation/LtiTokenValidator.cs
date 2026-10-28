@@ -283,9 +283,11 @@ namespace LtiAdvantage.IdentityModel.Validation
             return null;
         }
 
+        // Hash first so the comparison takes the same time whatever the lengths.
         private static bool FixedTimeEquals(string a, string b) =>
             System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(
-                System.Text.Encoding.UTF8.GetBytes(a), System.Text.Encoding.UTF8.GetBytes(b));
+                System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(a)),
+                System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(b)));
 
         private async Task<LtiTokenValidationResult> ValidateNonceAsync(JwtSecurityToken jwt, string expectedNonce,
             CancellationToken cancellationToken)

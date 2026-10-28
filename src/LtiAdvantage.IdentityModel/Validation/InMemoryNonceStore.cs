@@ -28,9 +28,10 @@ namespace LtiAdvantage.IdentityModel.Validation
         /// Creates the store.
         /// </summary>
         /// <param name="clockSkew">
-        /// How long past the token's expiry a nonce is kept. Use the validator's
+        /// How long past the token's expiry a nonce is kept. Must be at least the validator's
         /// <see cref="LtiTokenValidationOptions.ClockSkew"/> (the default, 5 minutes, matches it),
-        /// because the validator still accepts the token for that long.
+        /// because the validator still accepts the token for that long; a shorter value lets a
+        /// token be replayed in the gap.
         /// </param>
         /// <param name="timeProvider">The clock. Defaults to the system clock.</param>
         public InMemoryNonceStore(TimeSpan? clockSkew = null, TimeProvider timeProvider = null)
@@ -52,7 +53,8 @@ namespace LtiAdvantage.IdentityModel.Validation
             var now = _timeProvider.GetUtcNow();
             PruneIfDue(now);
 
-            var keepUntil = ToUtc(expiresAt) + _clockSkew;
+            var expiry = ToUtc(expiresAt);
+            var keepUntil = expiry > DateTimeOffset.MaxValue - _clockSkew ? DateTimeOffset.MaxValue : expiry + _clockSkew;
             while (true)
             {
                 if (_nonces.TryAdd(nonce, keepUntil))

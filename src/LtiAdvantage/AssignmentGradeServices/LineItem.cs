@@ -65,6 +65,14 @@ namespace LtiAdvantage.AssignmentGradeServices
         public string Tag { get; set; }
 
         /// <summary>
+        /// Optional. Whether the platform may release this line item's grades to learners.
+        /// See https://www.imsglobal.org/spec/lti-ags/v2p0.
+        /// </summary>
+        [JsonPropertyName("gradesReleased")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? GradesReleased { get; set; }
+
+        /// <summary>
         /// Submission Review extension. When present, the platform uses
         /// <c>SubmissionReviewExtension.Url</c> for LtiSubmissionReviewRequest
         /// launches against this line item.

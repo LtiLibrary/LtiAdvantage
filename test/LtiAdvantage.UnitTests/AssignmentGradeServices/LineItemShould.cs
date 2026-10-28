@@ -103,5 +103,14 @@ namespace LtiAdvantage.UnitTests.AssignmentGradeServices
             Assert.DoesNotContain("null", json);
             JsonAssert.Equal("{\"label\":\"Quiz\",\"scoreMaximum\":10}", json);
         }
+
+        [Fact]
+        public void RoundTripGradesReleased()
+        {
+            var json = JsonSerializer.Serialize(new LineItem { Label = "Quiz", ScoreMaximum = 10, GradesReleased = false });
+
+            Assert.Contains("\"gradesReleased\":false", json);
+            Assert.False(JsonSerializer.Deserialize<LineItem>(json).GradesReleased);
+        }
     }
 }

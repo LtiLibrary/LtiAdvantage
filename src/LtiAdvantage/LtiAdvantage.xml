@@ -141,6 +141,12 @@
             Optional tag.
             </summary>
         </member>
+        <member name="P:LtiAdvantage.AssignmentGradeServices.LineItem.GradesReleased">
+            <summary>
+            Optional. Whether the platform may release this line item's grades to learners.
+            See https://www.imsglobal.org/spec/lti-ags/v2p0.
+            </summary>
+        </member>
         <member name="P:LtiAdvantage.AssignmentGradeServices.LineItem.SubmissionReviewExtension">
             <summary>
             Submission Review extension. When present, the platform uses

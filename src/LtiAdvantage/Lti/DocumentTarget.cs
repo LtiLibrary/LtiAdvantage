@@ -28,6 +28,11 @@ namespace LtiAdvantage.Lti
         /// <c>link</c> item with <c>embed</c> HTML).
         /// See https://www.imsglobal.org/spec/lti-dl/v2p0#deep-linking-settings.
         /// </summary>
+        /// <remarks>
+        /// Only for deep linking's <c>accept_presentation_document_targets</c>. A launch's
+        /// <c>launch_presentation.document_target</c> is <c>iframe</c> or <c>window</c>, so do not
+        /// copy this value into <see cref="LaunchPresentationClaimValueType.DocumentTarget"/>.
+        /// </remarks>
         Embed
     }
 }

@@ -49,14 +49,35 @@ namespace LtiAdvantage.UnitTests.DeepLinking
         }
 
         [Theory]
-        [InlineData("{\"type\":\"link\",\"url\":\"https://example.com\",\"embed\":{\"html\":\"<p>hi</p>\"}}")]
-        [InlineData("{\"type\":\"link\",\"url\":\"https://example.com\",\"embed\":\"<p>hi</p>\"}")]
-        public void ReadEmbedHtml_FromTheSpecObjectAndFromTheOldString(string item)
+        [InlineData("{\"html\":\"<p>hi</p>\"}", "<p>hi</p>")]
+        [InlineData("\"<p>hi</p>\"", "<p>hi</p>")]
+        [InlineData("{\"HTML\":\"old\",\"other\":{\"html\":\"x\"},\"html\":\"<p>hi</p>\"}", "<p>hi</p>")]
+        [InlineData("{}", null)]
+        [InlineData("{\"html\":null}", null)]
+        [InlineData("null", null)]
+        public void ReadEmbedHtml(string embed, string expected)
+        {
+            var item = ReadItem("{\"type\":\"link\",\"url\":\"https://example.com\",\"embed\":" + embed + "}");
+
+            Assert.Equal(expected, item.Embed);
+            Assert.Equal("https://example.com", item.Url);
+        }
+
+        [Theory]
+        [InlineData("{\"html\":123}")]
+        [InlineData("{\"html\":{\"value\":\"<p/>\"}}")]
+        [InlineData("[\"<p/>\"]")]
+        public void RejectAMalformedEmbed(string embed)
+        {
+            Assert.ThrowsAny<System.Text.Json.JsonException>(() =>
+                ReadItem("{\"type\":\"link\",\"url\":\"https://example.com\",\"embed\":" + embed + "}"));
+        }
+
+        private static ContentItem ReadItem(string item)
         {
             var payload = new JwtPayload();
             payload.AddClaim(new Claim(Constants.LtiClaims.ContentItems, item, JsonClaimValueTypes.Json));
-
-            Assert.Equal("<p>hi</p>", Assert.Single(new LtiDeepLinkingResponse(payload).ContentItems).Embed);
+            return Assert.Single(new LtiDeepLinkingResponse(payload).ContentItems);
         }
 
         [Fact]

@@ -20,21 +20,34 @@ namespace LtiAdvantage.DeepLinking
                     // 4.0.0 wrote the HTML as a plain string.
                     return reader.GetString();
                 case JsonTokenType.StartObject:
-                    using (var document = JsonDocument.ParseValue(ref reader))
-                    {
-                        foreach (var property in document.RootElement.EnumerateObject())
-                        {
-                            if (string.Equals(property.Name, "html", StringComparison.OrdinalIgnoreCase))
-                            {
-                                return property.Value.ValueKind == JsonValueKind.String ? property.Value.GetString() : null;
-                            }
-                        }
-
-                        return null;
-                    }
+                    return ReadEmbedObject(ref reader);
                 default:
-                    throw new JsonException("Expected an embed object.");
+                    throw new JsonException("Expected embed to be an object with an html member.");
             }
+        }
+
+        private static string ReadEmbedObject(ref Utf8JsonReader reader)
+        {
+            string html = null;
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+            {
+                var isHtml = reader.ValueTextEquals("html");
+                reader.Read();
+                if (!isHtml)
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                html = reader.TokenType switch
+                {
+                    JsonTokenType.String => reader.GetString(),
+                    JsonTokenType.Null => null,
+                    _ => throw new JsonException("Expected embed.html to be a string.")
+                };
+            }
+
+            return html;
         }
 
         public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)

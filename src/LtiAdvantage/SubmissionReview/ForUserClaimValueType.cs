@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace LtiAdvantage.SubmissionReview
@@ -29,14 +28,15 @@ namespace LtiAdvantage.SubmissionReview
         [JsonPropertyName("email")]
         public string Email { get; set; }
 
-        /// <summary>The roles of the reviewed user in the context, as role URIs.</summary>
+        /// <summary>The roles of the reviewed user in the context.</summary>
         /// <remarks>
-        /// Strings, because a platform may send roles this library does not define. Use
-        /// <see cref="Lti.RoleExtensions.TryParse"/> to read them as <see cref="Lti.Role"/> values and
-        /// <see cref="Lti.RoleExtensions.ToUri"/> to write one.
+        /// Written and read as role URIs, like the launch's roles claim
+        /// (<see cref="Lti.LtiRequest.Roles"/>). A role this library does not define reads as
+        /// <see cref="Lti.Role.Unknown"/>, and <see cref="Lti.Role.Unknown"/> is left out when written.
         /// </remarks>
         [JsonPropertyName("roles")]
-        public IList<string> Roles { get; set; }
+        [JsonConverter(typeof(Lti.RoleArrayConverter))]
+        public Lti.Role[] Roles { get; set; }
 
         /// <summary>The person sourcedId of the reviewed user.</summary>
         [JsonPropertyName("person_sourcedid")]

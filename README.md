@@ -7,7 +7,41 @@
 - [LtiAdvantage.IntegrationTests](https://github.com/LtiLibrary/LtiAdvantage/tree/master/test/LtiAdvantage.IntegrationTests) integration tests.
 - [LtiAdvantage.UnitTests](https://github.com/LtiLibrary/LtiAdvantage/tree/master/test/LtiAdvantage.UnitTests) unit tests.
 
-### What's new
+### 4.1.0
+
+4.1.0 replaces 4.0.0, which is deprecated on NuGet. It fixes what building the samples against 4.0.0
+turned up, and it has breaking changes, so code built against 4.0.0 must be recompiled.
+
+#### Fixed and added
+
+- AGS and NRPS controllers bind the spec's query parameter names (`resource_link_id`, `resource_id`, `user_id`) and accept the role URI in NRPS `role`; the old names still work (#301).
+- Deep linking content items read and write `width`, `height`, `expiresAt` and the `embed` object by their spec names; `DocumentTarget.Embed`, and `gradesReleased` / `submissionReview` on a deep-linked `lineItem` (#302, #304).
+- `Score.ScoreGiven` / `ScoreMaximum` are optional, and AGS models leave unset optional properties out (#303).
+- The OpenID configuration document has no explicit nulls, and `MvcOptions.MapLtiRoute` moves any of the library's routes, for example away from OpenIddict's discovery endpoint (#305).
+- Tool helpers: `InMemoryNonceStore`, a login-nonce check on `LtiTokenValidator`, per-registration JWKS, and `HttpClient` extensions for AGS, NRPS and Course Groups (#306).
+- `RsaPemKeys` replaces `PemHelper` (sets `kid`, no BouncyCastle); `AccessTokenUtil` takes an `HttpClient` and writes a numeric `iat` (#307).
+- `ToolPlatform` / `ToolPlatformInstance` replace the misspelled `ToolPlatfom*` names, and `Role.ToUri()` / `ContextType.ToUri()` are public (#308).
+- `JwksCache` refetches a JWKS that was empty when first fetched, for example a tool registered before its key was published (#314).
+
+#### Breaking changes
+
+- `ImageProperty.Width` / `Height` are `int?` (#302), and `Score.ScoreGiven` / `ScoreMaximum` are `double?` (#303). Use `.Value` or `?? 0` where you read them, and leave the score values null for a progress-only score.
+- `CustomPropertySubstitutions.ToolPlatform` / `ToolPlatformInstance` use the correctly spelled `ToolPlatform` / `ToolPlatformInstance` types; the misspelled names remain as obsolete aliases (#308).
+- `LtiAdvantage.Lti.CourseGroup` is renamed to `LtiCourseGroup`, so it no longer clashes with an app's own `CourseGroup` (#320).
+- `ForUserClaimValueType.Roles` is `Role[]`, like the launch's roles claim, instead of `IList<string>` (#321). Convert with `RoleExtensions.TryParse` and `Role.ToUri()`. A role the library does not define reads as `Role.Unknown`.
+
+#### Changes on the wire
+
+- Deep linking content items are written with `width`, `height`, `expiresAt` and `embed: {"html": …}` instead of `Width`, `Height`, `ExpiresAt` and a bare `embed` string. Both forms are still read (#302, #304).
+- AGS line items, results and scores leave unset optional properties out instead of writing `null`, and a progress-only score has no `scoreGiven` / `scoreMaximum` (#303).
+- The client assertion's `iat` is a number, and it carries the `kid` when you pass a key id (#307).
+- Roles arrays (the roles claim, NRPS members, `for_user`) leave `Role.Unknown` out instead of writing `null` (#321).
+
+#### Deprecated
+
+- `PemHelper` (`LTIADV001`) and the `AccessTokenUtil.GetAccessTokenAsync` overload without an `HttpClient` (`LTIADV002`) still work but are obsolete; use `RsaPemKeys` and the overload that takes an `HttpClient` and key id (#307). The misspelled `ToolPlatfom*` names are obsolete too (#308).
+
+### What's new in 4.0.0
 
 - [LTI Course Groups Service 1.0](https://www.imsglobal.org/spec/lti-gs/v1p0) — `groupsservice` claim, `GroupsControllerBase` + `GroupSetsControllerBase`, and `group_enrollments` on the NRPS membership response (`?groups=true`)
 - [LTI Proctoring Services 1.0](https://www.imsglobal.org/spec/proctoring/v1p0) — `LtiStartProctoringRequest`, `LtiStartAssessmentRequest`, `LtiEndAssessmentRequest`, and the Assessment Control Service (`AssessmentControlControllerBase`)
@@ -18,16 +52,6 @@
 - [LTI Dynamic Registration 1.0](https://www.imsglobal.org/spec/lti-dr/v1p0) — tool-side `HttpClient` extensions and platform-side `DynamicRegistrationControllerBase`
 
 #### Fixed
-
-- AGS and NRPS controllers bind the spec's query parameter names (`resource_link_id`, `resource_id`, `user_id`) and accept the role URI in NRPS `role`; the old names still work (#301).
-- Deep linking content items read and write `width`, `height`, `expiresAt` and the `embed` object by their spec names; `DocumentTarget.Embed`, and `gradesReleased` / `submissionReview` on a deep-linked `lineItem` (#302, #304).
-- `Score.ScoreGiven` / `ScoreMaximum` are optional, and AGS models leave unset optional properties out (#303).
-- The OpenID configuration document has no explicit nulls, and `MvcOptions.MapLtiRoute` moves any of the library's routes, for example away from OpenIddict's discovery endpoint (#305).
-- Tool helpers: `InMemoryNonceStore`, a login-nonce check on `LtiTokenValidator`, per-registration JWKS, and `HttpClient` extensions for AGS, NRPS and Course Groups (#306).
-- `RsaPemKeys` replaces `PemHelper` (sets `kid`, no BouncyCastle); `AccessTokenUtil` takes an `HttpClient` and writes a numeric `iat` (#307).
-- `ToolPlatform` / `ToolPlatformInstance` replace the misspelled `ToolPlatfom*` names, and `Role.ToUri()` / `ContextType.ToUri()` are public (#308).
-
-**Breaking (recompile needed):** `ImageProperty.Width` / `Height` are now `int?`, `Score.ScoreGiven` / `ScoreMaximum` are now `double?`, and `CustomPropertySubstitutions.ToolPlatform` / `ToolPlatfomInstance` now have the correctly spelled types. Code that reads these as the old types needs a small change, and assemblies built against 4.0.0 must be rebuilt.
 
 - Custom-variable substitution: `$Context.id.history` and `$ResourceLink.id.history` were mangled by the shorter `.id` variable being substituted first, and `$Context.sourcedId` was unreachable because the sourced id was written over `$Context.title`.
 - The `…ControllerBase` classes no longer turn a client disconnect into a 500.

@@ -62,7 +62,7 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
             [FromQuery(Name = "user_id")] string userId = null, 
             [FromQuery] int? limit = null)
         {
-            // Before 4.0.1 this was bound as userId; keep accepting it.
+            // Before 4.1.0 this was bound as userId; keep accepting it.
             userId ??= Request.LegacyQueryValue("user_id", "userId");
 
             var request = new GetResultsRequest(contextId, lineItemId, userId, limit) { CancellationToken = HttpContext.RequestAborted };

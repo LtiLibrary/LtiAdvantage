@@ -81,6 +81,7 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// The role/s this member has in the context. Does not include non-context roles.
         /// </summary>
         [JsonPropertyName("roles")]
+        [JsonConverter(typeof(RoleArrayConverter))]
         public Role[] Roles { get; set; }
 
         /// <summary>

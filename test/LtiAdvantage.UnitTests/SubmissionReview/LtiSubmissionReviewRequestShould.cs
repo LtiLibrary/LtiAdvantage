@@ -53,6 +53,54 @@ namespace LtiAdvantage.UnitTests.SubmissionReview
             Assert.Equal("Jane Doe", request.ForUser.Name);
         }
 
+        /// <summary>The reviewed user's roles are Role values, written as the spec's role URIs.</summary>
+        [Fact]
+        public void RoundTripForUserRoles_AsRoleUris()
+        {
+            var request = new LtiSubmissionReviewRequest
+            {
+                ForUser = new ForUserClaimValueType
+                {
+                    UserId = "abc-123",
+                    Roles = new[] {Role.ContextLearner, Role.ContextMentor}
+                }
+            };
+
+            var jwt = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().WriteToken(
+                new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(new System.IdentityModel.Tokens.Jwt.JwtHeader(), request));
+            var payload = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().ReadJwtToken(jwt).Payload;
+
+            Assert.Contains("\"http://purl.imsglobal.org/vocab/lis/v2/membership#Learner\"", payload.SerializeToJson());
+            Assert.Contains("\"http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor\"", payload.SerializeToJson());
+            Assert.Equal(new[] {Role.ContextLearner, Role.ContextMentor},
+                new LtiSubmissionReviewRequest(payload).ForUser.Roles);
+        }
+
+        /// <summary>
+        /// A role the library does not define reads as Unknown and is left out when written, so the
+        /// array never carries a null.
+        /// </summary>
+        [Fact]
+        public void LeaveUnknownForUserRolesOut_WhenWriting()
+        {
+            var forUser = JsonSerializer.Deserialize<ForUserClaimValueType>(
+                "{\"user_id\":\"u\",\"roles\":[\"http://purl.imsglobal.org/vocab/lis/v2/membership#Learner\",\"https://example.edu/roles#Grader\",null]}");
+
+            Assert.Equal(new[] {Role.ContextLearner, Role.Unknown}, forUser.Roles);
+
+            var json = JsonSerializer.Serialize(forUser);
+            Assert.Contains("\"roles\":[\"http://purl.imsglobal.org/vocab/lis/v2/membership#Learner\"]", json);
+        }
+
+        [Fact]
+        public void ReadForUserRoles_FromTheSpecExample()
+        {
+            var request = JsonSerializer.Deserialize<LtiSubmissionReviewRequest>(
+                TestUtils.LoadReferenceJsonFile("LtiSubmissionReviewRequest"));
+
+            Assert.Equal(new[] {Role.ContextLearner}, request.ForUser.Roles);
+        }
+
         [Fact]
         public void ParseValidLtiSubmissionReviewRequest()
         {

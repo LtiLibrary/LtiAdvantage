@@ -155,6 +155,19 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
             Assert.Equal("spec", Header(response, "x-resource-link-id"));
         }
 
+        [Theory]
+        [InlineData("?resource_link_id=&resourceLinkId=old", "")]
+        [InlineData("?resourceLinkId=a&resourceLinkId=b", "a")]
+        public async Task ReadTheOldFilterName_OnlyWithoutTheSpecName_AndOnlyItsFirstValue(string query, string expected)
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Ags.LineItemReadonly);
+
+            var response = await _client.GetAsync(LineItemsUrl + query);
+
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(expected, Header(response, "x-resource-link-id"));
+        }
+
         private static string Header(HttpResponseMessage response, string name) =>
             string.Join(",", response.Headers.GetValues(name));
 

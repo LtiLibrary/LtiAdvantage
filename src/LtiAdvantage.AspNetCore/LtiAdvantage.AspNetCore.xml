@@ -1141,6 +1141,17 @@
             <param name="policyName"></param>
             <returns></returns>
         </member>
+        <member name="T:LtiAdvantage.AspNetCore.Utilities.QueryAliasExtensions">
+            <summary>
+            Reads query parameters under the names 4.0.0 bound before they were renamed to the spec names.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Utilities.QueryAliasExtensions.LegacyQueryValue(Microsoft.AspNetCore.Http.HttpRequest,System.String,System.String)">
+            <summary>
+            Returns the first value of <paramref name="legacyName"/>, unless the request also sent
+            <paramref name="specName"/> (even empty), in which case the spec name wins and this returns null.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.Utilities.ServiceExceptionFilterAttribute">
             <summary>
             The error contract shared by the LTI service controller bases: an exception thrown by an

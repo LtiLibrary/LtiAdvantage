@@ -17,7 +17,8 @@ namespace LtiAdvantage.Lti
         /// <summary>
         /// Parses a role the way LTI messages and services spell it: the full role URI
         /// (<c>http://purl.imsglobal.org/vocab/lis/v2/membership#Learner</c>), the simple name
-        /// the specs allow for context roles (<c>Learner</c>), or the enum name (<c>ContextLearner</c>).
+        /// the specs allow for context roles (<c>Learner</c>), or the enum name (<c>ContextLearner</c>, any case).
+        /// Role URIs and simple names are matched exactly.
         /// </summary>
         /// <param name="value">The role to parse.</param>
         /// <param name="role">The parsed role, or <see cref="Role.Unknown"/> when parsing fails.</param>
@@ -36,9 +37,10 @@ namespace LtiAdvantage.Lti
                 return true;
             }
 
-            // Enum names only: Enum.TryParse would also accept numbers ("3") and lists ("A, B").
-            if (!char.IsDigit(value[0]) && value[0] != '-' && value.IndexOf(',') < 0
-                && Enum.TryParse(value, ignoreCase: false, out role)
+            // Enum names only (ignoring case, as ASP.NET Core's enum binding does). Enum.TryParse
+            // would also accept numbers ("3", "+3") and lists ("A, B"), so require a plain name.
+            if (char.IsLetter(value[0]) && value.All(char.IsLetterOrDigit)
+                && Enum.TryParse(value, ignoreCase: true, out role)
                 && role != Role.Unknown && Enum.IsDefined(typeof(Role), role))
             {
                 return true;

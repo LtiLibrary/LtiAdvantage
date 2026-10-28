@@ -159,8 +159,8 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
             [FromQuery] int? limit = null)
         {
             // Before 4.0.1 these were bound as resourceLinkId and resourceId; keep accepting them.
-            resourceLinkId ??= LegacyQueryValue("resourceLinkId");
-            resourceId ??= LegacyQueryValue("resourceId");
+            resourceLinkId ??= Request.LegacyQueryValue("resource_link_id", "resourceLinkId");
+            resourceId ??= Request.LegacyQueryValue("resource_id", "resourceId");
 
             var request = new GetLineItemsRequest(contextId, resourceLinkId, resourceId, tag, limit) { CancellationToken = HttpContext.RequestAborted };
             return await OnGetLineItemsAsync(request).ConfigureAwait(false);
@@ -186,12 +186,6 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
         {
             var request = new UpdateLineItemRequest(contextId, lineItemId, lineItem) { CancellationToken = HttpContext.RequestAborted };
             return await OnUpdateLineItemAsync(request).ConfigureAwait(false);
-        }
-
-        private string LegacyQueryValue(string name)
-        {
-            var value = Request.Query[name].ToString();
-            return string.IsNullOrEmpty(value) ? null : value;
         }
     }
 }

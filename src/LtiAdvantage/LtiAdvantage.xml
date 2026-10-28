@@ -3782,7 +3782,8 @@
             <summary>
             Parses a role the way LTI messages and services spell it: the full role URI
             (<c>http://purl.imsglobal.org/vocab/lis/v2/membership#Learner</c>), the simple name
-            the specs allow for context roles (<c>Learner</c>), or the enum name (<c>ContextLearner</c>).
+            the specs allow for context roles (<c>Learner</c>), or the enum name (<c>ContextLearner</c>, any case).
+            Role URIs and simple names are matched exactly.
             </summary>
             <param name="value">The role to parse.</param>
             <param name="role">The parsed role, or <see cref="F:LtiAdvantage.Lti.Role.Unknown"/> when parsing fails.</param>

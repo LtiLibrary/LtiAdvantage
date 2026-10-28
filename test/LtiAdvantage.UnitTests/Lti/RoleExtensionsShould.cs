@@ -10,6 +10,7 @@ namespace LtiAdvantage.UnitTests.Lti
         [InlineData("Learner", Role.ContextLearner)]
         [InlineData("ContextLearner", Role.ContextLearner)]
         [InlineData(" Instructor ", Role.ContextInstructor)]
+        [InlineData("contextlearner", Role.ContextLearner)]
         [InlineData("http://purl.imsglobal.org/vocab/lis/v2/institution/person#Learner", Role.InstitutionLearner)]
         public void ParseKnownRoles(string value, Role expected)
         {
@@ -23,6 +24,7 @@ namespace LtiAdvantage.UnitTests.Lti
         [InlineData("Unknown")]
         [InlineData("3")]
         [InlineData("-1")]
+        [InlineData("+3")]
         [InlineData("learner")]
         [InlineData("ContextLearner, ContextInstructor")]
         [InlineData("http://example.com/role")]

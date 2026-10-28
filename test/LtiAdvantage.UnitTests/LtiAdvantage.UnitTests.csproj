@@ -10,6 +10,7 @@
     <None Remove="ReferenceJson\AssessmentControlRequest.json" />
     <None Remove="ReferenceJson\ContextGroupContainer.json" />
     <None Remove="ReferenceJson\ContextGroupSetContainer.json" />
+    <None Remove="ReferenceJson\DeepLinkingContentItems.json" />
     <None Remove="ReferenceJson\LineItem.json" />
     <None Remove="ReferenceJson\LineItemContainer.json" />
     <None Remove="ReferenceJson\LtiEndAssessmentRequest.json" />
@@ -32,6 +33,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ReferenceJson\ContextGroupSetContainer.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ReferenceJson\DeepLinkingContentItems.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ReferenceJson\LineItem.json">

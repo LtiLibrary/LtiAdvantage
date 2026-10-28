@@ -40,12 +40,14 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// The URL will be available until this time.
         /// </summary>
+        [JsonPropertyName("expiresAt")]
         public DateTime? ExpiresAt { get; set; }
 
         /// <inheritdoc />
         /// <summary>
         /// Height in pixels.
         /// </summary>
+        [JsonPropertyName("height")]
         public int? Height { get; set; }
 
         /// <inheritdoc />
@@ -138,6 +140,7 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// Width in pixels.
         /// </summary>
+        [JsonPropertyName("width")]
         public int? Width { get; set; }
 
         /// <inheritdoc cref="ILinkItem" />

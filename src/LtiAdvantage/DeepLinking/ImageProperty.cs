@@ -11,7 +11,8 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// Height in pixels.
         /// </summary>
-        public int Height { get; set; }
+        [JsonPropertyName("height")]
+        public int? Height { get; set; }
 
         /// <summary>
         /// Url to the image.
@@ -22,6 +23,7 @@ namespace LtiAdvantage.DeepLinking
         /// <summary>
         /// Width in pixels.
         /// </summary>
-        public int Width { get; set; }
+        [JsonPropertyName("width")]
+        public int? Width { get; set; }
     }
 }

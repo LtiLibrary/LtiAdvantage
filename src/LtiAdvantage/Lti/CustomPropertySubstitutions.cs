@@ -91,6 +91,7 @@ namespace LtiAdvantage.Lti
         /// </summary>
         [Obsolete("Use ToolPlatformInstance.")]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [System.Text.Json.Serialization.JsonIgnore]
         public ToolPlatformInstance ToolPlatfomInstance
         {
             get => ToolPlatformInstance;

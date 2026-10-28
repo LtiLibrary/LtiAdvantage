@@ -27,7 +27,7 @@
 - `RsaPemKeys` replaces `PemHelper` (sets `kid`, no BouncyCastle); `AccessTokenUtil` takes an `HttpClient` and writes a numeric `iat` (#307).
 - `ToolPlatform` / `ToolPlatformInstance` replace the misspelled `ToolPlatfom*` names, and `Role.ToUri()` / `ContextType.ToUri()` are public (#308).
 
-**Source-breaking:** `ImageProperty.Width` / `Height` are now `int?` and `Score.ScoreGiven` / `ScoreMaximum` are now `double?`.
+**Breaking (recompile needed):** `ImageProperty.Width` / `Height` are now `int?`, `Score.ScoreGiven` / `ScoreMaximum` are now `double?`, and `CustomPropertySubstitutions.ToolPlatform` / `ToolPlatfomInstance` now have the correctly spelled types. Code that reads these as the old types needs a small change, and assemblies built against 4.0.0 must be rebuilt.
 
 - Custom-variable substitution: `$Context.id.history` and `$ResourceLink.id.history` were mangled by the shorter `.id` variable being substituted first, and `$Context.sourcedId` was unreachable because the sourced id was written over `$Context.title`.
 - The `…ControllerBase` classes no longer turn a client disconnect into a 500.

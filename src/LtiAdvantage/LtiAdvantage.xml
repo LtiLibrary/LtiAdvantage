@@ -1978,8 +1978,8 @@
         </member>
         <member name="M:LtiAdvantage.Lti.ContextTypeExtensions.TryParse(System.String,LtiAdvantage.Lti.ContextType@)">
             <summary>
-            Parses a context type from its URI (or the simple name the spec allows, such as
-            <c>CourseOffering</c>, where the enum defines one).
+            Parses a context type from its URI, the simple name the spec allows (such as
+            <c>CourseOffering</c>), or the enum name in any case.
             </summary>
             <param name="value">The value to parse.</param>
             <param name="contextType">The parsed type, or <see cref="F:LtiAdvantage.Lti.ContextType.Unknown"/>.</param>

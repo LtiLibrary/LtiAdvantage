@@ -16,6 +16,7 @@ namespace LtiAdvantage.UnitTests.Lti
         [InlineData("http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering")]
         [InlineData("urn:lti:context-type:ims/lis/CourseOffering")]
         [InlineData("CourseOffering")]
+        [InlineData("courseoffering")]
         public void ParseAContextType(string value)
         {
             Assert.True(ContextTypeExtensions.TryParse(value, out var type));

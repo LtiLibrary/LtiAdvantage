@@ -12,6 +12,21 @@ namespace LtiAdvantage.IntegrationTests.Controllers
     {
         public JwksController(IJwksKeyStore keyStore, ILogger<JwksControllerBase> logger)
             : base(keyStore, logger) { }
+
+        /// <summary>
+        /// When the route is moved to carry a {registrationId}, publish that registration's key
+        /// instead of the store's: the per-registration pattern GetPublicKeysAsync documents.
+        /// </summary>
+        protected override Task<IReadOnlyList<JsonWebKey>> GetPublicKeysAsync()
+        {
+            if (!RouteData.Values.TryGetValue("registrationId", out var registrationId))
+                return base.GetPublicKeysAsync();
+
+            using var rsa = RSA.Create(2048);
+            var jwk = JsonWebKeyConverter.ConvertFromRSASecurityKey(
+                new RsaSecurityKey(rsa.ExportParameters(false)) { KeyId = "kid-" + registrationId });
+            return Task.FromResult<IReadOnlyList<JsonWebKey>>(new[] { jwk });
+        }
     }
 
     public class TestJwksKeyStore : IJwksKeyStore

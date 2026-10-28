@@ -104,7 +104,27 @@ namespace LtiAdvantage.IdentityModel.Validation
         /// sent it, so a fetch failure must not surface as an exception. Only cancellation of
         /// <paramref name="cancellationToken"/> is thrown.
         /// </returns>
-        public async Task<LtiTokenValidationResult> ValidateAsync(string idToken,
+        public Task<LtiTokenValidationResult> ValidateAsync(string idToken,
+            CancellationToken cancellationToken = default) =>
+            ValidateAsync(idToken, null, cancellationToken);
+
+        /// <summary>
+        /// Validates an ID token and checks that its nonce is the one this browser's login asked for.
+        /// </summary>
+        /// <remarks>
+        /// A tool sends a nonce with the OIDC login redirect and keeps it with the <c>state</c> (for
+        /// example in a cookie). Pass that nonce here: a token whose nonce differs was not issued for
+        /// this login, even if it is otherwise valid and unused, and is rejected before the
+        /// <see cref="LtiTokenValidationOptions.NonceStore"/> records it.
+        /// </remarks>
+        /// <param name="idToken">The serialized JWT from the launch.</param>
+        /// <param name="expectedNonce">
+        /// The nonce bound to this browser's <c>state</c>. Null skips the check, as
+        /// <see cref="ValidateAsync(string, CancellationToken)"/> does.
+        /// </param>
+        /// <param name="cancellationToken">Optional cancellation token.</param>
+        /// <returns>The outcome; see <see cref="ValidateAsync(string, CancellationToken)"/>.</returns>
+        public async Task<LtiTokenValidationResult> ValidateAsync(string idToken, string expectedNonce,
             CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(idToken))
@@ -185,7 +205,7 @@ namespace LtiAdvantage.IdentityModel.Validation
                     return ltiFailure;
                 }
 
-                var nonceFailure = await ValidateNonceAsync(jwt, cancellationToken).ConfigureAwait(false);
+                var nonceFailure = await ValidateNonceAsync(jwt, expectedNonce, cancellationToken).ConfigureAwait(false);
                 if (nonceFailure != null)
                 {
                     return nonceFailure;
@@ -263,16 +283,26 @@ namespace LtiAdvantage.IdentityModel.Validation
             return null;
         }
 
-        private async Task<LtiTokenValidationResult> ValidateNonceAsync(JwtSecurityToken jwt,
+        private static bool FixedTimeEquals(string a, string b) =>
+            System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(
+                System.Text.Encoding.UTF8.GetBytes(a), System.Text.Encoding.UTF8.GetBytes(b));
+
+        private async Task<LtiTokenValidationResult> ValidateNonceAsync(JwtSecurityToken jwt, string expectedNonce,
             CancellationToken cancellationToken)
         {
             var nonce = jwt.Payload.Nonce;
 
             if (string.IsNullOrEmpty(nonce))
             {
-                return _options.RequireNonce
+                // A caller that expects a nonce gets a failure even when RequireNonce is off.
+                return _options.RequireNonce || expectedNonce != null
                     ? LtiTokenValidationResult.Failure("The id_token has no nonce claim.")
                     : null;
+            }
+
+            if (expectedNonce != null && !FixedTimeEquals(nonce, expectedNonce))
+            {
+                return LtiTokenValidationResult.Failure("The id_token nonce does not match the one sent with the login.");
             }
 
             if (_options.NonceStore == null)

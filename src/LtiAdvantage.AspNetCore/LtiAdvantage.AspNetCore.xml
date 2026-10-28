@@ -738,7 +738,17 @@
             <summary>
             Constructs a new <see cref="T:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase"/>.
             </summary>
-            <param name="keyStore">The key store providing public keys to publish.</param>
+            <param name="keyStore">
+            The key store providing public keys to publish. May be null when
+            <see cref="M:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase.GetPublicKeysAsync"/> is overridden.
+            </param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase.#ctor(Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.Jwks.JwksControllerBase})">
+            <summary>
+            Constructs a new <see cref="T:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase"/> without a key store, for a controller
+            that overrides <see cref="M:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase.GetPublicKeysAsync"/>.
+            </summary>
             <param name="logger">The logger.</param>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase.GetJwksAsync">
@@ -746,6 +756,22 @@
             Returns the JSON Web Key Set containing the public keys used to verify
             signed JWTs issued by this server.
             </summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase.GetPublicKeysAsync">
+            <summary>
+            Returns the keys to publish. By default, the injected <see cref="T:LtiAdvantage.Jwks.IJwksKeyStore"/>'s keys.
+            </summary>
+            <remarks>
+            Override this to publish a different key set per request, for example one per platform
+            registration. Move the route so it carries the registration, then read it here:
+            <code>
+            // Startup: services.AddControllers(o => o.MapLtiRoute(
+            //     Constants.ServiceEndpoints.Jwks.JwksService, "registrations/{registrationId}/jwks.json"));
+            protected override Task&lt;IReadOnlyList&lt;JsonWebKey&gt;&gt; GetPublicKeysAsync() =>
+                _registrations.GetPublicKeysAsync((string) RouteData.Values["registrationId"], HttpContext.RequestAborted);
+            </code>
+            Private parameters are still removed from whatever this returns.
+            </remarks>
         </member>
         <member name="P:LtiAdvantage.AspNetCore.Jwks.JwksControllerBase.CacheDuration">
             <summary>

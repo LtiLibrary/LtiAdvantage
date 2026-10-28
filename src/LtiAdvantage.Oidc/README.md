@@ -1,30 +1,23 @@
-# LtiAdvantage.IdentityServer4
+# LtiAdvantage.Oidc
 
-This project has two Identity Server 4 extensions:
+This library extends an [OpenIddict](https://documentation.openiddict.com/) server for an LTI
+platform. It replaces LtiAdvantage.IdentityServer4.
 
-1. A secret validator that understands the 
-[IMS recommended format](https://www.imsglobal.org/spec/security/v1p0#using-json-web-tokens-with-oauth-2-0-client-credentials-grant)
-of client-credentials grant.
-2. Impersonation support that allows a user (such as an admin) impersonate another user (such as a member of a course).
-
-## .NET Standard
+It adds impersonation support, which lets a user (such as an admin) act as another user (such as a
+member of a course) during the authorize request.
 
 This library targets `net10.0`.
 
 ## Getting Started
 
-Add the secret validator to IdentityServer in `ConfigureServices`:
+Add impersonation support to the OpenIddict server in `ConfigureServices`:
 ```
-services.AddIdentityServer()
-  .AddLtiJwtBearerClientAuthentication();
-```
-
-Add impersonation support to IdentityServer in `ConfigureServices`:
-```
-services.AddIdentityServer()
-  .AddImpersonationSupport();
+services.AddOpenIddict()
+  .AddServer(options => options.AddImpersonationSupport());
 ```
 
-There are two sample applications you can reference for ideas:
-- [Sample Tool](https://github.com/andyfmiller/LtiAdvantageTool)
-- [Sample Platform](https://github.com/andyfmiller/LtiAdvantagePlatform)
+## Samples
+
+Two sample applications show the libraries in use:
+- [Sample Tool](https://github.com/LtiLibrary/LtiAdvantageTool)
+- [Sample Platform](https://github.com/LtiLibrary/LtiAdvantagePlatform)

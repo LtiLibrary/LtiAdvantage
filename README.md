@@ -2,7 +2,7 @@
 
 - [LtiAdvantage](https://github.com/LtiLibrary/LtiAdvantage/tree/master/src/LtiAdvantage) is a library to ease the work of creating an LTI Advantage platform or tool.
 - [LtiAdvantage.IdentityModel](https://github.com/LtiLibrary/LtiAdvantage/tree/master/src/LtiAdvantage.IdentityModel) has an HttpClient extension method to request a token using JWT client credentials.
-- [LtiAdvantage.Oidc](https://github.com/LtiLibrary/LtiAdvantage/tree/master/src/LtiAdvantage.Oidc) has an OIDC secret validator (replacing LtiAdvantage.IdentityServer4) that understands the [IMS recommended format](https://www.imsglobal.org/spec/security/v1p0#using-json-web-tokens-with-oauth-2-0-client-credentials-grant) of client-credentials grant.
+- [LtiAdvantage.Oidc](https://github.com/LtiLibrary/LtiAdvantage/tree/master/src/LtiAdvantage.Oidc) extends an OpenIddict server with impersonation support (it replaces LtiAdvantage.IdentityServer4).
 - [LtiAdvantage.AspNetCore](https://github.com/LtiLibrary/LtiAdvantage/tree/master/src/LtiAdvantage.AspNetCore) contains ASP.NET Core controller implementations to assist in platform development.
 - [LtiAdvantage.IntegrationTests](https://github.com/LtiLibrary/LtiAdvantage/tree/master/test/LtiAdvantage.IntegrationTests) integration tests.
 - [LtiAdvantage.UnitTests](https://github.com/LtiLibrary/LtiAdvantage/tree/master/test/LtiAdvantage.UnitTests) unit tests.
@@ -19,8 +19,35 @@
 
 #### Fixed
 
+- AGS and NRPS controllers bind the spec's query parameter names (`resource_link_id`, `resource_id`, `user_id`) and accept the role URI in NRPS `role`; the old names still work (#301).
+- Deep linking content items read and write `width`, `height`, `expiresAt` and the `embed` object by their spec names; `DocumentTarget.Embed`, and `gradesReleased` / `submissionReview` on a deep-linked `lineItem` (#302, #304).
+- `Score.ScoreGiven` / `ScoreMaximum` are optional, and AGS models leave unset optional properties out (#303).
+- The OpenID configuration document has no explicit nulls, and `MvcOptions.MapLtiRoute` moves any of the library's routes, for example away from OpenIddict's discovery endpoint (#305).
+- Tool helpers: `InMemoryNonceStore`, a login-nonce check on `LtiTokenValidator`, per-registration JWKS, and `HttpClient` extensions for AGS, NRPS and Course Groups (#306).
+- `RsaPemKeys` replaces `PemHelper` (sets `kid`, no BouncyCastle); `AccessTokenUtil` takes an `HttpClient` and writes a numeric `iat` (#307).
+- `ToolPlatform` / `ToolPlatformInstance` replace the misspelled `ToolPlatfom*` names, and `Role.ToUri()` / `ContextType.ToUri()` are public (#308).
+
+**Breaking (recompile needed):** `ImageProperty.Width` / `Height` are now `int?`, `Score.ScoreGiven` / `ScoreMaximum` are now `double?`, and `CustomPropertySubstitutions.ToolPlatform` / `ToolPlatfomInstance` now have the correctly spelled types. Code that reads these as the old types needs a small change, and assemblies built against 4.0.0 must be rebuilt.
+
 - Custom-variable substitution: `$Context.id.history` and `$ResourceLink.id.history` were mangled by the shorter `.id` variable being substituted first, and `$Context.sourcedId` was unreachable because the sourced id was written over `$Context.title`.
 - The `…ControllerBase` classes no longer turn a client disconnect into a 500.
+
+## XML documentation in your app
+
+The packages ship XML documentation. To have it copied into your app's output (so Swagger or
+another OpenAPI generator can show the controller and model docs), set this in your project file:
+
+```xml
+<PropertyGroup>
+  <CopyDocumentationFilesFromPackages>true</CopyDocumentationFilesFromPackages>
+</PropertyGroup>
+```
+
+## Samples
+
+Two sample applications show the libraries in use:
+- [Sample Tool](https://github.com/LtiLibrary/LtiAdvantageTool)
+- [Sample Platform](https://github.com/LtiLibrary/LtiAdvantagePlatform)
 
 ## NuGet
 | Library | Release | Prerelease |

@@ -1,7 +1,8 @@
 # LtiAdvantage.AspNetCore
 
-This library provides ASP.NET Core controller implementations to support platform development.
-It targets `net10.0`
+This library provides ASP.NET Core controller base classes for the platform side of the LTI
+Advantage services (AGS, NRPS, Course Groups, Proctoring), Dynamic Registration, the OpenID
+configuration and JWKS publishing. It targets `net10.0`.
 
 ## Running next to an OpenID Connect server
 
@@ -24,3 +25,20 @@ serves its own document at that path, and the two routes clash. Do one of the fo
 `Jwks.JwksService`. A service route's `.{format}` alias moves with it, and `Url.Link(routeName, …)`
 follows the new path. Keep the route's parameters (such as `{contextId}`) in the new template. A
 name that matches no route stops the app at startup.
+
+## XML documentation in your app
+
+The packages ship XML documentation. To have it copied into your app's output (so Swagger or
+another OpenAPI generator can show the controller and model docs), set this in your project file:
+
+```xml
+<PropertyGroup>
+  <CopyDocumentationFilesFromPackages>true</CopyDocumentationFilesFromPackages>
+</PropertyGroup>
+```
+
+## Samples
+
+Two sample applications show the libraries in use:
+- [Sample Tool](https://github.com/LtiLibrary/LtiAdvantageTool)
+- [Sample Platform](https://github.com/LtiLibrary/LtiAdvantagePlatform)

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 [assembly: InternalsVisibleTo("LtiAdvantage.UnitTests")]
@@ -51,14 +52,23 @@ namespace LtiAdvantage.Utilities
 
         private static T GetClaimValues<T>(this JwtPayload payload, string type)
         {
-            var values = payload.Claims
+            var claims = payload.Claims
                 .Where(c => c.Type == type)
-                .Select(c => c.Value).ToArray();
+                .ToArray();
 
-            if (0 == values.Length)
+            if (0 == claims.Length)
                 return default(T);
 
-            return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(values));
+            // Each array element becomes its own claim. Object elements (e.g. deep linking
+            // content items) carry their JSON as the claim value; keep them as objects
+            // rather than JSON strings so they deserialize into the element type.
+            var values = new JsonArray(claims
+                .Select(c => c.ValueType is JsonClaimValueTypes.Json or JsonClaimValueTypes.JsonArray
+                    ? JsonNode.Parse(c.Value)
+                    : JsonValue.Create(c.Value))
+                .ToArray());
+
+            return values.Deserialize<T>();
         }
 
         public static void SetClaimValue<T>(this JwtPayload payload, string type, T value)

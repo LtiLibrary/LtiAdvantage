@@ -192,7 +192,7 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
         [ProducesResponseType(typeof(ToolConfiguration), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(RegistrationError), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [Route("lti/register", Name = "lti-dynamic-registration")]
+        [Route("lti/register", Name = Constants.ServiceEndpoints.DynamicRegistration.RegistrationService)]
         public async Task<ActionResult<ToolConfiguration>> RegisterAsync()
         {
             try

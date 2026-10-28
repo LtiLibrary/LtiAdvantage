@@ -1011,6 +1011,14 @@
             produced by an override rather than an injected store, because most of its values are
             absolute URLs to this same host and are therefore easiest to build from the current
             request — see <see cref="M:LtiAdvantage.AspNetCore.OpenIdConnect.OpenIdConfigurationControllerBase.OnGetOpenIdConfigurationAsync"/>.
+            <para>
+            The route is <c>.well-known/openid-configuration</c>, which an OpenID Connect server in the
+            same app (such as OpenIddict) also serves. Either turn that one off (OpenIddict:
+            <c>SetConfigurationEndpointUris(Array.Empty&lt;string&gt;())</c>) or move this one with
+            <c>MvcOptions.MapLtiRoute(Constants.ServiceEndpoints.OpenIdConnect.OpenIdConfigurationService, "...")</c>.
+            Tools find the document through the <c>openid_configuration</c> URL the platform sends when
+            it starts a registration, so any path works.
+            </para>
             </remarks>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.OpenIdConnect.OpenIdConfigurationControllerBase.#ctor(Microsoft.Extensions.Logging.ILogger{LtiAdvantage.AspNetCore.OpenIdConnect.OpenIdConfigurationControllerBase})">
@@ -1141,6 +1149,37 @@
             <param name="policyName"></param>
             <returns></returns>
         </member>
+        <member name="T:LtiAdvantage.AspNetCore.Utilities.LtiRouteConvention">
+            <summary>
+            Moves one of the library's named routes, such as
+            <see cref="F:LtiAdvantage.Constants.ServiceEndpoints.OpenIdConnect.OpenIdConfigurationService"/>, to a
+            different path. Add it with <c>MvcOptions.MapLtiRoute</c>.
+            </summary>
+            <remarks>
+            The controller bases put fixed routes on their actions, for example
+            <c>.well-known/openid-configuration</c>. An app that already serves that path, such as an
+            OpenIddict server with its own discovery endpoint, can move the LTI one instead of turning
+            the other off. Only the route with this name changes; unnamed alternate routes on the same
+            action (the <c>.{format}</c> variants of the service routes) keep their template.
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Utilities.LtiRouteConvention.#ctor(System.String,System.String)">
+            <summary>
+            Creates a convention that gives the route named <paramref name="routeName"/> the
+            template <paramref name="template"/>.
+            </summary>
+            <param name="routeName">The route name, one of <see cref="T:LtiAdvantage.Constants.ServiceEndpoints"/>.</param>
+            <param name="template">The new route template, for example <c>lti/openid-configuration</c>.</param>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Utilities.LtiRouteConvention.RouteName">
+            <summary>The name of the route to move.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.Utilities.LtiRouteConvention.Template">
+            <summary>The new route template.</summary>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Utilities.LtiRouteConvention.Apply(Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel)">
+            <inheritdoc />
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.Utilities.QueryAliasExtensions">
             <summary>
             Reads query parameters under the names 4.0.0 bound before they were renamed to the spec names.
@@ -1177,6 +1216,29 @@
             Adds LTI Advantage authorization policy provider that converts the policy name into
             a <see cref="T:Microsoft.AspNetCore.Authorization.Infrastructure.ClaimsAuthorizationRequirement"/>s of type "scope".
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Mvc.LtiRouteMvcOptionsExtensions">
+            <summary>
+            Extension methods for changing the library's routes.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Mvc.LtiRouteMvcOptionsExtensions.MapLtiRoute(Microsoft.AspNetCore.Mvc.MvcOptions,System.String,System.String)">
+            <summary>
+            Serves the route named <paramref name="routeName"/> at <paramref name="template"/>
+            instead of its default path.
+            </summary>
+            <example>
+            Move the LTI discovery document away from OpenIddict's <c>.well-known/openid-configuration</c>:
+            <code>
+            services.AddControllers(options => options.MapLtiRoute(
+                Constants.ServiceEndpoints.OpenIdConnect.OpenIdConfigurationService,
+                "lti/.well-known/openid-configuration"));
+            </code>
+            </example>
+            <param name="options">The MVC options.</param>
+            <param name="routeName">The route name, one of <see cref="T:LtiAdvantage.Constants.ServiceEndpoints"/>.</param>
+            <param name="template">The new route template.</param>
+            <returns>The options, for chaining.</returns>
         </member>
     </members>
 </doc>

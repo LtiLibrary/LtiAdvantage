@@ -21,7 +21,7 @@ namespace LtiAdvantage.IntegrationTests.Controllers
                 // Resolve the sibling endpoints through their named routes so the document
                 // cannot drift from where the controllers actually live.
                 JwksUri = Url.Link(Constants.ServiceEndpoints.Jwks.JwksService, null),
-                RegistrationEndpoint = Url.Link("lti-dynamic-registration", null),
+                RegistrationEndpoint = Url.Link(Constants.ServiceEndpoints.DynamicRegistration.RegistrationService, null),
 
                 TokenEndpointAuthMethodsSupported = new[] {"private_key_jwt"},
                 ResponseTypesSupported = new[] {"id_token"},
@@ -36,7 +36,9 @@ namespace LtiAdvantage.IntegrationTests.Controllers
                 LtiPlatformConfiguration = new LtiPlatformConfiguration
                 {
                     ProductFamilyCode = "ExamplePlatform",
-                    Version = "1.0"
+                    Version = "1.0",
+                    // No target_link_uri: it must be left out, not written as null.
+                    MessagesSupported = new[] {new MessageDescriptor {Type = Constants.Lti.LtiResourceLinkRequestMessageType}}
                 }
             });
         }

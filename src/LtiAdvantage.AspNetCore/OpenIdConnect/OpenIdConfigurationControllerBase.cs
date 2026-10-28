@@ -1,4 +1,6 @@
 using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using LtiAdvantage.DynamicRegistration;
@@ -20,10 +22,25 @@ namespace LtiAdvantage.AspNetCore.OpenIdConnect
     /// produced by an override rather than an injected store, because most of its values are
     /// absolute URLs to this same host and are therefore easiest to build from the current
     /// request — see <see cref="OnGetOpenIdConfigurationAsync"/>.
+    /// <para>
+    /// The route is <c>.well-known/openid-configuration</c>, which an OpenID Connect server in the
+    /// same app (such as OpenIddict) also serves. Either turn that one off (OpenIddict:
+    /// <c>SetConfigurationEndpointUris(Array.Empty&lt;string&gt;())</c>) or move this one with
+    /// <c>MvcOptions.MapLtiRoute(Constants.ServiceEndpoints.OpenIdConnect.OpenIdConfigurationService, "...")</c>.
+    /// Tools find the document through the <c>openid_configuration</c> URL the platform sends when
+    /// it starts a registration, so any path works.
+    /// </para>
     /// </remarks>
     [ApiController]
     public abstract class OpenIdConfigurationControllerBase : ControllerBase, IOpenIdConfigurationController
     {
+        // Unset metadata is left out, not written as null (for example "target_link_uri": null
+        // in messages_supported), as the Dynamic Registration response does.
+        private static readonly JsonSerializerOptions ResponseJsonOptions = new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+
         private readonly ILogger<OpenIdConfigurationControllerBase> _logger;
 
         /// <summary>
@@ -72,7 +89,7 @@ namespace LtiAdvantage.AspNetCore.OpenIdConnect
                 if (configuration == null)
                     throw new InvalidOperationException(
                         $"{nameof(OnGetOpenIdConfigurationAsync)} must return the platform's OpenID configuration.");
-                return configuration;
+                return new JsonResult(configuration, ResponseJsonOptions);
             }
             catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
             {

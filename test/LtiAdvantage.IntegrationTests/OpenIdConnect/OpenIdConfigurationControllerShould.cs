@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using LtiAdvantage.DynamicRegistration;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -76,6 +78,58 @@ namespace LtiAdvantage.IntegrationTests.OpenIdConnect
 
             Assert.Contains(Constants.LtiScopes.Gs.ContextGroupReadonly, configuration.ScopesSupported);
             Assert.Contains(Constants.LtiScopes.Ap.ControlAll, configuration.ScopesSupported);
+        }
+
+        [Fact]
+        public async Task NotWriteNulls()
+        {
+            var body = await _client.GetStringAsync(".well-known/openid-configuration");
+
+            Assert.Contains("messages_supported", body);
+            Assert.DoesNotContain("null", body);
+        }
+
+        /// <summary>
+        /// An app whose OpenID Connect server already serves .well-known/openid-configuration can
+        /// move the LTI document; the named route, and so Url.Link, follow it.
+        /// </summary>
+        [Fact]
+        public async Task ServeTheDocumentAtAMovedRoute()
+        {
+            using var host = TestHostFactory.Create(services => services.Configure<MvcOptions>(options =>
+                options.MapLtiRoute(Constants.ServiceEndpoints.OpenIdConnect.OpenIdConfigurationService,
+                    "lti/.well-known/openid-configuration")));
+            using var client = host.GetTestClient();
+
+            var moved = await client.GetAsync("lti/.well-known/openid-configuration");
+            var old = await client.GetAsync(".well-known/openid-configuration");
+
+            Assert.Equal(HttpStatusCode.OK, moved.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, old.StatusCode);
+        }
+
+        [Fact]
+        public async Task MoveTheJwksRouteToo()
+        {
+            using var host = TestHostFactory.Create(services => services.Configure<MvcOptions>(options =>
+                options.MapLtiRoute(Constants.ServiceEndpoints.Jwks.JwksService, "keys/jwks.json")));
+            using var client = host.GetTestClient();
+
+            var configuration = JsonSerializer.Deserialize<PlatformOpenIdConfiguration>(
+                await client.GetStringAsync(".well-known/openid-configuration"));
+
+            Assert.EndsWith("/keys/jwks.json", configuration.JwksUri);
+            Assert.Equal(HttpStatusCode.OK, (await client.GetAsync(new Uri(configuration.JwksUri).PathAndQuery)).StatusCode);
+        }
+
+        /// <summary>A mistyped route name stops the app at startup instead of leaving the route where it was.</summary>
+        [Fact]
+        public void RefuseToMoveARouteThatDoesNotExist()
+        {
+            var ex = Assert.ThrowsAny<InvalidOperationException>(() => TestHostFactory.Create(services =>
+                services.Configure<MvcOptions>(options => options.MapLtiRoute("no-such-route", "anywhere"))));
+
+            Assert.Contains("no-such-route", ex.Message);
         }
 
         public void Dispose()

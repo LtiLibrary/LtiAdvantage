@@ -1,6 +1,4 @@
 using System;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using LtiAdvantage.DynamicRegistration;
@@ -34,13 +32,6 @@ namespace LtiAdvantage.AspNetCore.OpenIdConnect
     [ApiController]
     public abstract class OpenIdConfigurationControllerBase : ControllerBase, IOpenIdConfigurationController
     {
-        // Unset metadata is left out, not written as null (for example "target_link_uri": null
-        // in messages_supported), as the Dynamic Registration response does.
-        private static readonly JsonSerializerOptions ResponseJsonOptions = new JsonSerializerOptions
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
         private readonly ILogger<OpenIdConfigurationControllerBase> _logger;
 
         /// <summary>
@@ -89,7 +80,7 @@ namespace LtiAdvantage.AspNetCore.OpenIdConnect
                 if (configuration == null)
                     throw new InvalidOperationException(
                         $"{nameof(OnGetOpenIdConfigurationAsync)} must return the platform's OpenID configuration.");
-                return new JsonResult(configuration, ResponseJsonOptions);
+                return configuration;
             }
             catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
             {

@@ -13,8 +13,9 @@ namespace LtiAdvantage.AspNetCore.Utilities
     /// The controller bases put fixed routes on their actions, for example
     /// <c>.well-known/openid-configuration</c>. An app that already serves that path, such as an
     /// OpenIddict server with its own discovery endpoint, can move the LTI one instead of turning
-    /// the other off. Only the route with this name changes; unnamed alternate routes on the same
-    /// action (the <c>.{format}</c> variants of the service routes) keep their template.
+    /// the other off. The action's <c>.{format}</c> variant, which the service routes have, moves
+    /// with it. The new template must keep the route's parameters (such as <c>{contextId}</c>), or
+    /// the action no longer receives them.
     /// </remarks>
     public class LtiRouteConvention : IApplicationModelConvention
     {
@@ -26,8 +27,8 @@ namespace LtiAdvantage.AspNetCore.Utilities
         /// <param name="template">The new route template, for example <c>lti/openid-configuration</c>.</param>
         public LtiRouteConvention(string routeName, string template)
         {
-            if (string.IsNullOrWhiteSpace(routeName)) throw new ArgumentNullException(nameof(routeName));
-            if (string.IsNullOrWhiteSpace(template)) throw new ArgumentNullException(nameof(template));
+            if (string.IsNullOrWhiteSpace(routeName)) throw new ArgumentException("A route name is required.", nameof(routeName));
+            if (string.IsNullOrWhiteSpace(template)) throw new ArgumentException("A route template is required.", nameof(template));
             RouteName = routeName;
             Template = template;
         }
@@ -41,24 +42,38 @@ namespace LtiAdvantage.AspNetCore.Utilities
         /// <inheritdoc />
         public void Apply(ApplicationModel application)
         {
-            var routes = application.Controllers
-                .SelectMany(c => c.Actions)
-                .SelectMany(a => a.Selectors)
-                .Select(s => s.AttributeRouteModel)
-                .Where(r => r != null && string.Equals(r.Name, RouteName, StringComparison.Ordinal))
-                .ToList();
+            var moved = 0;
+            foreach (var action in application.Controllers.SelectMany(c => c.Actions))
+            {
+                var named = action.Selectors
+                    .Select(s => s.AttributeRouteModel)
+                    .FirstOrDefault(r => r != null && string.Equals(r.Name, RouteName, StringComparison.Ordinal));
+                if (named == null)
+                {
+                    continue;
+                }
 
-            if (routes.Count == 0)
+                // The service routes also answer at "<template>.{format}"; move that alias too, or
+                // the old path keeps working.
+                var formatAlias = named.Template + ".{format}";
+                foreach (var route in action.Selectors.Select(s => s.AttributeRouteModel))
+                {
+                    if (route != null && route.Name == null && string.Equals(route.Template, formatAlias, StringComparison.Ordinal))
+                    {
+                        route.Template = Template + ".{format}";
+                    }
+                }
+
+                named.Template = Template;
+                moved++;
+            }
+
+            if (moved == 0)
             {
                 // A typo in the name would otherwise leave the route where it was without a word.
                 throw new InvalidOperationException(
                     $"No route named '{RouteName}' was found. Use one of the Constants.ServiceEndpoints names " +
                     "of a controller this app maps.");
-            }
-
-            foreach (var route in routes)
-            {
-                route.Template = Template;
             }
         }
     }

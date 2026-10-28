@@ -16,26 +16,32 @@ namespace LtiAdvantage.DynamicRegistration
 
         /// <summary>Per-message target_link_uri (tool side).</summary>
         [JsonPropertyName("target_link_uri")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string TargetLinkUri { get; set; }
 
         /// <summary>Per-message label shown by the platform (tool side).</summary>
         [JsonPropertyName("label")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Label { get; set; }
 
         /// <summary>Per-message icon URI (tool side).</summary>
         [JsonPropertyName("icon_uri")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string IconUri { get; set; }
 
         /// <summary>Custom parameters to merge into this launch (tool side).</summary>
         [JsonPropertyName("custom_parameters")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IDictionary<string, string> CustomParameters { get; set; }
 
         /// <summary>Placements this message is offered for (e.g. <c>"ContentArea"</c>, <c>"RichTextEditor"</c>).</summary>
         [JsonPropertyName("placements")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IList<string> Placements { get; set; }
 
         /// <summary>Roles required for this launch (tool side).</summary>
         [JsonPropertyName("roles")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IList<string> Roles { get; set; }
     }
 }

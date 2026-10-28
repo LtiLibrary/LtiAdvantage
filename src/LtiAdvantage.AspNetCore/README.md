@@ -23,5 +23,6 @@ serves its own document at that path, and the two routes clash. Do one of the fo
   ```
 
 `MapLtiRoute` works for any of the named routes in `Constants.ServiceEndpoints`, for example
-`Jwks.JwksService`. `Url.Link(routeName, …)` follows the new path. A name that matches no route
-stops the app at startup.
+`Jwks.JwksService`. A service route's `.{format}` alias moves with it, and `Url.Link(routeName, …)`
+follows the new path. Keep the route's parameters (such as `{contextId}`) in the new template. A
+name that matches no route stops the app at startup.

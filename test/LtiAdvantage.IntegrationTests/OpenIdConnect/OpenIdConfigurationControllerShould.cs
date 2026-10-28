@@ -83,10 +83,11 @@ namespace LtiAdvantage.IntegrationTests.OpenIdConnect
         [Fact]
         public async Task NotWriteNulls()
         {
-            var body = await _client.GetStringAsync(".well-known/openid-configuration");
+            var body = System.Text.Json.Nodes.JsonNode.Parse(
+                await _client.GetStringAsync(".well-known/openid-configuration"))!;
 
-            Assert.Contains("messages_supported", body);
-            Assert.DoesNotContain("null", body);
+            var message = body["https://purl.imsglobal.org/spec/lti-platform-configuration"]!["messages_supported"]![0]!.AsObject();
+            Assert.Equal(new[] {"type"}, System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(message, p => p.Key)));
         }
 
         /// <summary>
@@ -106,6 +107,21 @@ namespace LtiAdvantage.IntegrationTests.OpenIdConnect
 
             Assert.Equal(HttpStatusCode.OK, moved.StatusCode);
             Assert.Equal(HttpStatusCode.NotFound, old.StatusCode);
+        }
+
+        /// <summary>A service route's .{format} alias moves with it, so the old path stops answering.</summary>
+        [Fact]
+        public async Task MoveTheFormatAliasWithTheRoute()
+        {
+            using var host = TestHostFactory.Create(services => services.Configure<MvcOptions>(options =>
+                options.MapLtiRoute(Constants.ServiceEndpoints.Nrps.MembershipService, "lti/context/{contextId}/members")));
+            using var client = host.GetTestClient();
+            client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Nrps.MembershipReadonly);
+
+            Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("lti/context/1/members")).StatusCode);
+            Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("lti/context/1/members.json")).StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("context/1/membership")).StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("context/1/membership.json")).StatusCode);
         }
 
         [Fact]

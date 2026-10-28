@@ -1159,8 +1159,9 @@
             The controller bases put fixed routes on their actions, for example
             <c>.well-known/openid-configuration</c>. An app that already serves that path, such as an
             OpenIddict server with its own discovery endpoint, can move the LTI one instead of turning
-            the other off. Only the route with this name changes; unnamed alternate routes on the same
-            action (the <c>.{format}</c> variants of the service routes) keep their template.
+            the other off. The action's <c>.{format}</c> variant, which the service routes have, moves
+            with it. The new template must keep the route's parameters (such as <c>{contextId}</c>), or
+            the action no longer receives them.
             </remarks>
         </member>
         <member name="M:LtiAdvantage.AspNetCore.Utilities.LtiRouteConvention.#ctor(System.String,System.String)">

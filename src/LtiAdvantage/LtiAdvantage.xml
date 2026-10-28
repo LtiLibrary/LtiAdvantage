@@ -4362,11 +4362,11 @@
             <summary>The reviewed user's email.</summary>
         </member>
         <member name="P:LtiAdvantage.SubmissionReview.ForUserClaimValueType.Roles">
-            <summary>The roles of the reviewed user in the context, as role URIs.</summary>
+            <summary>The roles of the reviewed user in the context.</summary>
             <remarks>
-            Strings, because a platform may send roles this library does not define. Use
-            <see cref="M:LtiAdvantage.Lti.RoleExtensions.TryParse(System.String,LtiAdvantage.Lti.Role@)"/> to read them as <see cref="T:LtiAdvantage.Lti.Role"/> values and
-            <see cref="M:LtiAdvantage.Lti.RoleExtensions.ToUri(LtiAdvantage.Lti.Role)"/> to write one.
+            Written and read as role URIs, like the launch's roles claim
+            (<see cref="P:LtiAdvantage.Lti.LtiRequest.Roles"/>). A role this library does not define reads as
+            <see cref="F:LtiAdvantage.Lti.Role.Unknown"/>.
             </remarks>
         </member>
         <member name="P:LtiAdvantage.SubmissionReview.ForUserClaimValueType.PersonSourcedId">

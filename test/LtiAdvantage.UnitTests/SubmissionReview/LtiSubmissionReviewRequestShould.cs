@@ -53,6 +53,37 @@ namespace LtiAdvantage.UnitTests.SubmissionReview
             Assert.Equal("Jane Doe", request.ForUser.Name);
         }
 
+        /// <summary>The reviewed user's roles are Role values, written as the spec's role URIs.</summary>
+        [Fact]
+        public void RoundTripForUserRoles_AsRoleUris()
+        {
+            var request = new LtiSubmissionReviewRequest
+            {
+                ForUser = new ForUserClaimValueType
+                {
+                    UserId = "abc-123",
+                    Roles = new[] {Role.ContextLearner, Role.ContextMentor}
+                }
+            };
+
+            var jwt = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().WriteToken(
+                new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(new System.IdentityModel.Tokens.Jwt.JwtHeader(), request));
+            var payload = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().ReadJwtToken(jwt).Payload;
+
+            Assert.Contains("\"http://purl.imsglobal.org/vocab/lis/v2/membership#Learner\"", payload.SerializeToJson());
+            Assert.Equal(new[] {Role.ContextLearner, Role.ContextMentor},
+                new LtiSubmissionReviewRequest(payload).ForUser.Roles);
+        }
+
+        [Fact]
+        public void ReadForUserRoles_FromTheSpecExample()
+        {
+            var request = JsonSerializer.Deserialize<LtiSubmissionReviewRequest>(
+                TestUtils.LoadReferenceJsonFile("LtiSubmissionReviewRequest"));
+
+            Assert.Equal(new[] {Role.ContextLearner}, request.ForUser.Roles);
+        }
+
         [Fact]
         public void ParseValidLtiSubmissionReviewRequest()
         {

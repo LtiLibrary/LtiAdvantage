@@ -158,7 +158,7 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
             [FromQuery] string tag = null,
             [FromQuery] int? limit = null)
         {
-            // Before 4.0.1 these were bound as resourceLinkId and resourceId; keep accepting them.
+            // Before 4.1.0 these were bound as resourceLinkId and resourceId; keep accepting them.
             resourceLinkId ??= Request.LegacyQueryValue("resource_link_id", "resourceLinkId");
             resourceId ??= Request.LegacyQueryValue("resource_id", "resourceId");
 

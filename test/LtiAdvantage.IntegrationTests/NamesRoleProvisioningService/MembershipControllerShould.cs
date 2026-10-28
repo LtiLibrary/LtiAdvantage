@@ -72,6 +72,21 @@ namespace LtiAdvantage.IntegrationTests.NamesRoleProvisioningService
             Assert.Equal(expectGroups, body.Contains("group_enrollments"));
         }
 
+        /// <summary>
+        /// Even an override that loads group enrollments regardless must not leak them to a tool
+        /// without the groups scope: the base class strips them.
+        /// </summary>
+        [Fact]
+        public async Task StripGroupEnrollments_WithoutTheGroupsScope_EvenIfTheOverrideAddsThem()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Nrps.MembershipReadonly);
+
+            var response = await _client.GetAsync(MembershipUrl + "?groups=true&rlid=always-groups");
+
+            response.EnsureSuccessStatusCode();
+            Assert.DoesNotContain("group_enrollments", await response.Content.ReadAsStringAsync());
+        }
+
         public void Dispose()
         {
             _client?.Dispose();

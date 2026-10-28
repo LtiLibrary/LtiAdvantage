@@ -313,7 +313,64 @@ namespace LtiAdvantage.UnitTests.Validation
             var result = await validator.ValidateAsync(platform.CreateIdToken());
 
             Assert.True(result.IsValid, result.Error);
-            Assert.Equal(2, platform.FetchCount);
+            // The expired set triggers a background refresh, which fails; the cached keys stay.
+            await WaitUntil(() => platform.FetchCount == 2);
+            var afterFailedRefresh = await validator.ValidateAsync(platform.CreateIdToken());
+            Assert.True(afterFailedRefresh.IsValid, afterFailedRefresh.Error);
+        }
+
+        private static async Task WaitUntil(Func<bool> condition)
+        {
+            for (var i = 0; i < 200 && !condition(); i++) await Task.Delay(10);
+            Assert.True(condition(), "condition not reached");
+        }
+
+        /// <summary>
+        /// When the cache has expired but already holds the caller's key, the caller gets the
+        /// cached keys at once; the refresh runs in the background, so a hanging JWKS endpoint
+        /// does not stall every launch.
+        /// </summary>
+        [Fact]
+        public async Task NotWaitForAnExpiryRefresh_WhenTheKeyIsCached()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, options =>
+            {
+                options.JwksCacheDuration = TimeSpan.Zero;
+                options.MinimumRefreshInterval = TimeSpan.Zero;
+            });
+            Assert.True((await validator.ValidateAsync(platform.CreateIdToken())).IsValid);
+
+            platform.HoldJwks = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var launch = validator.ValidateAsync(platform.CreateIdToken());
+            var finished = await Task.WhenAny(launch, Task.Delay(TimeSpan.FromSeconds(5)));
+
+            Assert.Same(launch, finished);
+            Assert.True(launch.Result.IsValid, launch.Result.Error);
+            platform.HoldJwks.SetResult(true);
+        }
+
+        /// <summary>
+        /// A maximum staleness below the cache duration is raised to it, so keys still within
+        /// their cache lifetime are never thrown away.
+        /// </summary>
+        [Fact]
+        public async Task NotDropFreshKeys_WhenMaximumStalenessIsBelowTheCacheDuration()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, options =>
+            {
+                options.JwksCacheDuration = TimeSpan.FromHours(1);
+                options.MaximumKeyStaleness = TimeSpan.Zero;
+            });
+
+            Assert.True((await validator.ValidateAsync(platform.CreateIdToken())).IsValid);
+            await Task.Delay(20);
+            platform.JwksDown = true;
+            var result = await validator.ValidateAsync(platform.CreateIdToken());
+
+            Assert.True(result.IsValid, result.Error);
+            Assert.Equal(1, platform.FetchCount);
         }
 
         /// <summary>
@@ -333,6 +390,8 @@ namespace LtiAdvantage.UnitTests.Validation
                 var result = await validator.ValidateAsync(platform.CreateIdToken());
                 Assert.False(result.IsValid);
                 Assert.Contains("signing keys could not be fetched", result.Error);
+                Assert.DoesNotContain(JwksUri, result.Error);
+                Assert.NotNull(result.Exception);
             }
 
             Assert.Equal(1, platform.FetchCount);
@@ -428,7 +487,8 @@ namespace LtiAdvantage.UnitTests.Validation
             var result = await validator.ValidateAsync(platform.CreateIdToken());
 
             Assert.False(result.IsValid);
-            Assert.Contains("nonce store unavailable", result.Error);
+            Assert.Equal("nonce store unavailable", result.Exception?.Message);
+            Assert.DoesNotContain("nonce store unavailable", result.Error);
         }
 
         private sealed class ThrowingNonceStore : INonceStore

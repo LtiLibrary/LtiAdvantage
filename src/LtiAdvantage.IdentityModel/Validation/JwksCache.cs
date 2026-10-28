@@ -48,8 +48,9 @@ namespace LtiAdvantage.IdentityModel.Validation
         /// </param>
         /// <param name="maximumStaleness">
         /// How long after their last successful fetch keys may still be served while refreshes
-        /// fail. Defaults to 7 days. After that the keys are dropped, so a key the platform has
-        /// revoked cannot stay trusted indefinitely just because its JWKS cannot be reached.
+        /// fail. Defaults to 7 days, and is never shorter than <paramref name="cacheDuration"/>.
+        /// After that the keys are dropped, so a key the platform has revoked cannot stay trusted
+        /// indefinitely just because its JWKS cannot be reached.
         /// </param>
         public JwksCache(HttpClient client, TimeSpan cacheDuration, TimeSpan minimumRefreshInterval,
             TimeSpan? maximumStaleness = null)
@@ -57,7 +58,10 @@ namespace LtiAdvantage.IdentityModel.Validation
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _cacheDuration = cacheDuration;
             _minimumRefreshInterval = minimumRefreshInterval;
-            _maximumStaleness = maximumStaleness ?? TimeSpan.FromDays(7);
+            // Never shorter than the cache duration: keys still within their cache lifetime are
+            // fresh, so a smaller value would only throw away good keys.
+            var staleness = maximumStaleness ?? TimeSpan.FromDays(7);
+            _maximumStaleness = staleness < cacheDuration ? cacheDuration : staleness;
         }
 
         private readonly TimeSpan _maximumStaleness;
@@ -96,19 +100,33 @@ namespace LtiAdvantage.IdentityModel.Validation
                     entry = null;
                 }
 
-                var needsFreshKeys = entry == null
-                    || now - entry.FetchedAt >= _cacheDuration
-                    // A key id we do not hold usually means the peer rotated.
-                    // (Only meaningful when the peer names its keys: if none has a kid, every token
-                    // would look like a rotation and the cache would degrade into polling.)
-                    || (requiredKeyId != null && entry.HasKeyIds && !entry.HasKeyId(requiredKeyId));
+                // A key id we do not hold usually means the peer rotated. (Only meaningful when the
+                // peer names its keys: if none has a kid, every token would look like a rotation
+                // and the cache would degrade into polling.)
+                var keyMissing = entry != null
+                    && requiredKeyId != null && entry.HasKeyIds && !entry.HasKeyId(requiredKeyId);
+                var expired = entry != null && now - entry.FetchedAt >= _cacheDuration;
 
-                if (!needsFreshKeys)
+                if (entry != null && !keyMissing)
                 {
+                    // The cached set can answer this caller. If it has expired, refresh in the
+                    // background (once, rate limited) instead of making the caller wait for it.
+                    if (expired && !_inFlight.ContainsKey(jwksUri)
+                        && now - entry.LastAttemptAt >= _minimumRefreshInterval)
+                    {
+                        entry.LastAttemptAt = now;
+                        var refresh = FetchAndStoreAsync(jwksUri, now);
+                        _inFlight[jwksUri] = refresh;
+                        // Nobody awaits a background refresh; observe a failure so it is not
+                        // reported as an unobserved task exception. Later callers see its outcome.
+                        _ = refresh.ContinueWith(t => _ = t.Exception, CancellationToken.None,
+                            TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Default);
+                    }
+
                     return entry.Keys;
                 }
 
-                // Join a fetch that is already running rather than starting another.
+                // No usable keys: join a fetch that is already running rather than starting another.
                 if (!_inFlight.TryGetValue(jwksUri, out fetch))
                 {
                     // Never fetch more often than the minimum interval, counting failed attempts.

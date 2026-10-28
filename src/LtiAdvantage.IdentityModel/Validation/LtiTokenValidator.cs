@@ -114,19 +114,16 @@ namespace LtiAdvantage.IdentityModel.Validation
 
             var handler = Handler;
 
-            if (!handler.CanReadToken(idToken))
-            {
-                return LtiTokenValidationResult.Failure("The id_token is not a readable JWT.");
-            }
 
             string keyId;
             try
             {
+                // Also the readability check: a token that is not a JWT fails here.
                 keyId = handler.ReadJwtToken(idToken).Header.Kid;
             }
             catch (Exception ex)
             {
-                return LtiTokenValidationResult.Failure($"The id_token header could not be read: {ex.Message}");
+                return LtiTokenValidationResult.Failure("The id_token is not a readable JWT.", ex);
             }
 
             IReadOnlyCollection<SecurityKey> keys;
@@ -139,8 +136,9 @@ namespace LtiAdvantage.IdentityModel.Validation
             catch (Exception ex) when (!(ex is OperationCanceledException && cancellationToken.IsCancellationRequested))
             {
                 // Fetch failures, timeouts and malformed JWKS documents.
-                return LtiTokenValidationResult.Failure(
-                    $"The platform's signing keys could not be fetched: {ex.Message}");
+                // Generic text: the details (JWKS URL, HTTP status) are configuration, and Error
+                // may end up on a page. They stay available on Exception for logging.
+                return LtiTokenValidationResult.Failure("The platform's signing keys could not be fetched.", ex);
             }
 
             var parameters = new TokenValidationParameters
@@ -171,7 +169,7 @@ namespace LtiAdvantage.IdentityModel.Validation
             {
                 // Security token failures, and anything else signature checking can throw (for
                 // example a crypto provider rejecting a platform key), are failed validations.
-                return LtiTokenValidationResult.Failure($"The id_token failed validation: {ex.Message}");
+                return LtiTokenValidationResult.Failure($"The id_token failed validation: {ex.Message}", ex);
             }
 
             if (validatedToken is not JwtSecurityToken jwt)
@@ -197,7 +195,7 @@ namespace LtiAdvantage.IdentityModel.Validation
             {
                 // A malformed claim (such as a non-numeric iat) or a failing nonce store must still
                 // come back as a failed validation, as this method promises.
-                return LtiTokenValidationResult.Failure($"The id_token could not be validated: {ex.Message}");
+                return LtiTokenValidationResult.Failure("The id_token could not be validated.", ex);
             }
 
             return LtiTokenValidationResult.Success(principal, jwt.Payload,

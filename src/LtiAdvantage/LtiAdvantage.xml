@@ -2008,7 +2008,8 @@
         </member>
         <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.Add(System.Collections.Generic.IDictionary{System.String,System.String},System.String,System.String)">
             <summary>
-            Records a variable's value, unless the variable was already recorded.
+            Records a variable's value. Order does not matter: <see cref="M:LtiAdvantage.Lti.CustomPropertySubstitutions.BuildPattern(System.Collections.Generic.IDictionary{System.String,System.String})"/> sorts the
+            names longest first, so prefixes such as <c>$Context.id</c> cannot shadow longer names.
             </summary>
         </member>
         <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.SubstituteAll(System.String,System.Collections.Generic.IDictionary{System.String,System.String},System.Text.RegularExpressions.Regex)">

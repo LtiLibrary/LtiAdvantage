@@ -1,4 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
@@ -68,6 +70,8 @@ namespace LtiAdvantage.Utilities
             return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(values), ReadSettings);
         }
 
+        private static Type ScalarType<T>() => Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
+
         public static void SetClaimValue<T>(this JwtPayload payload, string type, T value)
         {
             if (payload.ContainsKey(type))
@@ -90,9 +94,15 @@ namespace LtiAdvantage.Utilities
                     payload.AddClaim(new Claim(type, stringValue, ClaimValueTypes.String));
                 }
             } 
-            else if (typeof(T) == typeof(int))
+            else if (ScalarType<T>() == typeof(int) || ScalarType<T>() == typeof(long))
             {
-                payload.AddClaim(new Claim(type, value.ToString(), ClaimValueTypes.Integer));
+                // int? and long? unwrap to the same typed claim as int, not a JSON claim.
+                payload.AddClaim(new Claim(type, Convert.ToString(value, CultureInfo.InvariantCulture),
+                    ScalarType<T>() == typeof(int) ? ClaimValueTypes.Integer : ClaimValueTypes.Integer64));
+            }
+            else if (ScalarType<T>() == typeof(bool))
+            {
+                payload.AddClaim(new Claim(type, (bool) (object) value ? "true" : "false", ClaimValueTypes.Boolean));
             }
             else if (typeof(T).IsArray)
             {

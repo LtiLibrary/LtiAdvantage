@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using LtiAdvantage.Lti;
@@ -96,6 +97,20 @@ namespace LtiAdvantage.UnitTests.Proctoring
             var claim = JsonSerializer.Deserialize<AssessmentControlClaimValueType>(json);
 
             Assert.Equal(new[] {AssessmentControlAction.Resume}, claim.Actions);
+        }
+
+        /// <summary>A nullable number claim is stored as an integer claim, not as JSON.</summary>
+        [Fact]
+        public void StoreAttemptNumber_AsAnIntegerClaim()
+        {
+            var request = new LtiStartProctoringRequest {AttemptNumber = 2};
+
+            var claim = request.Claims.Single(c => c.Type == Constants.LtiClaims.AttemptNumber);
+
+            // IdentityModel reports it as integer or integer32 depending on how it is read; either
+            // way it must be a number claim, not a JSON one.
+            Assert.StartsWith(System.Security.Claims.ClaimValueTypes.Integer, claim.ValueType);
+            Assert.Equal("2", claim.Value);
         }
 
         /// <summary>Setting a nullable claim to null removes it, instead of writing "null".</summary>

@@ -75,7 +75,12 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
                 {
                     var includeGroups = groups && await CallerHoldsGroupsScopeAsync().ConfigureAwait(false);
                     var request = new GetMembershipRequest(contextId, limit, rlid, role, includeGroups);
-                    return await OnGetMembershipAsync(request).ConfigureAwait(false);
+                    var result = await OnGetMembershipAsync(request).ConfigureAwait(false);
+
+                    // Enforce, don't just hint: without the groups scope no group data leaves,
+                    // even if the override loaded it anyway.
+                    if (!includeGroups) StripGroupEnrollments(result);
+                    return result;
                 }
                 catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
                 {
@@ -117,10 +122,25 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
                     .ConfigureAwait(false);
                 return result.Succeeded;
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
-                // No policy for the scope (AddLtiAdvantagePolicies not called): not granted.
+                // Usually no policy for the scope (AddLtiAdvantagePolicies not called). Either way
+                // the scope is not granted, but say why, or ?groups=true fails silently.
+                _logger.LogWarning(ex,
+                    "Could not check the {Scope} scope; serving membership without group enrollments.",
+                    Constants.LtiScopes.Gs.ContextGroupReadonly);
                 return false;
+            }
+        }
+
+        private static void StripGroupEnrollments(ActionResult<MembershipContainer> result)
+        {
+            var container = result.Value ?? (result.Result as ObjectResult)?.Value as MembershipContainer;
+            if (container?.Members == null) return;
+
+            foreach (var member in container.Members)
+            {
+                if (member != null) member.GroupEnrollments = null;
             }
         }
     }

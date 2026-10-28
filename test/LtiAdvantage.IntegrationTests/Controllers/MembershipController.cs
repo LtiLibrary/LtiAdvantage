@@ -18,7 +18,8 @@ namespace LtiAdvantage.IntegrationTests.Controllers
         {
             // One member; with group enrollments only when the base class passed IncludeGroups.
             var member = new Member {UserId = "user-1"};
-            if (request.IncludeGroups)
+            // rlid "always-groups" simulates an override that ignores IncludeGroups.
+            if (request.IncludeGroups || request.Rlid == "always-groups")
                 member.GroupEnrollments = new[] {new LtiAdvantage.CourseGroupsService.GroupEnrollment {GroupId = "group-1"}};
 
             var result = (ActionResult<MembershipContainer>) new ObjectResult(

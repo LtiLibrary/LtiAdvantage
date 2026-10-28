@@ -1,3 +1,4 @@
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -44,6 +45,12 @@ namespace LtiAdvantage.IdentityModel.Validation
         /// </summary>
         public string MessageType { get; private set; }
 
+        /// <summary>
+        /// The exception behind a failure, when there was one (for example the JWKS fetch error),
+        /// for logging. Null on success and for failures that are plain claim checks.
+        /// </summary>
+        public Exception Exception { get; private set; }
+
         internal static LtiTokenValidationResult Success(ClaimsPrincipal principal, JwtPayload payload,
             string messageType) =>
             new()
@@ -53,6 +60,9 @@ namespace LtiAdvantage.IdentityModel.Validation
                 Payload = payload,
                 MessageType = messageType
             };
+
+        internal static LtiTokenValidationResult Failure(string error, Exception exception) =>
+            new() {IsValid = false, Error = error, Exception = exception};
 
         internal static LtiTokenValidationResult Failure(string error) =>
             new() {IsValid = false, Error = error};

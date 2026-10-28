@@ -53,7 +53,8 @@ namespace LtiAdvantage.IdentityModel.Validation
 
         /// <summary>
         /// How long after the last successful JWKS fetch the keys may still be used while
-        /// refreshes fail. Defaults to 7 days; see <see cref="JwksCache"/>.
+        /// refreshes fail. Defaults to 7 days, and is never shorter than
+        /// <see cref="JwksCacheDuration"/>; see <see cref="JwksCache"/>.
         /// </summary>
         public TimeSpan MaximumKeyStaleness { get; set; } = TimeSpan.FromDays(7);
 

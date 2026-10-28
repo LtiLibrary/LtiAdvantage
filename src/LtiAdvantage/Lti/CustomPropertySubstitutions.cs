@@ -113,7 +113,8 @@ namespace LtiAdvantage.Lti
         }
 
         /// <summary>
-        /// Records a variable's value, unless the variable was already recorded.
+        /// Records a variable's value. Order does not matter: <see cref="BuildPattern"/> sorts the
+        /// names longest first, so prefixes such as <c>$Context.id</c> cannot shadow longer names.
         /// </summary>
         private static void Add(IDictionary<string, string> variables, string variable, string replacement)
         {
@@ -308,7 +309,6 @@ namespace LtiAdvantage.Lti
             // LTI Context variable substitutions
             if (LtiContext != null)
             {
-                // $Context.id.history before $Context.id: see the remarks on this method.
                 Add(variables, "$Context.id.history", LtiContext.IdHistory);
                 Add(variables, "$Context.id", LtiContext.Id);
                 Add(variables, "$Context.label", LtiContext.Label);
@@ -322,7 +322,6 @@ namespace LtiAdvantage.Lti
             if (LtiResourceLink != null)
             {
                 Add(variables, "$ResourceLink.description", LtiResourceLink.Description);
-                // $ResourceLink.id.history before $ResourceLink.id: see the remarks on this method.
                 Add(variables, "$ResourceLink.id.history", LtiResourceLink.IdHistory);
                 Add(variables, "$ResourceLink.id", LtiResourceLink.Id);
                 Add(variables, "$ResourceLink.title", LtiResourceLink.Title);

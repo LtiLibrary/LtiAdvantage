@@ -25,6 +25,9 @@ namespace LtiAdvantage.IdentityModel.Client
             JwtClientCredentialsTokenRequest request, CancellationToken cancellationToken = default(CancellationToken))
         {
             request.GrantType = OidcConstants.GrantTypes.ClientCredentials;
+            // IdentityModel defaults to sending client credentials in an Authorization header,
+            // which it refuses to combine with a client assertion. Send them in the body.
+            request.ClientCredentialStyle = ClientCredentialStyle.PostBody;
             request.ClientAssertion = new ClientAssertion
             {
                 Type = OidcConstants.ClientAssertionTypes.JwtBearer,

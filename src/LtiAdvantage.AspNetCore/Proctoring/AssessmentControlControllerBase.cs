@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using LtiAdvantage.AspNetCore.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -25,6 +26,7 @@ namespace LtiAdvantage.AspNetCore.Proctoring
     /// LtiStartProctoring message.
     /// </remarks>
     [ApiController]
+    [ServiceExceptionFilter]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public abstract class AssessmentControlControllerBase : ControllerBase, IAssessmentControlController
@@ -68,70 +70,40 @@ namespace LtiAdvantage.AspNetCore.Proctoring
         public async Task<ActionResult<AssessmentControlResponse>> ControlAssessmentAsync(
             [Required] [FromBody] AssessmentControlRequest control)
         {
-            try
+            // An action this library does not recognise cannot be handed to the override
+            // as "Unknown"; tell the tool instead.
+            if (control.Action == AssessmentControlAction.Unknown)
             {
-                _logger.LogDebug($"Entering {nameof(ControlAssessmentAsync)}.");
-
-                try
+                return BadRequest(new ProblemDetails
                 {
-                    // An action this library does not recognise cannot be handed to the override
-                    // as "Unknown"; tell the tool instead.
-                    if (control.Action == AssessmentControlAction.Unknown)
-                    {
-                        return BadRequest(new ProblemDetails
-                        {
-                            Title = "Unsupported action",
-                            Status = StatusCodes.Status400BadRequest,
-                            Detail = "The action is missing or not one this platform supports."
-                        });
-                    }
-
-                    var missing = MissingRequiredFields(control);
-                    if (missing.Count > 0)
-                    {
-                        return BadRequest(new ProblemDetails
-                        {
-                            Title = "Invalid assessment control request",
-                            Status = StatusCodes.Status400BadRequest,
-                            Detail = string.Join(" ", missing)
-                        });
-                    }
-
-                    var request = new ControlAssessmentRequest(control);
-                    var result = await OnControlAssessmentAsync(request).ConfigureAwait(false);
-
-                    // status is required in the response; never send it as null.
-                    var response = result.Value ?? (result.Result as ObjectResult)?.Value as AssessmentControlResponse;
-                    if (response != null && response.Status == AssessmentControlStatus.Unknown)
-                        throw new InvalidOperationException(
-                            $"{nameof(OnControlAssessmentAsync)} must set the response Status " +
-                            $"(use {nameof(AssessmentControlStatus)}.{nameof(AssessmentControlStatus.None)} for no attempt in progress).");
-
-                    return result;
-                }
-                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
-                {
-                    // The caller went away. Let the framework abort the response rather than
-                    // reporting a server error the caller will never see.
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(ControlAssessmentAsync)}.");
-                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
-                    {
-                        Title = "An unexpected error occurred",
-                        Status = StatusCodes.Status500InternalServerError,
-                        Detail = _env.IsDevelopment()
-                            ? ex.Message + ex.StackTrace
-                            : null // Exception messages can reveal configuration; Development only.
-                    });
-                }
+                    Title = "Unsupported action",
+                    Status = StatusCodes.Status400BadRequest,
+                    Detail = "The action is missing or not one this platform supports."
+                });
             }
-            finally
+
+            var missing = MissingRequiredFields(control);
+            if (missing.Count > 0)
             {
-                _logger.LogDebug($"Exiting {nameof(ControlAssessmentAsync)}.");
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid assessment control request",
+                    Status = StatusCodes.Status400BadRequest,
+                    Detail = string.Join(" ", missing)
+                });
             }
+
+            var request = new ControlAssessmentRequest(control) { CancellationToken = HttpContext.RequestAborted };
+            var result = await OnControlAssessmentAsync(request).ConfigureAwait(false);
+
+            // status is required in the response; never send it as null.
+            var response = result.Value ?? (result.Result as ObjectResult)?.Value as AssessmentControlResponse;
+            if (response != null && response.Status == AssessmentControlStatus.Unknown)
+                throw new InvalidOperationException(
+                    $"{nameof(OnControlAssessmentAsync)} must set the response Status " +
+                    $"(use {nameof(AssessmentControlStatus)}.{nameof(AssessmentControlStatus.None)} for no attempt in progress).");
+
+            return result;
         }
 
         /// <summary>

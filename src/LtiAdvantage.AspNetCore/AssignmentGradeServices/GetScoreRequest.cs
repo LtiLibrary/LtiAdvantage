@@ -1,4 +1,5 @@
-﻿namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
+﻿using System.Threading;
+namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
 {
     /// <summary>
     /// Represents a Get Score request.
@@ -32,5 +33,11 @@
         /// Get or set the score id.
         /// </summary>
         public string ScoreId { get; set; }
+
+        /// <summary>
+        /// Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+        /// Pass it to database and HTTP calls so work for a caller that has gone away stops.
+        /// </summary>
+        public CancellationToken CancellationToken { get; init; }
     }
 }

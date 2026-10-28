@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Threading;
+using System;
 using LtiAdvantage.Lti;
 using LtiAdvantage.NamesRoleProvisioningService;
 
@@ -91,5 +92,11 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
         /// See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
         /// </remarks>
         public bool IncludeGroups { get; }
+
+        /// <summary>
+        /// Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+        /// Pass it to database and HTTP calls so work for a caller that has gone away stops.
+        /// </summary>
+        public CancellationToken CancellationToken { get; init; }
     }
 }

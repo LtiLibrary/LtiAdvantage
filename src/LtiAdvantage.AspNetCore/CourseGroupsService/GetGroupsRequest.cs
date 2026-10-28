@@ -1,3 +1,4 @@
+using System.Threading;
 using System;
 
 namespace LtiAdvantage.AspNetCore.CourseGroupsService
@@ -45,5 +46,11 @@ namespace LtiAdvantage.AspNetCore.CourseGroupsService
         /// See https://www.imsglobal.org/spec/lti-gs/v1p0#limit-query-parameter.
         /// </remarks>
         public int? Limit { get; }
+
+        /// <summary>
+        /// Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+        /// Pass it to database and HTTP calls so work for a caller that has gone away stops.
+        /// </summary>
+        public CancellationToken CancellationToken { get; init; }
     }
 }

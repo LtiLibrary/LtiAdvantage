@@ -216,7 +216,8 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
                 // The platform assigns the client_id; never keep one chosen by the tool.
                 tool.ClientId = null;
 
-                var registered = await OnRegisterAsync(new RegisterToolRequest(tool)).ConfigureAwait(false);
+                var registered = await OnRegisterAsync(
+                    new RegisterToolRequest(tool) { CancellationToken = HttpContext.RequestAborted }).ConfigureAwait(false);
 
                 if (registered == null || string.IsNullOrWhiteSpace(registered.ClientId))
                     throw new InvalidOperationException(

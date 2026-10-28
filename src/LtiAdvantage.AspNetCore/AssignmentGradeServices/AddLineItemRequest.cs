@@ -1,4 +1,5 @@
-﻿using LtiAdvantage.AssignmentGradeServices;
+﻿using System.Threading;
+using LtiAdvantage.AssignmentGradeServices;
 
 namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
 {
@@ -25,5 +26,11 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
         /// The line item.
         /// </summary>
         public LineItem LineItem { get; set; }
+
+        /// <summary>
+        /// Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+        /// Pass it to database and HTTP calls so work for a caller that has gone away stops.
+        /// </summary>
+        public CancellationToken CancellationToken { get; init; }
     }
 }

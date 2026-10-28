@@ -114,6 +114,17 @@ namespace LtiAdvantage.IntegrationTests.NamesRoleProvisioningService
             Assert.DoesNotContain("group_enrollments", body, StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>The override gets the request's abort token, so it can stop work for a caller that left.</summary>
+        [Fact]
+        public async Task PassTheRequestAbortedToken_ToTheOverride()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Nrps.MembershipReadonly);
+
+            var response = await _client.GetAsync(MembershipUrl + "?rlid=check-cancellation");
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
         public void Dispose()
         {
             _client?.Dispose();

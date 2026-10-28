@@ -56,7 +56,6 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// The user id.
         /// </summary>
         [JsonPropertyName("userId")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string UserId { get; set; }
     }
 }

@@ -28,7 +28,6 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// For example, this label might be used as the heading of a column in a gradebook.
         /// </summary>
         [JsonPropertyName("label")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Label { get; set; }
 
         /// <summary>
@@ -49,7 +48,6 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// The maximum score allowed.
         /// </summary>
         [JsonPropertyName("scoreMaximum")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? ScoreMaximum { get; set; }
 
         /// <summary>

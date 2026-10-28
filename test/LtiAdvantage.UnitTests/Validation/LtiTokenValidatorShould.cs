@@ -273,6 +273,43 @@ namespace LtiAdvantage.UnitTests.Validation
             Assert.Equal(2, platform.FetchCount);
         }
 
+        /// <summary>
+        /// When the refetch of an empty set fails, the caller hears that the keys could not be
+        /// fetched, not that no key matched.
+        /// </summary>
+        [Fact]
+        public async Task ReportAFailedRefetch_OfAnEmptyKeySet()
+        {
+            var platform = new FakePlatform("key-1") {PublishNoKeys = true};
+            var validator = CreateValidator(platform, options =>
+            {
+                options.JwksCacheDuration = TimeSpan.FromHours(24);
+                options.MinimumRefreshInterval = TimeSpan.Zero;
+            });
+            await validator.ValidateAsync(platform.CreateIdToken());
+
+            platform.JwksDown = true;
+            var result = await validator.ValidateAsync(platform.CreateIdToken());
+
+            Assert.False(result.IsValid);
+            Assert.Equal("The platform's signing keys could not be fetched.", result.Error);
+            Assert.Equal(2, platform.FetchCount);
+        }
+
+        /// <summary>A caller that names no key id (a platform checking a tool's JWKS) also gets a refetch.</summary>
+        [Fact]
+        public async Task RefetchAnEmptyKeySet_WithoutAKeyId()
+        {
+            var platform = new FakePlatform("key-1") {PublishNoKeys = true};
+            var cache = new JwksCache(platform.CreateClient(), TimeSpan.FromHours(24), TimeSpan.Zero);
+
+            Assert.Empty(await cache.GetSigningKeysAsync(JwksUri));
+            platform.PublishNoKeys = false;
+
+            Assert.Single(await cache.GetSigningKeysAsync(JwksUri));
+            Assert.Equal(2, platform.FetchCount);
+        }
+
         /// <summary>The refetch of an empty key set is still rate limited.</summary>
         [Fact]
         public async Task NotRefetchAnEmptyKeySet_MoreOftenThanTheMinimumInterval()

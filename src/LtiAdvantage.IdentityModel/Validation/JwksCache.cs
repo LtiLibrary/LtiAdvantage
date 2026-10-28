@@ -24,6 +24,12 @@ namespace LtiAdvantage.IdentityModel.Validation
     /// Stale keys are only served up to a maximum age (7 days by default); after that they are
     /// dropped, so a revoked key cannot stay trusted through a long outage.
     /// </para>
+    /// <para>
+    /// An empty key set is not trusted to stay empty: the peer may not have published its key yet.
+    /// While the cached set is empty, every lookup refetches, still at most once per
+    /// <see cref="LtiTokenValidationOptions.MinimumRefreshInterval"/>, and a failed refetch is
+    /// reported instead of answering with the empty set.
+    /// </para>
     /// </remarks>
     public class JwksCache
     {
@@ -76,7 +82,7 @@ namespace LtiAdvantage.IdentityModel.Validation
         /// The key id the caller needs. When supplied and absent from the cached set, the cache
         /// refetches (subject to the minimum refresh interval) so that a freshly rotated key is
         /// picked up without waiting for the cache to expire. Pass null to accept whatever is
-        /// cached.
+        /// cached, unless the cached set is empty, which is refetched either way.
         /// </param>
         /// <param name="cancellationToken">Optional cancellation token.</param>
         public async Task<IReadOnlyCollection<SecurityKey>> GetSigningKeysAsync(string jwksUri,
@@ -190,12 +196,20 @@ namespace LtiAdvantage.IdentityModel.Validation
                     // HttpClient timeout.
                     if (_entries.TryGetValue(jwksUri, out var entry) && !IsTooStale(entry, DateTimeOffset.UtcNow))
                     {
-                        // Keep serving the keys we have; the next attempt waits the minimum interval.
+                        // The next attempt waits the minimum interval either way.
                         entry.LastAttemptAt = startedAt;
-                        return entry.Keys;
-                    }
 
-                    _failedFirstFetches[jwksUri] = startedAt;
+                        // Keep serving the keys we have. An empty set is not worth serving: answering
+                        // with it would hide the outage behind "no matching key".
+                        if (entry.Keys.Count > 0)
+                        {
+                            return entry.Keys;
+                        }
+                    }
+                    else
+                    {
+                        _failedFirstFetches[jwksUri] = startedAt;
+                    }
                 }
                 throw;
             }

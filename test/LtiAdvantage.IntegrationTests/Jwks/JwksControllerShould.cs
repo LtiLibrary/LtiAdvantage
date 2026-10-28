@@ -75,5 +75,26 @@ namespace LtiAdvantage.IntegrationTests.Jwks
         }
 
         public void Dispose() { _client?.Dispose(); _host?.Dispose(); }
+
+        /// <summary>
+        /// A tool with one key set per platform registration moves the route to carry the
+        /// registration and overrides GetPublicKeysAsync to pick the keys.
+        /// </summary>
+        [Fact]
+        public async Task PublishAKeySetPerRegistration()
+        {
+            using var host = TestHostFactory.Create(services =>
+                Microsoft.Extensions.DependencyInjection.OptionsServiceCollectionExtensions.Configure<Microsoft.AspNetCore.Mvc.MvcOptions>(
+                    services, options => Microsoft.AspNetCore.Mvc.LtiRouteMvcOptionsExtensions.MapLtiRoute(options,
+                        Constants.ServiceEndpoints.Jwks.JwksService, "registrations/{registrationId}/jwks.json")));
+            using var client = host.GetTestClient();
+
+            var a = JsonDocument.Parse(await client.GetStringAsync("registrations/a/jwks.json"));
+            var b = JsonDocument.Parse(await client.GetStringAsync("registrations/b/jwks.json"));
+
+            Assert.Equal("kid-a", a.RootElement.GetProperty("keys")[0].GetProperty("kid").GetString());
+            Assert.Equal("kid-b", b.RootElement.GetProperty("keys")[0].GetProperty("kid").GetString());
+            Assert.False(a.RootElement.GetProperty("keys")[0].TryGetProperty("d", out _));
+        }
     }
 }

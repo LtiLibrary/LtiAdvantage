@@ -170,7 +170,7 @@ namespace LtiAdvantage.UnitTests.Validation
         public async Task RejectAReplayedNonce()
         {
             var platform = new FakePlatform("key-1");
-            var store = new InMemoryNonceStore();
+            var store = new RecordingNonceStore();
             var validator = CreateValidator(platform, options => options.NonceStore = store);
 
             var token = platform.CreateIdToken(nonce: "nonce-once");
@@ -529,7 +529,7 @@ namespace LtiAdvantage.UnitTests.Validation
             Assert.Contains("NonceStore", ex.Message);
 
             var withStore = Options();
-            withStore.NonceStore = new InMemoryNonceStore();
+            withStore.NonceStore = new RecordingNonceStore();
             _ = new LtiTokenValidator(withStore, platform.CreateClient());
 
             var optedOut = Options();
@@ -607,7 +607,7 @@ namespace LtiAdvantage.UnitTests.Validation
         public async Task PassTheTokenExpiry_ToTheNonceStore()
         {
             var platform = new FakePlatform("key-1");
-            var store = new InMemoryNonceStore();
+            var store = new RecordingNonceStore();
             var validator = CreateValidator(platform, options => options.NonceStore = store);
             var expires = DateTime.UtcNow.AddMinutes(7);
 
@@ -644,6 +644,62 @@ namespace LtiAdvantage.UnitTests.Validation
             {
                 Issuer = Issuer, ClientId = ClientId
             }, platform.CreateClient()));
+        }
+
+        [Fact]
+        public async Task AcceptAToken_WhoseNonceMatchesTheLogin()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform);
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken(nonce: "login-nonce"), "login-nonce");
+
+            Assert.True(result.IsValid, result.Error);
+        }
+
+        /// <summary>
+        /// A token issued for another browser's login is rejected, and its nonce is not recorded,
+        /// so the login it belongs to can still complete.
+        /// </summary>
+        [Fact]
+        public async Task RejectAToken_WhoseNonceIsNotTheLogins_WithoutConsumingIt()
+        {
+            var platform = new FakePlatform("key-1");
+            var store = new RecordingNonceStore();
+            var validator = CreateValidator(platform, o => o.NonceStore = store);
+            var token = platform.CreateIdToken(nonce: "other-nonce");
+
+            var result = await validator.ValidateAsync(token, "login-nonce");
+
+            Assert.False(result.IsValid);
+            Assert.Contains("does not match", result.Error);
+            Assert.True((await validator.ValidateAsync(token, "other-nonce")).IsValid);
+        }
+
+        [Fact]
+        public async Task RejectATokenWithoutNonce_WhenOneIsExpected_EvenIfNoncesAreOptional()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, o => o.RequireNonce = false);
+
+            var result = await validator.ValidateAsync(platform.CreateIdToken(nonce: null), "login-nonce");
+
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task WorkWithTheLibraryInMemoryNonceStore()
+        {
+            var platform = new FakePlatform("key-1");
+            var validator = CreateValidator(platform, o =>
+            {
+                o.AllowNonceReuse = false;
+                o.NonceStore = new LtiAdvantage.IdentityModel.Validation.InMemoryNonceStore();
+            });
+            var token = platform.CreateIdToken(nonce: "once");
+
+            Assert.True((await validator.ValidateAsync(token)).IsValid);
+            Assert.False((await validator.ValidateAsync(token)).IsValid);
         }
 
         private static LtiTokenValidator CreateValidator(FakePlatform platform,
@@ -762,7 +818,7 @@ namespace LtiAdvantage.UnitTests.Validation
             }
         }
 
-        private sealed class InMemoryNonceStore : INonceStore
+        private sealed class RecordingNonceStore : INonceStore
         {
             private readonly HashSet<string> _seen = new(StringComparer.Ordinal);
 

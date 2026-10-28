@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LtiAdvantage.Jwks;
@@ -29,12 +30,24 @@ namespace LtiAdvantage.AspNetCore.Jwks
         /// <summary>
         /// Constructs a new <see cref="JwksControllerBase"/>.
         /// </summary>
-        /// <param name="keyStore">The key store providing public keys to publish.</param>
+        /// <param name="keyStore">
+        /// The key store providing public keys to publish. May be null when
+        /// <see cref="GetPublicKeysAsync"/> is overridden.
+        /// </param>
         /// <param name="logger">The logger.</param>
         protected JwksControllerBase(IJwksKeyStore keyStore, ILogger<JwksControllerBase> logger)
         {
             _keyStore = keyStore;
             _logger = logger;
+        }
+
+        /// <summary>
+        /// Constructs a new <see cref="JwksControllerBase"/> without a key store, for a controller
+        /// that overrides <see cref="GetPublicKeysAsync"/>.
+        /// </summary>
+        /// <param name="logger">The logger.</param>
+        protected JwksControllerBase(ILogger<JwksControllerBase> logger) : this(null, logger)
+        {
         }
 
         /// <summary>
@@ -52,7 +65,7 @@ namespace LtiAdvantage.AspNetCore.Jwks
             _logger.LogDebug($"Entering {nameof(GetJwksAsync)}.");
             try
             {
-                var keys = await _keyStore.GetPublicKeysAsync().ConfigureAwait(false);
+                var keys = await GetPublicKeysAsync().ConfigureAwait(false);
 
                 var maxAge = (long)CacheDuration.TotalSeconds;
                 Response.Headers[HeaderNames.CacheControl] = maxAge > 0 ? $"public, max-age={maxAge}" : "no-store";
@@ -92,6 +105,25 @@ namespace LtiAdvantage.AspNetCore.Jwks
                 _logger.LogDebug($"Exiting {nameof(GetJwksAsync)}.");
             }
         }
+
+        /// <summary>
+        /// Returns the keys to publish. By default, the injected <see cref="IJwksKeyStore"/>'s keys.
+        /// </summary>
+        /// <remarks>
+        /// Override this to publish a different key set per request, for example one per platform
+        /// registration. Move the route so it carries the registration, then read it here:
+        /// <code>
+        /// // Startup: services.AddControllers(o => o.MapLtiRoute(
+        /// //     Constants.ServiceEndpoints.Jwks.JwksService, "registrations/{registrationId}/jwks.json"));
+        /// protected override Task&lt;IReadOnlyList&lt;JsonWebKey&gt;&gt; GetPublicKeysAsync() =>
+        ///     _registrations.GetPublicKeysAsync((string) RouteData.Values["registrationId"], HttpContext.RequestAborted);
+        /// </code>
+        /// Private parameters are still removed from whatever this returns.
+        /// </remarks>
+        protected virtual Task<IReadOnlyList<JsonWebKey>> GetPublicKeysAsync() =>
+            (_keyStore ?? throw new InvalidOperationException(
+                $"Pass an {nameof(IJwksKeyStore)} to the constructor or override {nameof(GetPublicKeysAsync)}."))
+            .GetPublicKeysAsync();
 
         /// <summary>
         /// How long clients and proxies may cache the JWKS document. Default 5 minutes.

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using LtiAdvantage.AssignmentGradeServices;
+using LtiAdvantage.CourseGroupsService;
 using LtiAdvantage.NamesRoleProvisioningService;
 using LtiAdvantage.Utilities;
 
@@ -30,23 +31,9 @@ namespace LtiAdvantage.Lti
         {
         }
 
-        /// <summary>
-        /// The Assignment and Grade Services claim.
-        /// </summary>
-        public AssignmentGradeServicesClaimValueType AssignmentGradeServices
-        {
-            get { return this.GetClaimValue<AssignmentGradeServicesClaimValueType>(Constants.LtiClaims.AssignmentGradeServices); }
-            set { this.SetClaimValue(Constants.LtiClaims.AssignmentGradeServices, value); }
-        }
+        #region Resource Link Claim
 
-        /// <summary>
-        /// The Names and Roles Provisioning Service claim.
-        /// </summary>
-        public NamesRoleServiceClaimValueType NamesRoleService
-        {
-            get { return this.GetClaimValue<NamesRoleServiceClaimValueType>(Constants.LtiClaims.NamesRoleService); }
-            set { this.SetClaimValue(Constants.LtiClaims.NamesRoleService, value); }
-        }
+        // See https://www.imsglobal.org/spec/lti/v1p3/#resource-link-claim
 
         /// <summary>
         /// The https://purl.imsglobal.org/spec/lti/claim/resource_link claim composes
@@ -63,5 +50,43 @@ namespace LtiAdvantage.Lti
             get { return this.GetClaimValue<ResourceLinkClaimValueType>(Constants.LtiClaims.ResourceLink); }
             set { this.SetClaimValue(Constants.LtiClaims.ResourceLink, value); }
         }
+
+        #endregion
+
+        #region Optional Service Claims
+
+        // Each of these is the platform advertising a service the tool may call against this
+        // launch's context. All are optional: a platform that does not offer the service, or
+        // does not grant this deployment access to it, omits the claim.
+
+        /// <summary>
+        /// The Assignment and Grade Services claim.
+        /// </summary>
+        public AssignmentGradeServicesClaimValueType AssignmentGradeServices
+        {
+            get { return this.GetClaimValue<AssignmentGradeServicesClaimValueType>(Constants.LtiClaims.AssignmentGradeServices); }
+            set { this.SetClaimValue(Constants.LtiClaims.AssignmentGradeServices, value); }
+        }
+
+        /// <summary>
+        /// The Course Groups Service claim, present when the platform exposes the groups
+        /// (and optionally the group sets) endpoint for this context.
+        /// </summary>
+        public CourseGroupsServiceClaimValueType CourseGroupsService
+        {
+            get { return this.GetClaimValue<CourseGroupsServiceClaimValueType>(Constants.LtiClaims.CourseGroupsService); }
+            set { this.SetClaimValue(Constants.LtiClaims.CourseGroupsService, value); }
+        }
+
+        /// <summary>
+        /// The Names and Roles Provisioning Service claim.
+        /// </summary>
+        public NamesRoleServiceClaimValueType NamesRoleService
+        {
+            get { return this.GetClaimValue<NamesRoleServiceClaimValueType>(Constants.LtiClaims.NamesRoleService); }
+            set { this.SetClaimValue(Constants.LtiClaims.NamesRoleService, value); }
+        }
+
+        #endregion
     }
 }

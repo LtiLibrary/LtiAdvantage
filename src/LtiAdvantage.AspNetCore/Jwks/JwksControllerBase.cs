@@ -71,6 +71,11 @@ namespace LtiAdvantage.AspNetCore.Jwks
                 }
                 return set;
             }
+            catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+            {
+                // The caller went away; let the framework abort the response.
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An unexpected error occurred in {nameof(GetJwksAsync)}.");
@@ -88,24 +93,6 @@ namespace LtiAdvantage.AspNetCore.Jwks
             }
         }
 
-        private static string ToPublicKeyOperation(string operation)
-        {
-            switch (operation)
-            {
-                case "sign":
-                case "verify":
-                    return "verify";
-                case "decrypt":
-                case "encrypt":
-                    return "encrypt";
-                case "unwrapKey":
-                case "wrapKey":
-                    return "wrapKey";
-                default:
-                    return null;
-            }
-        }
-
         /// <summary>
         /// How long clients and proxies may cache the JWKS document. Default 5 minutes.
         /// Keep it well below the overlap during which a retired key stays published (see
@@ -119,46 +106,8 @@ namespace LtiAdvantage.AspNetCore.Jwks
         /// or <c>null</c> when the key is not an RSA or EC key (for example a symmetric key), or is
         /// missing public parameters (<c>n</c>/<c>e</c> or <c>crv</c>/<c>x</c>/<c>y</c>) that verifiers need,
         /// or is restricted by <c>key_ops</c> to operations that have no public counterpart.
+        /// See <see cref="PublicJsonWebKey.From"/>.
         /// </summary>
-        public static JsonWebKey ToPublicKey(JsonWebKey key)
-        {
-            if (key == null) return null;
-
-            var publicKey = new JsonWebKey
-            {
-                Kty = key.Kty,
-                Kid = key.Kid,
-                Use = key.Use,
-                Alg = key.Alg,
-                X5t = key.X5t,
-                X5tS256 = key.X5tS256,
-                X5u = key.X5u
-            };
-            // key_ops describe what the published (public) key may do, so private operations are
-            // mapped to their public counterparts (sign -> verify, ...) and the rest are dropped.
-            // If the key is restricted to operations that have no public counterpart (e.g. deriveKey),
-            // it is skipped: publishing it without key_ops would widen what it may be used for.
-            var publicOps = key.KeyOps.Select(ToPublicKeyOperation).Where(o => o != null).Distinct().ToList();
-            if (key.KeyOps.Count > 0 && publicOps.Count == 0) return null;
-            foreach (var op in publicOps) publicKey.KeyOps.Add(op);
-            foreach (var cert in key.X5c) publicKey.X5c.Add(cert);
-
-            switch (key.Kty)
-            {
-                case JsonWebAlgorithmsKeyTypes.RSA:
-                    if (string.IsNullOrEmpty(key.N) || string.IsNullOrEmpty(key.E)) return null;
-                    publicKey.N = key.N;
-                    publicKey.E = key.E;
-                    return publicKey;
-                case JsonWebAlgorithmsKeyTypes.EllipticCurve:
-                    if (string.IsNullOrEmpty(key.Crv) || string.IsNullOrEmpty(key.X) || string.IsNullOrEmpty(key.Y)) return null;
-                    publicKey.Crv = key.Crv;
-                    publicKey.X = key.X;
-                    publicKey.Y = key.Y;
-                    return publicKey;
-                default:
-                    return null;
-            }
-        }
+        public static JsonWebKey ToPublicKey(JsonWebKey key) => PublicJsonWebKey.From(key);
     }
 }

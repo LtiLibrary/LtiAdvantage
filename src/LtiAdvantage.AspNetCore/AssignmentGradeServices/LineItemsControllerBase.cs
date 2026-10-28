@@ -94,6 +94,12 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
                     var request = new AddLineItemRequest(contextId, lineItem);
                     return await OnAddLineItemAsync(request).ConfigureAwait(false);
                 }
+                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+                {
+                    // The caller went away. Let the framework abort the response rather than
+                    // reporting a server error the caller will never see.
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, $"An unexpected error occurred in {nameof(OnAddLineItemAsync)}.");
@@ -137,6 +143,12 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
                 {
                     var request = new DeleteLineItemRequest(contextId, lineItemId);
                     return await OnDeleteLineItemAsync(request).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+                {
+                    // The caller went away. Let the framework abort the response rather than
+                    // reporting a server error the caller will never see.
+                    throw;
                 }
                 catch (Exception ex)
                 {
@@ -183,6 +195,12 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
                 {
                     var request = new GetLineItemRequest(contextId, lineItemId);
                     return await OnGetLineItemAsync(request).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+                {
+                    // The caller went away. Let the framework abort the response rather than
+                    // reporting a server error the caller will never see.
+                    throw;
                 }
                 catch (Exception ex)
                 {
@@ -237,6 +255,12 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
                     var request = new GetLineItemsRequest(contextId, resourceLinkId, resourceId, tag, limit);
                     return await OnGetLineItemsAsync(request).ConfigureAwait(false);
                 }
+                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+                {
+                    // The caller went away. Let the framework abort the response rather than
+                    // reporting a server error the caller will never see.
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, $"An unexpected error occurred in {nameof(OnGetLineItemsAsync)}.");
@@ -283,9 +307,15 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
                     var request = new UpdateLineItemRequest(contextId, lineItemId, lineItem);
                     return await OnUpdateLineItemAsync(request).ConfigureAwait(false);
                 }
+                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+                {
+                    // The caller went away. Let the framework abort the response rather than
+                    // reporting a server error the caller will never see.
+                    throw;
+                }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(OnAddLineItemAsync)}.");
+                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(UpdateLineItemAsync)}.");
                     return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
                     {
                         Title = "An unexpected error occurred",

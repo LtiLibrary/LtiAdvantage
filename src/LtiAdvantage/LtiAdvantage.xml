@@ -319,9 +319,24 @@
             The message type of an LtiDeepLinkingRequest.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.Lti.LtiEndAssessmentRequestMessageType">
+            <summary>
+            The message type of an LtiEndAssessmentRequest (Proctoring Services 1.0 §4.4).
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.Lti.LtiResourceLinkRequestMessageType">
             <summary>
             The message type of an LtiResourceLinkRequest.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.Lti.LtiStartAssessmentRequestMessageType">
+            <summary>
+            The message type of an LtiStartAssessmentRequest (Proctoring Services 1.0 §4.3).
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.Lti.LtiStartProctoringRequestMessageType">
+            <summary>
+            The message type of an LtiStartProctoringRequest (Proctoring Services 1.0 §4.2).
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.Lti.LtiSubmissionReviewRequestMessageType">
@@ -339,9 +354,19 @@
             LTI claims.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.Acs">
+            <summary>
+            The Assessment Control Service endpoint and permitted actions (Proctoring Services 1.0 §5.2).
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.AssignmentGradeServices">
             <summary>
             The claim to include Names and Role Provisioning Service parameter in LTI 1.3 messages.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.AttemptNumber">
+            <summary>
+            The attempt number of the assessment being proctored (Proctoring Services 1.0 §4.2).
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.ContentItems">
@@ -352,6 +377,12 @@
         <member name="F:LtiAdvantage.Constants.LtiClaims.Context">
             <summary>
             Properties of the context from which the launch originated (for example, course id and title).
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.CourseGroupsService">
+            <summary>
+            The claim to include Course Groups Service parameters in LTI 1.3 messages
+            (Course Groups Service 1.0 §2.1).
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.Custom">
@@ -372,6 +403,12 @@
         <member name="F:LtiAdvantage.Constants.LtiClaims.DeploymentId">
             <summary>
             The deployment identifier, uniquely identifying the tool's deployment on the platform.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.EndAssessmentReturn">
+            <summary>
+            Set by the proctoring tool to ask the platform to send an LtiEndAssessment message
+            when the assessment ends (Proctoring Services 1.0 §4.3).
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.ErrorLog">
@@ -441,6 +478,25 @@
             Properties associated with the platform initiating the launch.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.ProctoringErrorLog">
+            <summary>
+            Proctoring-specific log message, reported by the proctoring tool on LtiEndAssessment
+            (Proctoring Services 1.0 §4.4). Distinct from the Deep Linking <see cref="F:LtiAdvantage.Constants.LtiClaims.ErrorLog"/> claim.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.ProctoringErrorMessage">
+            <summary>
+            Proctoring-specific error message intended for the end user, reported by the proctoring tool
+            on LtiEndAssessment (Proctoring Services 1.0 §4.4). Distinct from the Deep Linking
+            <see cref="F:LtiAdvantage.Constants.LtiClaims.ErrorMessage"/> claim.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.ProctoringSettings">
+            <summary>
+            Opaque proctoring configuration passed between the platform and the proctoring tool
+            (Proctoring Services 1.0 §4.2).
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.ResourceLink">
             <summary>
             A link to tool's resource from the tool's platform.
@@ -456,9 +512,27 @@
             An array of the user_id values which the current user can access as a mentor.
             </summary>
         </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.SessionData">
+            <summary>
+            Opaque value the platform issues on LtiStartProctoring and requires back on
+            LtiStartAssessment to correlate the two messages (Proctoring Services 1.0 §4.2).
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.StartAssessmentUrl">
+            <summary>
+            The platform URL the proctoring tool POSTs the LtiStartAssessment message to
+            (Proctoring Services 1.0 §4.2).
+            </summary>
+        </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.TargetLinkUri">
             <summary>
             The launch url.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiClaims.VerifiedUser">
+            <summary>
+            The user identity attributes the proctoring tool verified before the assessment started
+            (Proctoring Services 1.0 §4.3).
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiClaims.Version">
@@ -501,11 +575,33 @@
             Custom Assignment and Grade Service score readonly scope.
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Constants.LtiScopes.Ap">
+            <summary>
+            Proctoring Services scopes.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiScopes.Ap.ControlAll">
+            <summary>
+            Assessment Control Service scope, required to invoke any control action
+            (Proctoring Services 1.0 §5.1).
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.Constants.LtiScopes.DynamicRegistration">
             <summary>LTI Dynamic Registration scopes (Dynamic Registration §4.4).</summary>
         </member>
         <member name="F:LtiAdvantage.Constants.LtiScopes.DynamicRegistration.Scope">
             <summary>Scope required on the registration access token.</summary>
+        </member>
+        <member name="T:LtiAdvantage.Constants.LtiScopes.Gs">
+            <summary>
+            Course Groups Service scopes.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.LtiScopes.Gs.ContextGroupReadonly">
+            <summary>
+            Course Groups Service readonly scope, required for both the groups and the
+            group sets endpoints (Course Groups Service 1.0 §3).
+            </summary>
         </member>
         <member name="T:LtiAdvantage.Constants.LtiScopes.Nrps">
             <summary>
@@ -520,6 +616,22 @@
         <member name="T:LtiAdvantage.Constants.MediaTypes">
             <summary>
             Service media types.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.MediaTypes.AssessmentControl">
+            <summary>
+            Assessment Control Service request and response body (Proctoring 1.0 §5).
+            https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-service
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.MediaTypes.ContextGroupContainer">
+            <summary>
+            https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-container-media-type
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.MediaTypes.ContextGroupSetContainer">
+            <summary>
+            https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-set-container-media-type
             </summary>
         </member>
         <member name="F:LtiAdvantage.Constants.MediaTypes.Jwks">
@@ -653,6 +765,31 @@
             Scores endpoint.
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Constants.ServiceEndpoints.Ap">
+            <summary>
+            Proctoring Services endpoints.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Ap.AssessmentControlService">
+            <summary>
+            Assessment Control Service endpoint.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Constants.ServiceEndpoints.Gs">
+            <summary>
+            Course Groups Service endpoints.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Gs.GroupSetsService">
+            <summary>
+            Context group sets endpoint.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Gs.GroupsService">
+            <summary>
+            Context groups endpoint.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.Constants.ServiceEndpoints.Jwks">
             <summary>
             JWKS publication endpoint.
@@ -669,6 +806,167 @@
         <member name="F:LtiAdvantage.Constants.ServiceEndpoints.Nrps.MembershipService">
             <summary>
             Membership endpoint.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Constants.ServiceEndpoints.OpenIdConnect">
+            <summary>
+            OpenID Provider Metadata publication endpoint.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.OpenIdConnect.OpenIdConfigurationService">
+            <summary>The well-known OpenID configuration endpoint route name.</summary>
+        </member>
+        <member name="T:LtiAdvantage.CourseGroupsService.ContextGroupContainer">
+            <summary>
+            Represents the results returned by the Course Groups Service groups endpoint.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-container-media-type.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.ContextGroupContainer.Id">
+            <summary>
+            The ID of these results. Typically the request URL to the groups endpoint.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.ContextGroupContainer.UserId">
+            <summary>
+            The user the results were filtered to. Only present when the request
+            included a user filter.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.ContextGroupContainer.Groups">
+            <summary>
+            The groups in the specified context.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.CourseGroupsService.ContextGroupSetContainer">
+            <summary>
+            Represents the results returned by the Course Groups Service group sets endpoint.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-set-container-media-type.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.ContextGroupSetContainer.Id">
+            <summary>
+            The ID of these results. Typically the request URL to the group sets endpoint.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.ContextGroupSetContainer.Sets">
+            <summary>
+            The group sets in the specified context.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType">
+            <summary>
+            LTI claim to include in a launch message if the platform supports the
+            Course Groups Service.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#groupsservice-claim.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.#ctor">
+            <summary>
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.Version">
+            <summary>
+            The version of this implementation.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.ContextGroupsUrl">
+            <summary>
+            Fully resolved URL to the context groups endpoint. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.ContextGroupSetsUrl">
+            <summary>
+            Fully resolved URL to the context group sets endpoint.
+            Only present when the platform supports group sets.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.Scope">
+            <summary>
+            The scope to request to access this service. Contains
+            <see cref="F:LtiAdvantage.Constants.LtiScopes.Gs.ContextGroupReadonly"/>.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.ServiceVersions">
+            <summary>
+            Service version. Default is <see cref="F:LtiAdvantage.CourseGroupsService.CourseGroupsServiceClaimValueType.Version"/>.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.CourseGroupsService.Group">
+            <summary>
+            Represents a group within a context.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-container-media-type.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.Group.Id">
+            <summary>
+            A unique identifier for the group. Stable for the lifetime of the group
+            within its context. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.Group.Name">
+            <summary>
+            The displayable name of the group. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.Group.SetIds">
+            <summary>
+            The identifiers of the <see cref="T:LtiAdvantage.CourseGroupsService.GroupSet"/>s this group belongs to.
+            Omitted when the group belongs to no set.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.Group.Tag">
+            <summary>
+            A string value identifying the purpose of this group. For example, "marking".
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.Group.Hidden">
+            <summary>
+            Whether the group is hidden from learners in the platform's UI.
+            Defaults to false when not specified.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.CourseGroupsService.GroupEnrollment">
+            <summary>
+            A single group membership reported against a member of a context.
+            Included in the Names and Role Provisioning Service membership response when
+            the caller requests groups.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.GroupEnrollment.GroupId">
+            <summary>
+            The <see cref="P:LtiAdvantage.CourseGroupsService.Group.Id"/> of a group the member belongs to.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.CourseGroupsService.GroupSet">
+            <summary>
+            Represents a named collection of <see cref="T:LtiAdvantage.CourseGroupsService.Group"/>s within a context.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#context-group-set-container-media-type.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.GroupSet.Id">
+            <summary>
+            A unique identifier for the group set. Stable for the lifetime of the set
+            within its context. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.GroupSet.Name">
+            <summary>
+            The displayable name of the group set. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.GroupSet.Tag">
+            <summary>
+            A string value identifying the purpose of this group set. May reference an
+            LIS vocabulary term, for example
+            "http://purl.imsglobal.org/vocab/lis/v2/course#CourseSection".
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.CourseGroupsService.GroupSet.Hidden">
+            <summary>
+            Whether the group set is hidden from learners in the platform's UI.
+            Defaults to false when not specified.
             </summary>
         </member>
         <member name="T:LtiAdvantage.DeepLinking.ContentItem">
@@ -1485,6 +1783,84 @@
              keys is expensive (database, KMS), cache them in the implementation.
              </summary>
         </member>
+        <member name="T:LtiAdvantage.Jwks.InMemoryJwksKeyStore">
+            <summary>
+            An <see cref="T:LtiAdvantage.Jwks.IJwksKeyStore"/> over a fixed set of keys held in memory.
+            </summary>
+            <remarks>
+            <para>
+            A reference implementation so that publishing a JWKS does not require writing a store
+            first. It suits a deployment whose signing keys are loaded at startup and rotated by a
+            restart. It is not suitable where keys rotate while the process runs, or where several
+            instances must agree on the current key: implement <see cref="T:LtiAdvantage.Jwks.IJwksKeyStore"/> against
+            whatever the instances share instead.
+            </para>
+            <para>
+            Keys are sanitized on the way in, so a private JWK handed to this store by mistake is
+            still published as public material only.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.Jwks.InMemoryJwksKeyStore.#ctor(System.Collections.Generic.IEnumerable{Microsoft.IdentityModel.Tokens.JsonWebKey})">
+            <summary>
+            Constructs a store over the supplied keys.
+            </summary>
+            <param name="keys">
+            The keys to publish. Each must have a <see cref="P:Microsoft.IdentityModel.Tokens.JsonWebKey.Kid"/>, because a verifier
+            selects a key by id. Private components are stripped.
+            </param>
+        </member>
+        <member name="M:LtiAdvantage.Jwks.InMemoryJwksKeyStore.#ctor(Microsoft.IdentityModel.Tokens.JsonWebKey[])">
+            <summary>
+            Constructs a store over the supplied keys.
+            </summary>
+            <param name="keys">The keys to publish.</param>
+        </member>
+        <member name="M:LtiAdvantage.Jwks.InMemoryJwksKeyStore.GetPublicKeysAsync">
+            <inheritdoc />
+        </member>
+        <member name="M:LtiAdvantage.Jwks.InMemoryJwksKeyStore.CreateRsaKey(System.Security.Cryptography.RSA,System.String)">
+            <summary>
+            Builds a public signing JWK from an RSA key, ready to publish.
+            </summary>
+            <param name="rsa">
+            The signing key. Only its public components are read, so passing a key that holds
+            private material is safe.
+            </param>
+            <param name="keyId">
+            The key's stable, unique id. It must match the "kid" header of the tokens signed with
+            this key, otherwise verifiers cannot pair the two.
+            </param>
+        </member>
+        <member name="M:LtiAdvantage.Jwks.InMemoryJwksKeyStore.ToPublicKey(Microsoft.IdentityModel.Tokens.JsonWebKey)">
+            <summary>
+            Copies the public half of a key (see <see cref="M:LtiAdvantage.Jwks.PublicJsonWebKey.From(Microsoft.IdentityModel.Tokens.JsonWebKey)"/>), and fills in
+            <c>use</c> and <c>alg</c> when they are missing.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Jwks.InMemoryJwksKeyStore.DefaultEcAlgorithm(System.String)">
+            <summary>The JWS algorithm that goes with an EC curve (RFC 7518 §3.4); null if unknown.</summary>
+        </member>
+        <member name="T:LtiAdvantage.Jwks.PublicJsonWebKey">
+            <summary>
+            Copies the public half of a JSON Web Key, for publishing in a JWKS. Shared by
+            <c>JwksControllerBase</c> and <see cref="T:LtiAdvantage.Jwks.InMemoryJwksKeyStore"/>, so both apply the same rules.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Jwks.PublicJsonWebKey.From(Microsoft.IdentityModel.Tokens.JsonWebKey)">
+            <summary>
+            Returns a copy of <paramref name="key"/> with only its public parameters, or <c>null</c>
+            when the key cannot be published: it is not an RSA or EC key (for example a symmetric
+            key), it is missing public parameters (<c>n</c>/<c>e</c> or <c>crv</c>/<c>x</c>/<c>y</c>)
+            that verifiers need, or <c>key_ops</c> restricts it to operations with no public
+            counterpart.
+            </summary>
+            <remarks>
+            Private parameters (<c>d</c>, <c>p</c>, <c>q</c>, <c>dp</c>, <c>dq</c>, <c>qi</c>,
+            <c>k</c>, <c>oth</c>) are never copied. <c>key_ops</c> are mapped to what the public key
+            may do (<c>sign</c> becomes <c>verify</c>, and so on), keeping the key's restriction.
+            </remarks>
+        </member>
         <member name="T:LtiAdvantage.Lti.ContextClaimValueType">
             <summary>
             Properties of the context from which the launch originated (for example, course id and title).
@@ -1558,6 +1934,11 @@
             that is not available via the normal launch.
             </remarks>
         </member>
+        <member name="P:LtiAdvantage.Lti.CustomPropertySubstitutions.CourseGroup">
+            <summary>
+            Substitution values for Course Groups Service variables.
+            </summary>
+        </member>
         <member name="P:LtiAdvantage.Lti.CustomPropertySubstitutions.LisCourseOffering">
             <summary>
             Substitution values for LIS Course Offering variables.
@@ -1625,12 +2006,59 @@
             <param name="source">Custom properties.</param>
             <returns>Custom properties with the variables replaced.</returns>
         </member>
-        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.SubstituteCustomVariable(System.String)">
+        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.Add(System.Collections.Generic.IDictionary{System.String,System.String},System.String,System.String)">
             <summary>
-            Replace variable with value. Unknown variables are ignored.
+            Records a variable's value. Order does not matter: <see cref="M:LtiAdvantage.Lti.CustomPropertySubstitutions.BuildPattern(System.Collections.Generic.IDictionary{System.String,System.String})"/> sorts the
+            names longest first, so prefixes such as <c>$Context.id</c> cannot shadow longer names.
             </summary>
-            <param name="value">Variable to replace.</param>
-            <returns>Value if variable is known.</returns>
+        </member>
+        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.SubstituteAll(System.String,System.Collections.Generic.IDictionary{System.String,System.String},System.Text.RegularExpressions.Regex)">
+            <summary>
+            Replaces every known variable in <paramref name="value"/> in a single pass.
+            </summary>
+            <remarks>
+            One pass over the original text means a substituted value is never scanned again, so a
+            context titled "$User.id" stays "$User.id" instead of expanding to the user's id. The
+            alternation lists longer names first, so where one name is a prefix of another
+            (<c>$Context.id</c> and <c>$Context.id.history</c>) the longer one wins regardless of
+            the order the variables were recorded in. Names are regex-escaped, and values are
+            inserted through a match evaluator, so neither is read as regex syntax.
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.BuildPattern(System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Builds one alternation of all recorded variable names, longest first, or null if there
+            are none. Culture-invariant, so case folding matches the ordinal-ignore-case dictionary
+            for ordinary names.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.CollectVariables">
+            <summary>
+            Collects every variable this launch can substitute, with its value.
+            </summary>
+            <remarks>
+            Each section that is set records its variables; <see cref="M:LtiAdvantage.Lti.CustomPropertySubstitutions.SubstituteAll(System.String,System.Collections.Generic.IDictionary{System.String,System.String},System.Text.RegularExpressions.Regex)"/> then
+            replaces them in one pass. Variables of sections that are not set stay as they are.
+            </remarks>
+            <returns>Variable names (case-insensitive) and their values.</returns>
+        </member>
+        <member name="T:LtiAdvantage.Lti.CourseGroup">
+            <summary>
+            Substitution values for Course Groups Service variables.
+            </summary>
+            <remarks>
+            Added by Course Groups Service 1.0.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#custom-parameter-substitutions.
+            </remarks>
+        </member>
+        <member name="P:LtiAdvantage.Lti.CourseGroup.Id">
+            <summary>
+            The id of any one context group associated with the launch, or an empty string when
+            the launch is not associated with a group.
+            <para>
+            Custom parameter substitution: $CourseGroup.id.
+            </para>
+            </summary>
         </member>
         <member name="T:LtiAdvantage.Lti.LisCourseOffering">
             <summary>
@@ -2087,9 +2515,20 @@
             </para>
             </summary>
         </member>
+        <member name="P:LtiAdvantage.Lti.LisMembership.CourseGroupIds">
+            <summary>
+            A comma separated list of the group ids the person is enrolled in, aligning to the
+            group_enrollments array of the Names and Role Provisioning Service response.
+            <para>
+            Parameter: n/a.
+            Custom parameter substitution: $Membership.course.groupIds.
+            Versions: added by Course Groups Service 1.0.
+            </para>
+            </summary>
+        </member>
         <member name="P:LtiAdvantage.Lti.LisMembership.CreatedTimestamp">
             <summary>
-            LIS membership variable. 
+            LIS membership variable.
             <para>
             Parameter: n/a.
             Custom parameter substitution: $Membership.createdTimestamp.
@@ -2622,6 +3061,69 @@
             <summary>
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Lti.LtiEndAssessmentRequest">
+            <inheritdoc />
+            <summary>
+            LTI End Assessment request, sent by the assessment platform to the proctoring tool when
+            the candidate has finished, so the tool can close its proctoring session
+            (https://www.imsglobal.org/spec/proctoring/v1p0#lti-end-assessment-message).
+            </summary>
+            <remarks>
+            The platform only sends this message when the tool asked for it by setting
+            <see cref="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.EndAssessmentReturn"/>.
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiEndAssessmentRequest.#ctor">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiEndAssessmentRequest" /> with default
+            values for the MessageType and Version claims.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiEndAssessmentRequest.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiEndAssessmentRequest" /> with the claims.
+            </summary>
+            <param name="claims">A list of claims.</param>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiEndAssessmentRequest.#ctor(System.IdentityModel.Tokens.Jwt.JwtPayload)">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiEndAssessmentRequest" /> with the
+            claims in payload.
+            </summary>
+            <param name="payload"></param>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.ResourceLink">
+            <summary>The resource_link claim identifying the assessment. Required.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.AttemptNumber">
+            <summary>
+            The attempt that just ended, starting at 1. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.ProctoringSettings">
+            <summary>
+            Opaque proctoring configuration the platform holds on the tool's behalf.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.ErrorMessage">
+            <summary>
+            A message about the assessment intended for the end user.
+            </summary>
+            <remarks>
+            This is the proctoring-specific errormsg claim, not the Deep Linking one.
+            </remarks>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiEndAssessmentRequest.ErrorLog">
+            <summary>
+            A message about the assessment intended for the tool's log.
+            </summary>
+            <remarks>
+            This is the proctoring-specific errorlog claim, not the Deep Linking one.
+            </remarks>
+        </member>
         <member name="T:LtiAdvantage.Lti.LtiMigrationClaimValueType">
             <summary>
             A mapping of ids that have shifted with the transition to LTI 1.3, 
@@ -2706,11 +3208,6 @@
             contains a string that identifies the platform-tool integration governing the message.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.Lti.LtiRequest.Lti11LegacyUserId">
-            <summary>
-            Obsolete: User ID as defined in LTI 1.1.
-            </summary>
-        </member>
         <member name="P:LtiAdvantage.Lti.LtiRequest.MessageType">
             <summary>
             The type of LTI message.
@@ -2773,6 +3270,11 @@
         <member name="P:LtiAdvantage.Lti.LtiRequest.Lti11">
             <summary>
             A mapping of ids that have shifted with the transition to LTI 1.3.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiRequest.Lti11LegacyUserId">
+            <summary>
+            Obsolete: User ID as defined in LTI 1.1.
             </summary>
         </member>
         <member name="P:LtiAdvantage.Lti.LtiRequest.Platform">
@@ -2891,16 +3393,6 @@
             <summary>Create an instance with the claims.</summary>
             <param name="claims">A list of claims.</param>
         </member>
-        <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.AssignmentGradeServices">
-            <summary>
-            The Assignment and Grade Services claim.
-            </summary>
-        </member>
-        <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.NamesRoleService">
-            <summary>
-            The Names and Roles Provisioning Service claim.
-            </summary>
-        </member>
         <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.ResourceLink">
             <summary>
             The https://purl.imsglobal.org/spec/lti/claim/resource_link claim composes
@@ -2911,6 +3403,150 @@
               ...
             }
             </example>
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.AssignmentGradeServices">
+            <summary>
+            The Assignment and Grade Services claim.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.CourseGroupsService">
+            <summary>
+            The Course Groups Service claim, present when the platform exposes the groups
+            (and optionally the group sets) endpoint for this context.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiServiceLaunchRequest.NamesRoleService">
+            <summary>
+            The Names and Roles Provisioning Service claim.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Lti.LtiStartAssessmentRequest">
+            <inheritdoc />
+            <summary>
+            LTI Start Assessment request, sent by the proctoring tool back to the assessment
+            platform once the candidate has been verified and the assessment may begin
+            (https://www.imsglobal.org/spec/proctoring/v1p0#lti-start-assessment-message).
+            </summary>
+            <remarks>
+            This is the one message in the proctoring flow that travels tool to platform. It is
+            POSTed to the <see cref="P:LtiAdvantage.Lti.LtiStartProctoringRequest.StartAssessmentUrl"/> the platform
+            supplied, and it must carry back the platform's
+            <see cref="P:LtiAdvantage.Lti.LtiStartProctoringRequest.SessionData"/> unchanged.
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiStartAssessmentRequest.#ctor">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiStartAssessmentRequest" /> with default
+            values for the MessageType and Version claims.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiStartAssessmentRequest.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiStartAssessmentRequest" /> with the claims.
+            </summary>
+            <param name="claims">A list of claims.</param>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiStartAssessmentRequest.#ctor(System.IdentityModel.Tokens.Jwt.JwtPayload)">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiStartAssessmentRequest" /> with the
+            claims in payload.
+            </summary>
+            <param name="payload"></param>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.ResourceLink">
+            <summary>The resource_link claim identifying the assessment. Required.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.AttemptNumber">
+            <summary>
+            The attempt this proctoring session covers, starting at 1. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.SessionData">
+            <summary>
+            The opaque value the platform issued on the
+            <see cref="T:LtiAdvantage.Lti.LtiStartProctoringRequest"/>, echoed back unchanged. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.EndAssessmentReturn">
+            <summary>
+            Set by the tool to ask the platform to send an <see cref="T:LtiAdvantage.Lti.LtiEndAssessmentRequest"/>
+            when the candidate finishes, so the tool can close its proctoring session.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.VerifiedUser">
+            <summary>
+            The user identity attributes the tool verified at check-in.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartAssessmentRequest.ProctoringSettings">
+            <summary>
+            Opaque proctoring configuration the tool asks the platform to store for later
+            launches of this attempt.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Lti.LtiStartProctoringRequest">
+            <inheritdoc />
+            <summary>
+            LTI Start Proctoring request, sent by the assessment platform to the proctoring tool
+            to open a proctoring session before the assessment begins
+            (https://www.imsglobal.org/spec/proctoring/v1p0#lti-start-proctoring-message).
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiStartProctoringRequest.#ctor">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiStartProctoringRequest" /> with default
+            values for the MessageType and Version claims.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiStartProctoringRequest.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiStartProctoringRequest" /> with the claims.
+            </summary>
+            <param name="claims">A list of claims.</param>
+        </member>
+        <member name="M:LtiAdvantage.Lti.LtiStartProctoringRequest.#ctor(System.IdentityModel.Tokens.Jwt.JwtPayload)">
+            <inheritdoc />
+            <summary>
+            Create an instance of <see cref="T:LtiAdvantage.Lti.LtiStartProctoringRequest" /> with the
+            claims in payload.
+            </summary>
+            <param name="payload"></param>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.ResourceLink">
+            <summary>The resource_link claim identifying the assessment. Required.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.AttemptNumber">
+            <summary>
+            The attempt this proctoring session covers, starting at 1. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.StartAssessmentUrl">
+            <summary>
+            The platform URL the proctoring tool submits the
+            <see cref="T:LtiAdvantage.Lti.LtiStartAssessmentRequest"/> to once the candidate is verified. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.SessionData">
+            <summary>
+            Opaque value the tool must echo back on the <see cref="T:LtiAdvantage.Lti.LtiStartAssessmentRequest"/>
+            so the platform can correlate the two messages. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.Acs">
+            <summary>
+            The Assessment Control Service claim, present when the platform lets the proctoring
+            tool pause, resume, terminate, update or flag the attempt.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.LtiStartProctoringRequest.ProctoringSettings">
+            <summary>
+            Opaque proctoring configuration the platform holds on the tool's behalf.
             </summary>
         </member>
         <member name="T:LtiAdvantage.Lti.LtiSubmissionReviewRequest">
@@ -3177,8 +3813,18 @@
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.FamilyName">
             <summary>
             The person's assigned family name.
-            Not specified  if not included in a basic launch from same context. 
+            Not specified  if not included in a basic launch from same context.
             </summary>
+        </member>
+        <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.GroupEnrollments">
+            <summary>
+            The context groups this member belongs to.
+            </summary>
+            <remarks>
+            Course Groups Service 1.0 extension. Only included when the caller asked for
+            groups and the platform supports the Course Groups Service.
+            See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
+            </remarks>
         </member>
         <member name="P:LtiAdvantage.NamesRoleProvisioningService.Member.GivenName">
             <summary>
@@ -3239,6 +3885,12 @@
             If the user id is changing with the migration to LTI 1.3, a platform should include the lti11_legacy_user_id
             as an additional member attribute. It should contain the userId value from LTI 1.1 Names and Roles Provisioning
             Service 1.0 for that same user.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.NamesRoleProvisioningService.Member.WithoutGroupEnrollments">
+            <summary>
+            A shallow copy of this member without <see cref="P:LtiAdvantage.NamesRoleProvisioningService.Member.GroupEnrollments"/>. Used to withhold
+            group data without changing objects the caller may share or cache.
             </summary>
         </member>
         <member name="T:LtiAdvantage.NamesRoleProvisioningService.MembershipContainer">
@@ -3315,6 +3967,266 @@
             <summary>
             Service version. Default is <see cref="F:LtiAdvantage.NamesRoleProvisioningService.NamesRoleServiceClaimValueType.Version"/>.
             </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.AssessmentControlAction">
+            <summary>
+            Represents the actions a proctoring tool may request of the platform through the
+            Assessment Control Service.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-actions.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlAction.Unknown">
+            <summary>
+            The action was absent or is not recognised by this library version.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlAction.Pause">
+            <summary>
+            Pause the assessment. The candidate cannot continue until it is resumed.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlAction.Resume">
+            <summary>
+            Resume a paused assessment.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlAction.Terminate">
+            <summary>
+            End the assessment. The candidate cannot continue.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlAction.Update">
+            <summary>
+            Update the assessment, for example to grant extra time.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlAction.Flag">
+            <summary>
+            Record an incident against the attempt without changing its state.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.AssessmentControlClaimValueType">
+            <summary>
+            LTI claim to include in an LtiStartProctoring message if the platform supports the
+            Assessment Control Service.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#acs-claim.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.AssessmentControlUrl">
+            <summary>
+            Fully resolved URL of the Assessment Control Service endpoint. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.ActionNames">
+            <summary>
+            The actions the platform permits the proctoring tool to request, exactly as sent.
+            Required. A tool must not request an action absent from this list.
+            </summary>
+            <remarks>
+            Kept as strings so that actions this library version does not know (a later spec
+            revision may add some) survive a read and re-write unchanged. Use
+            <see cref="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.Actions"/> for the recognised ones.
+            </remarks>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.Actions">
+            <summary>
+            The recognised actions in <see cref="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.ActionNames"/>; unrecognised names are left out.
+            Setting this replaces <see cref="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.ActionNames"/>.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.AssessmentControlRequest">
+            <summary>
+            A control action the proctoring tool asks the platform to take against an
+            assessment attempt in progress.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-request.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.User">
+            <summary>
+            The candidate the action applies to. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.ResourceLink">
+            <summary>
+            The resource link of the assessment. Only <see cref="P:LtiAdvantage.Lti.ResourceLinkClaimValueType.Id"/>
+            is required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.AttemptNumber">
+            <summary>
+            The attempt the action applies to. Required.
+            </summary>
+            <remarks>
+            Read leniently: the specification's examples show the attempt number both as a
+            JSON number and as a quoted string.
+            </remarks>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.Action">
+            <summary>
+            The action to take. Required, and must be one of the actions the platform
+            advertised in <see cref="P:LtiAdvantage.Proctoring.AssessmentControlClaimValueType.Actions"/>.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.IncidentTime">
+            <summary>
+            When the incident prompting this action occurred. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.IncidentSeverity">
+            <summary>
+            How serious the incident is, from 0 (least) to 1 (most).
+            </summary>
+            <remarks>
+            Read leniently: the specification's example shows this as a quoted string.
+            </remarks>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.ExtraTime">
+            <summary>
+            Additional minutes to grant the candidate. Only meaningful with
+            <see cref="F:LtiAdvantage.Proctoring.AssessmentControlAction.Update"/>.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.ReasonCode">
+            <summary>
+            A tool-specific code categorising the reason for the action.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlRequest.ReasonMsg">
+            <summary>
+            A human-readable explanation of the reason for the action.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.AssessmentControlResponse">
+            <summary>
+            The platform's report of the assessment attempt after applying a control action.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-response.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlResponse.Status">
+            <summary>
+            The state of the attempt after the action was applied.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlResponse.ExtraTime">
+            <summary>
+            The total extra minutes granted to the candidate for this attempt, counting any
+            previously granted time — not just the minutes added by this request.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.AssessmentControlStatus">
+            <summary>
+            Represents the state of an assessment attempt as reported by the platform in an
+            Assessment Control Service response.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-response.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlStatus.Unknown">
+            <summary>
+            The status was absent or is not recognised by this library version. Distinct from
+            <see cref="F:LtiAdvantage.Proctoring.AssessmentControlStatus.None"/>, which the platform sends deliberately.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlStatus.None">
+            <summary>
+            There is no attempt in progress.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlStatus.Running">
+            <summary>
+            The attempt is in progress.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlStatus.Paused">
+            <summary>
+            The attempt is paused and can be resumed.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlStatus.Terminated">
+            <summary>
+            The attempt was ended before the candidate finished.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Proctoring.AssessmentControlStatus.Complete">
+            <summary>
+            The candidate finished the attempt.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.AssessmentControlUser">
+            <summary>
+            Identifies the candidate an Assessment Control Service request applies to.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#assessment-control-request.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlUser.Iss">
+            <summary>
+            The issuer that identified the user, i.e. the platform's issuer identifier. Required.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.AssessmentControlUser.Sub">
+            <summary>
+            The user's opaque identifier, matching the "sub" claim of the launch. Required.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.EnumNames">
+            <summary>
+            Strict parsing of enum names from the wire.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Proctoring.EnumNames.TryParse``1(System.String,``0@)">
+            <summary>
+            Parses <paramref name="value"/> only if it is exactly one defined member name (any case).
+            </summary>
+            <remarks>
+            <see cref="M:System.Enum.TryParse``1(System.String,System.Boolean,``0@)"/> alone is not safe for values
+            that come from another system: it also accepts numbers ("3") and comma-separated lists
+            ("pause,resume", which it ORs together), so a string that names no action could still
+            come out as a real one such as Terminate, or as a value the enum does not define.
+            </remarks>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.LowercaseEnumConverter`1">
+            <summary>
+            Reads an enum from a case-insensitive string and writes it in lowercase. Null, empty and
+            unrecognized values read as <c>default(TEnum)</c>, which must be the enum's "unknown"
+            member (value 0); that member is written as JSON null.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.ProctoringSettingsClaimValueType">
+            <summary>
+            Proctoring configuration exchanged between the platform and the proctoring tool.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#proctoring-settings-claim.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.ProctoringSettingsClaimValueType.Data">
+            <summary>
+            Opaque, tool-specific settings. The platform stores and echoes this value without
+            interpreting it; only the proctoring tool understands its format.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Proctoring.VerifiedUserClaimValueType">
+            <summary>
+            The user identity attributes the proctoring tool verified before allowing the
+            assessment to start. Sent by the tool on the LtiStartAssessment message.
+            See https://www.imsglobal.org/spec/proctoring/v1p0#verified-user-claim.
+            </summary>
+            <remarks>
+            Only the attributes the tool actually verified are populated. An attribute being
+            absent means "not verified", not "did not match".
+            </remarks>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.VerifiedUserClaimValueType.GivenName">
+            <summary>The verified given (first) name.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.VerifiedUserClaimValueType.FamilyName">
+            <summary>The verified family (last) name.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.VerifiedUserClaimValueType.Name">
+            <summary>The verified full name.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.VerifiedUserClaimValueType.Email">
+            <summary>The verified email address.</summary>
+        </member>
+        <member name="P:LtiAdvantage.Proctoring.VerifiedUserClaimValueType.Picture">
+            <summary>A URL to an image of the verified user, for example the identity photo taken at check-in.</summary>
         </member>
         <member name="T:LtiAdvantage.SubmissionReview.ForUserClaimValueType">
             <summary>

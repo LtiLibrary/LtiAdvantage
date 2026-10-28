@@ -1,4 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
@@ -14,6 +16,13 @@ namespace LtiAdvantage.Utilities
     /// </summary>
     internal static class JwtExtensions
     {
+        // Platforms are not consistent about quoting numbers (the Proctoring spec's own examples
+        // send attempt_number both as 1 and as "1"), so claim values accept both when read.
+        private static readonly JsonSerializerOptions ReadSettings = new JsonSerializerOptions
+        {
+            NumberHandling = JsonNumberHandling.AllowReadingFromString
+        };
+
         private static readonly JsonSerializerOptions Settings = new JsonSerializerOptions
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -44,7 +53,7 @@ namespace LtiAdvantage.Utilities
 
             if (payload.TryGetValue(type, out var value))
             {
-                return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value));
+                return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value), ReadSettings);
             }
 
             return default(T);
@@ -68,14 +77,24 @@ namespace LtiAdvantage.Utilities
                     : JsonValue.Create(c.Value))
                 .ToArray());
 
-            return values.Deserialize<T>();
+            // ReadSettings: numbers written as strings are accepted here too.
+            return values.Deserialize<T>(ReadSettings);
         }
+
+        private static Type ScalarType<T>() => Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
 
         public static void SetClaimValue<T>(this JwtPayload payload, string type, T value)
         {
             if (payload.ContainsKey(type))
             {
                 payload.Remove(type);
+            }
+
+            // Setting a claim to null removes it; an absent claim and a "null" one are not the same
+            // to a strict receiver.
+            if (value == null)
+            {
+                return;
             }
 
             if (typeof(T) == typeof(string))
@@ -86,9 +105,15 @@ namespace LtiAdvantage.Utilities
                     payload.AddClaim(new Claim(type, stringValue, ClaimValueTypes.String));
                 }
             } 
-            else if (typeof(T) == typeof(int))
+            else if (ScalarType<T>() == typeof(int) || ScalarType<T>() == typeof(long))
             {
-                payload.AddClaim(new Claim(type, value.ToString(), ClaimValueTypes.Integer));
+                // int? and long? unwrap to the same typed claim as int, not a JSON claim.
+                payload.AddClaim(new Claim(type, Convert.ToString(value, CultureInfo.InvariantCulture),
+                    ScalarType<T>() == typeof(int) ? ClaimValueTypes.Integer : ClaimValueTypes.Integer64));
+            }
+            else if (ScalarType<T>() == typeof(bool))
+            {
+                payload.AddClaim(new Claim(type, (bool) (object) value ? "true" : "false", ClaimValueTypes.Boolean));
             }
             else if (typeof(T).IsArray)
             {

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 ﻿using System.Threading.Tasks;
 using LtiAdvantage.AspNetCore.NamesRoleProvisioningService;
 using LtiAdvantage.NamesRoleProvisioningService;
@@ -13,9 +14,33 @@ namespace LtiAdvantage.IntegrationTests.Controllers
         {
         }
 
+        /// <summary>A member shared between requests, as a cache would hand it out.</summary>
+        public static readonly Member SharedMember = new()
+        {
+            UserId = "shared-user",
+            GroupEnrollments = new[] {new LtiAdvantage.CourseGroupsService.GroupEnrollment {GroupId = "group-1"}}
+        };
+
         protected override Task<ActionResult<MembershipContainer>> OnGetMembershipAsync(GetMembershipRequest request)
         {
-            var result = (ActionResult<MembershipContainer>) new ObjectResult(new MembershipContainer());
+            // rlid "shared-member" returns one cached Member that always has group enrollments, and
+            // "json-result" returns it in a JsonResult, to check what the base class strips.
+            if (request.Rlid == "shared-member" || request.Rlid == "json-result")
+            {
+                var shared = new MembershipContainer {Members = new List<Member> {SharedMember}};
+                return Task.FromResult<ActionResult<MembershipContainer>>(request.Rlid == "json-result"
+                    ? new JsonResult(shared)
+                    : new ObjectResult(shared));
+            }
+
+            // One member; with group enrollments only when the base class passed IncludeGroups.
+            var member = new Member {UserId = "user-1"};
+            // rlid "always-groups" simulates an override that ignores IncludeGroups.
+            if (request.IncludeGroups || request.Rlid == "always-groups")
+                member.GroupEnrollments = new[] {new LtiAdvantage.CourseGroupsService.GroupEnrollment {GroupId = "group-1"}};
+
+            var result = (ActionResult<MembershipContainer>) new ObjectResult(
+                new MembershipContainer {Members = new List<Member> {member}});
             return Task.FromResult(result);
         }
     }

@@ -158,16 +158,6 @@ namespace LtiAdvantage.Lti
         }
 
         /// <summary>
-        /// Obsolete: User ID as defined in LTI 1.1.
-        /// </summary>
-        [Obsolete("This claim has been removed from the current LTI spec. Use Lti11 migration claim instead.", false)]
-        public string Lti11LegacyUserId
-        {
-            get { return this.GetClaimValue(Constants.LtiClaims.Lti11LegacyUserId); }
-            set { this.SetClaimValue(Constants.LtiClaims.Lti11LegacyUserId, value); }
-        }
-
-        /// <summary>
         /// The type of LTI message.
         /// </summary>
         public string MessageType
@@ -277,6 +267,16 @@ namespace LtiAdvantage.Lti
         {
             get { return this.GetClaimValue<LtiMigrationClaimValueType>(Constants.LtiClaims.LtiMigration); }
             set { this.SetClaimValue(Constants.LtiClaims.LtiMigration, value); }
+        }
+
+        /// <summary>
+        /// Obsolete: User ID as defined in LTI 1.1.
+        /// </summary>
+        [Obsolete("This claim has been removed from the current LTI spec. Use Lti11 migration claim instead.", false)]
+        public string Lti11LegacyUserId
+        {
+            get { return this.GetClaimValue(Constants.LtiClaims.Lti11LegacyUserId); }
+            set { this.SetClaimValue(Constants.LtiClaims.Lti11LegacyUserId, value); }
         }
 
         /// <summary>

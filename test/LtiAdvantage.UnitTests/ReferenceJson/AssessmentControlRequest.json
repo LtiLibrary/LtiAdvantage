@@ -1,0 +1,15 @@
+{
+  "user": {
+    "iss": "https://assessment.org",
+    "sub": "2047534b3cc6d7086909"
+  },
+  "resource_link": {
+    "id": "398"
+  },
+  "attempt_number": 1,
+  "action": "flag",
+  "incident_time": "2018-02-01T10:45:33Z",
+  "incident_severity": "0.1",
+  "reason_code": "12056",
+  "reason_msg": "Excessive background noise outside candidate control"
+}

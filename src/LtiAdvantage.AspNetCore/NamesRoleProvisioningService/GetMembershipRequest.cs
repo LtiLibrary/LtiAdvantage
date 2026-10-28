@@ -1,5 +1,6 @@
 ﻿using System;
 using LtiAdvantage.Lti;
+using LtiAdvantage.NamesRoleProvisioningService;
 
 namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
 {
@@ -13,18 +14,30 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
     public class GetMembershipRequest
     {
         /// <summary>
+        /// Initializes a new instance of the class, without group enrollments.
+        /// </summary>
+        /// <remarks>Kept so code compiled against the four-parameter constructor keeps working.</remarks>
+        public GetMembershipRequest(string contextId, int? limit, string rlid, Role? role)
+            : this(contextId, limit, rlid, role, false)
+        {
+        }
+
+        /// <summary>
         /// Initialize a new instance of the class.
         /// </summary>
         /// <param name="contextId">Required context id.</param>
         /// <param name="limit">Optional limit to the number of members to return.</param>
         /// <param name="rlid">Optional resource link filter for members with access to resource link.</param>
         /// <param name="role">Optional role filter for members that have the specified role.</param>
-        public GetMembershipRequest(string contextId, int? limit = null, string rlid = null, Role? role = null)
+        /// <param name="includeGroups">Optional request for each member's group enrollments.</param>
+        public GetMembershipRequest(string contextId, int? limit = null, string rlid = null, Role? role = null,
+            bool includeGroups = false)
         {
             ContextId = contextId ?? throw new ArgumentNullException(nameof(contextId));
             Limit = limit;
             Rlid = rlid;
             Role = role;
+            IncludeGroups = includeGroups;
         }
 
         /// <summary>
@@ -67,5 +80,16 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
         /// See https://www.imsglobal.org/spec/lti-nrps/v2p0#role-query-parameter.
         /// </remarks>
         public Role? Role { get; }
+
+        /// <summary>
+        /// Whether the caller asked for each member's group enrollments.
+        /// </summary>
+        /// <remarks>
+        /// Course Groups Service 1.0 extension. When true, a platform that supports the
+        /// Course Groups Service should populate <see cref="Member.GroupEnrollments"/> on each
+        /// returned member. Platforms that do not support the service ignore this.
+        /// See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
+        /// </remarks>
+        public bool IncludeGroups { get; }
     }
 }

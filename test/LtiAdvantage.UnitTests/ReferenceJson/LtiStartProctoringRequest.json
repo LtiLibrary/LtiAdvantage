@@ -1,0 +1,44 @@
+{
+  "iss": "https://assessment.org",
+  "aud": ["ptool009"],
+  "sub": "2047534b3cc6d7086909",
+  "exp": 1548871170,
+  "iat": 1548870870,
+  "nonce": "cc0d7b7f6cdc554bacc7",
+  "https://purl.imsglobal.org/spec/lti/claim/message_type": "LtiStartProctoring",
+  "https://purl.imsglobal.org/spec/lti/claim/version": "1.3.0",
+  "https://purl.imsglobal.org/spec/lti/claim/deployment_id": "23487",
+  "https://purl.imsglobal.org/spec/lti/claim/target_link_uri": "https://proctoring.org/launch",
+  "https://purl.imsglobal.org/spec/lti/claim/resource_link": {
+    "id": "398",
+    "title": "Algebra I",
+    "description": "Algebra I: End of module exam"
+  },
+  "https://purl.imsglobal.org/spec/lti-ap/claim/attempt_number": 1,
+  "given_name": "Jane",
+  "family_name": "Doe",
+  "name": "Jane Doe",
+  "https://purl.imsglobal.org/spec/lti/claim/roles": [
+    "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"
+  ],
+  "https://purl.imsglobal.org/spec/lti-ap/claim/start_assessment_url": "https://assessment.org/examgo",
+  "https://purl.imsglobal.org/spec/lti-ap/claim/session_data": "ZOG9BSUgweWxVMlB1WXduZWdjOFk5dkpxOWcif",
+  "https://purl.imsglobal.org/spec/lti/claim/context": {
+    "id": "115",
+    "label": "M01",
+    "title": "Math Part 1",
+    "type": ["CourseOffering"]
+  },
+  "https://purl.imsglobal.org/spec/lti/claim/launch_presentation": {
+    "document_target": "window",
+    "return_url": "https://assessment.org/home",
+    "locale": "en-US"
+  },
+  "https://purl.imsglobal.org/spec/lti-ap/claim/acs": {
+    "actions": ["terminate", "flag", "update"],
+    "assessment_control_url": "https://assessment.org/acs"
+  },
+  "https://purl.imsglobal.org/spec/lti-ap/claim/proctoring_settings": {
+    "data": "video=on,audio=on,screencapture=off"
+  }
+}

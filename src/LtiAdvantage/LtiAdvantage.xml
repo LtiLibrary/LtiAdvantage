@@ -248,12 +248,15 @@
         </member>
         <member name="P:LtiAdvantage.AssignmentGradeServices.Score.ScoreGiven">
             <summary>
-            The score.
+            The score. Optional: leave it null for a score that only reports progress, such as
+            <see cref="F:LtiAdvantage.AssignmentGradeServices.ActivityProgress.Started"/> with
+            <see cref="F:LtiAdvantage.AssignmentGradeServices.GradingProgress.NotReady"/>. When set,
+            <see cref="P:LtiAdvantage.AssignmentGradeServices.Score.ScoreMaximum"/> must be set too.
             </summary>
         </member>
         <member name="P:LtiAdvantage.AssignmentGradeServices.Score.ScoreMaximum">
             <summary>
-            The maximum possible score.
+            The maximum possible score. Required when <see cref="P:LtiAdvantage.AssignmentGradeServices.Score.ScoreGiven"/> is set.
             </summary>
         </member>
         <member name="P:LtiAdvantage.AssignmentGradeServices.Score.TimeStamp">

@@ -19,6 +19,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// A comment with the score.
         /// </summary>
         [JsonPropertyName("comment")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Comment { get; set; }
 
         /// <summary>
@@ -28,16 +29,21 @@ namespace LtiAdvantage.AssignmentGradeServices
         public GradingProgress GradingProgress { get; set; }
 
         /// <summary>
-        /// The score.
+        /// The score. Optional: leave it null for a score that only reports progress, such as
+        /// <see cref="AssignmentGradeServices.ActivityProgress.Started"/> with
+        /// <see cref="AssignmentGradeServices.GradingProgress.NotReady"/>. When set,
+        /// <see cref="ScoreMaximum"/> must be set too.
         /// </summary>
         [JsonPropertyName("scoreGiven")]
-        public double ScoreGiven { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public double? ScoreGiven { get; set; }
 
         /// <summary>
-        /// The maximum possible score.
+        /// The maximum possible score. Required when <see cref="ScoreGiven"/> is set.
         /// </summary>
         [JsonPropertyName("scoreMaximum")]
-        public double ScoreMaximum { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public double? ScoreMaximum { get; set; }
 
         /// <summary>
         /// The UTC time the score was set. ISO 8601 format.

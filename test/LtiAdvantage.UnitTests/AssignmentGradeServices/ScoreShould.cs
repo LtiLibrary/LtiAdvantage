@@ -39,5 +39,39 @@ namespace LtiAdvantage.UnitTests.AssignmentGradeServices
 
             JsonAssert.Equal(referenceJson, scoreJson);
         }
+
+        /// <summary>
+        /// A score that only reports progress has no scoreGiven or scoreMaximum. Writing 0 for
+        /// them would record a grade of 0.
+        /// </summary>
+        [Fact]
+        public void LeaveOutScoreValues_ForAProgressOnlyScore()
+        {
+            var score = new Score
+            {
+                ActivityProgress = ActivityProgress.Started,
+                GradingProgress = GradingProgress.NotReady,
+                TimeStamp = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                UserId = "user-1"
+            };
+
+            var json = JsonSerializer.Serialize(score);
+
+            Assert.DoesNotContain("scoreGiven", json);
+            Assert.DoesNotContain("scoreMaximum", json);
+            Assert.DoesNotContain("comment", json);
+            Assert.DoesNotContain("null", json);
+        }
+
+        [Fact]
+        public void ReadAProgressOnlyScore()
+        {
+            var score = JsonSerializer.Deserialize<Score>(
+                "{\"timestamp\":\"2026-01-01T00:00:00Z\",\"activityProgress\":\"Started\",\"gradingProgress\":\"NotReady\",\"userId\":\"user-1\"}");
+
+            Assert.Null(score.ScoreGiven);
+            Assert.Null(score.ScoreMaximum);
+            Assert.Equal(ActivityProgress.Started, score.ActivityProgress);
+        }
     }
 }

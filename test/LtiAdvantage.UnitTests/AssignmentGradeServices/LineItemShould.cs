@@ -93,5 +93,15 @@ namespace LtiAdvantage.UnitTests.AssignmentGradeServices
             Assert.Equal("https://platform.example.com/act/849023/sub", review.Url);
             Assert.Equal("review", review.Custom["action"]);
         }
+
+        /// <summary>Unset optional properties are left out rather than written as null.</summary>
+        [Fact]
+        public void NotWriteNulls_ForUnsetProperties()
+        {
+            var json = JsonSerializer.Serialize(new LineItem { Label = "Quiz", ScoreMaximum = 10 });
+
+            Assert.DoesNotContain("null", json);
+            JsonAssert.Equal("{\"label\":\"Quiz\",\"scoreMaximum\":10}", json);
+        }
     }
 }

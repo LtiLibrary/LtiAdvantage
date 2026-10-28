@@ -13,6 +13,7 @@ namespace LtiAdvantage.SubmissionReview
         /// Optional label the platform shows for the review link.
         /// </summary>
         [JsonPropertyName("label")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Label { get; set; }
 
         /// <summary>
@@ -20,12 +21,14 @@ namespace LtiAdvantage.SubmissionReview
         /// the tool to review a submission for this line item.
         /// </summary>
         [JsonPropertyName("url")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Url { get; set; }
 
         /// <summary>
         /// Optional custom parameters to include with each Submission Review launch.
         /// </summary>
         [JsonPropertyName("custom")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IDictionary<string, string> Custom { get; set; }
     }
 }

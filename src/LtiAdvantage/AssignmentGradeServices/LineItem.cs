@@ -13,12 +13,14 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// The end date and time.
         /// </summary>
         [JsonPropertyName("endDateTime")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public DateTime? EndDateTime { get; set; }
 
         /// <summary>
         /// The endpoint url for this item.
         /// </summary>
         [JsonPropertyName("id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Id { get; set; }
 
         /// <summary>
@@ -32,12 +34,14 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// The resource link id.
         /// </summary>
         [JsonPropertyName("resourceLinkId")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string ResourceLinkId { get; set; }
 
         /// <summary>
         /// The non-link resource id.
         /// </summary>
         [JsonPropertyName("resourceId")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string ResourceId { get; set; }
 
         /// <summary>
@@ -50,12 +54,14 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// The start date and time.
         /// </summary>
         [JsonPropertyName("startDateTime")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public DateTime? StartDateTime { get; set; }
 
         /// <summary>
         /// Optional tag.
         /// </summary>
         [JsonPropertyName("tag")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Tag { get; set; }
 
         /// <summary>
@@ -64,6 +70,7 @@ namespace LtiAdvantage.AssignmentGradeServices
         /// launches against this line item.
         /// </summary>
         [JsonPropertyName("submissionReview")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public SubmissionReviewProperty SubmissionReviewExtension { get; set; }
     }
 }

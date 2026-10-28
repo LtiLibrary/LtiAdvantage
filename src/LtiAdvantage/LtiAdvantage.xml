@@ -799,6 +799,14 @@
             Context groups endpoint.
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Constants.ServiceEndpoints.DynamicRegistration">
+            <summary>
+            Dynamic Registration endpoints.
+            </summary>
+        </member>
+        <member name="F:LtiAdvantage.Constants.ServiceEndpoints.DynamicRegistration.RegistrationService">
+            <summary>The tool registration endpoint route name.</summary>
+        </member>
         <member name="T:LtiAdvantage.Constants.ServiceEndpoints.Jwks">
             <summary>
             JWKS publication endpoint.

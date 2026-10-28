@@ -23,6 +23,7 @@ namespace LtiAdvantage.DynamicRegistration
 
         /// <summary>Custom variable expansions the platform supports (e.g. <c>"Person.email.primary"</c>).</summary>
         [JsonPropertyName("variables")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IList<string> Variables { get; set; }
     }
 }

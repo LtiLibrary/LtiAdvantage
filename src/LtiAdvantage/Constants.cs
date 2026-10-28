@@ -539,6 +539,15 @@
             }
 
             /// <summary>
+            /// Dynamic Registration endpoints.
+            /// </summary>
+            public static class DynamicRegistration
+            {
+                /// <summary>The tool registration endpoint route name.</summary>
+                public const string RegistrationService = "lti-dynamic-registration";
+            }
+
+            /// <summary>
             /// JWKS publication endpoint.
             /// </summary>
             public static class Jwks

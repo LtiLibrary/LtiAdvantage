@@ -71,8 +71,25 @@ namespace LtiAdvantage.UnitTests.SubmissionReview
             var payload = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().ReadJwtToken(jwt).Payload;
 
             Assert.Contains("\"http://purl.imsglobal.org/vocab/lis/v2/membership#Learner\"", payload.SerializeToJson());
+            Assert.Contains("\"http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor\"", payload.SerializeToJson());
             Assert.Equal(new[] {Role.ContextLearner, Role.ContextMentor},
                 new LtiSubmissionReviewRequest(payload).ForUser.Roles);
+        }
+
+        /// <summary>
+        /// A role the library does not define reads as Unknown and is left out when written, so the
+        /// array never carries a null.
+        /// </summary>
+        [Fact]
+        public void LeaveUnknownForUserRolesOut_WhenWriting()
+        {
+            var forUser = JsonSerializer.Deserialize<ForUserClaimValueType>(
+                "{\"user_id\":\"u\",\"roles\":[\"http://purl.imsglobal.org/vocab/lis/v2/membership#Learner\",\"https://example.edu/roles#Grader\",null]}");
+
+            Assert.Equal(new[] {Role.ContextLearner, Role.Unknown}, forUser.Roles);
+
+            var json = JsonSerializer.Serialize(forUser);
+            Assert.Contains("\"roles\":[\"http://purl.imsglobal.org/vocab/lis/v2/membership#Learner\"]", json);
         }
 
         [Fact]

@@ -26,9 +26,11 @@ namespace LtiAdvantage.Utilities
             PropertyNameCaseInsensitive = true
         };
 
+        // Role arrays (the roles claim) leave unknown roles out rather than writing nulls.
         private static readonly JsonSerializerOptions Settings = new JsonSerializerOptions
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            Converters = { new Lti.RoleArrayConverter() }
         };
 
         /// <summary>

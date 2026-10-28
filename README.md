@@ -28,8 +28,18 @@ turned up, and it has breaking changes, so code built against 4.0.0 must be reco
 - `ImageProperty.Width` / `Height` are `int?` (#302), and `Score.ScoreGiven` / `ScoreMaximum` are `double?` (#303). Use `.Value` or `?? 0` where you read them, and leave the score values null for a progress-only score.
 - `CustomPropertySubstitutions.ToolPlatform` / `ToolPlatformInstance` use the correctly spelled `ToolPlatform` / `ToolPlatformInstance` types; the misspelled names remain as obsolete aliases (#308).
 - `LtiAdvantage.Lti.CourseGroup` is renamed to `LtiCourseGroup`, so it no longer clashes with an app's own `CourseGroup` (#320).
-- `ForUserClaimValueType.Roles` is `Role[]`, like the launch's roles claim, instead of `IList<string>` (#321).
-- `PemHelper` and the `AccessTokenUtil.GetAccessTokenAsync` overload without an `HttpClient` are obsolete (`LTIADV001`, `LTIADV002`); use `RsaPemKeys` and the overload that takes an `HttpClient` and key id (#307).
+- `ForUserClaimValueType.Roles` is `Role[]`, like the launch's roles claim, instead of `IList<string>` (#321). Convert with `RoleExtensions.TryParse` and `Role.ToUri()`. A role the library does not define reads as `Role.Unknown`.
+
+#### Changes on the wire
+
+- Deep linking content items are written with `width`, `height`, `expiresAt` and `embed: {"html": …}` instead of `Width`, `Height`, `ExpiresAt` and a bare `embed` string. Both forms are still read (#302, #304).
+- AGS line items, results and scores leave unset optional properties out instead of writing `null`, and a progress-only score has no `scoreGiven` / `scoreMaximum` (#303).
+- The client assertion's `iat` is a number, and it carries the `kid` when you pass a key id (#307).
+- Roles arrays (the roles claim, NRPS members, `for_user`) leave `Role.Unknown` out instead of writing `null` (#321).
+
+#### Deprecated
+
+- `PemHelper` (`LTIADV001`) and the `AccessTokenUtil.GetAccessTokenAsync` overload without an `HttpClient` (`LTIADV002`) still work but are obsolete; use `RsaPemKeys` and the overload that takes an `HttpClient` and key id (#307). The misspelled `ToolPlatfom*` names are obsolete too (#308).
 
 ### What's new in 4.0.0
 

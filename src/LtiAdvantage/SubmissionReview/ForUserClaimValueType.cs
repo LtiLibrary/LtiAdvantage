@@ -32,9 +32,10 @@ namespace LtiAdvantage.SubmissionReview
         /// <remarks>
         /// Written and read as role URIs, like the launch's roles claim
         /// (<see cref="Lti.LtiRequest.Roles"/>). A role this library does not define reads as
-        /// <see cref="Lti.Role.Unknown"/>.
+        /// <see cref="Lti.Role.Unknown"/>, and <see cref="Lti.Role.Unknown"/> is left out when written.
         /// </remarks>
         [JsonPropertyName("roles")]
+        [JsonConverter(typeof(Lti.RoleArrayConverter))]
         public Lti.Role[] Roles { get; set; }
 
         /// <summary>The person sourcedId of the reviewed user.</summary>

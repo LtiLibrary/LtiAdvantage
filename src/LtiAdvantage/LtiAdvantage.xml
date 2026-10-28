@@ -3862,6 +3862,17 @@
             <summary>
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Lti.RoleArrayConverter">
+            <summary>
+            Reads and writes a roles array as role URIs.
+            </summary>
+            <remarks>
+            <see cref="T:LtiAdvantage.Lti.RoleConverter"/> writes <see cref="F:LtiAdvantage.Lti.Role.Unknown"/> as null, which inside a roles
+            array gives <c>["…#Learner", null]</c>, not the array of URI strings the specs require.
+            This converter leaves unknown roles out instead. When reading, a role the library does not
+            define reads as <see cref="F:LtiAdvantage.Lti.Role.Unknown"/>, and null elements are skipped.
+            </remarks>
+        </member>
         <member name="T:LtiAdvantage.Lti.RoleExtensions">
             <summary>
             Helpers for <see cref="T:LtiAdvantage.Lti.Role"/> values.
@@ -4366,7 +4377,7 @@
             <remarks>
             Written and read as role URIs, like the launch's roles claim
             (<see cref="P:LtiAdvantage.Lti.LtiRequest.Roles"/>). A role this library does not define reads as
-            <see cref="F:LtiAdvantage.Lti.Role.Unknown"/>.
+            <see cref="F:LtiAdvantage.Lti.Role.Unknown"/>, and <see cref="F:LtiAdvantage.Lti.Role.Unknown"/> is left out when written.
             </remarks>
         </member>
         <member name="P:LtiAdvantage.SubmissionReview.ForUserClaimValueType.PersonSourcedId">

@@ -1964,6 +1964,27 @@
             A course group within a course section.
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Lti.ContextTypeExtensions">
+            <summary>
+            Helpers for <see cref="T:LtiAdvantage.Lti.ContextType"/> values.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.ContextTypeExtensions.ToUri(LtiAdvantage.Lti.ContextType)">
+            <summary>
+            Returns the context type's full URI, as the context claim writes it
+            (<c>http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering</c>), or null for
+            <see cref="F:LtiAdvantage.Lti.ContextType.Unknown"/>.
+            </summary>
+        </member>
+        <member name="M:LtiAdvantage.Lti.ContextTypeExtensions.TryParse(System.String,LtiAdvantage.Lti.ContextType@)">
+            <summary>
+            Parses a context type from its URI (or the simple name the spec allows, such as
+            <c>CourseOffering</c>, where the enum defines one).
+            </summary>
+            <param name="value">The value to parse.</param>
+            <param name="contextType">The parsed type, or <see cref="F:LtiAdvantage.Lti.ContextType.Unknown"/>.</param>
+            <returns>True when <paramref name="value"/> names a known context type.</returns>
+        </member>
         <member name="T:LtiAdvantage.Lti.CustomPropertySubstitutions">
             <summary>
             Implements custom property substitutions as described in
@@ -2035,9 +2056,14 @@
             Substitution values for Tool Platform variables.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.Lti.CustomPropertySubstitutions.ToolPlatfomInstance">
+        <member name="P:LtiAdvantage.Lti.CustomPropertySubstitutions.ToolPlatformInstance">
             <summary>
             Substitution values for Tool Platform Instance variables.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.Lti.CustomPropertySubstitutions.ToolPlatfomInstance">
+            <summary>
+            Misspelled name of <see cref="P:LtiAdvantage.Lti.CustomPropertySubstitutions.ToolPlatformInstance"/>, kept for compatibility.
             </summary>
         </member>
         <member name="M:LtiAdvantage.Lti.CustomPropertySubstitutions.ReplaceCustomPropertyValues(System.Collections.Generic.Dictionary{System.String,System.String})">
@@ -2977,47 +3003,57 @@
             $User.username
             </summary>
         </member>
-        <member name="T:LtiAdvantage.Lti.ToolPlatfom">
+        <member name="T:LtiAdvantage.Lti.ToolPlatform">
             <summary>
             Substitution values for Tool Platform variables.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.Lti.ToolPlatfom.ProductFamilyCode">
+        <member name="P:LtiAdvantage.Lti.ToolPlatform.ProductFamilyCode">
             <summary>
             $ToolPlatform.productFamilyCode
             </summary>
         </member>
-        <member name="P:LtiAdvantage.Lti.ToolPlatfom.Version">
+        <member name="P:LtiAdvantage.Lti.ToolPlatform.Version">
             <summary>
             $ToolPlatform.version
             </summary>
         </member>
+        <member name="T:LtiAdvantage.Lti.ToolPlatfom">
+            <summary>
+            Misspelled name of <see cref="T:LtiAdvantage.Lti.ToolPlatform"/>, kept for compatibility.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.Lti.ToolPlatfomInstance">
+            <summary>
+            Misspelled name of <see cref="T:LtiAdvantage.Lti.ToolPlatformInstance"/>, kept for compatibility.
+            </summary>
+        </member>
+        <member name="T:LtiAdvantage.Lti.ToolPlatformInstance">
             <summary>
             Substitution values for Tool Platform Instance variables.
             </summary>
         </member>
-        <member name="P:LtiAdvantage.Lti.ToolPlatfomInstance.ContactEmail">
+        <member name="P:LtiAdvantage.Lti.ToolPlatformInstance.ContactEmail">
             <summary>
             $ToolPlatformInstance.contactEmail
             </summary>
         </member>
-        <member name="P:LtiAdvantage.Lti.ToolPlatfomInstance.Description">
+        <member name="P:LtiAdvantage.Lti.ToolPlatformInstance.Description">
             <summary>
             $ToolPlatformInstance.description
             </summary>
         </member>
-        <member name="P:LtiAdvantage.Lti.ToolPlatfomInstance.Guid">
+        <member name="P:LtiAdvantage.Lti.ToolPlatformInstance.Guid">
             <summary>
             $ToolPlatformInstance.guid
             </summary>
         </member>
-        <member name="P:LtiAdvantage.Lti.ToolPlatfomInstance.Name">
+        <member name="P:LtiAdvantage.Lti.ToolPlatformInstance.Name">
             <summary>
             $ToolPlatformInstance.name
             </summary>
         </member>
-        <member name="P:LtiAdvantage.Lti.ToolPlatfomInstance.Url">
+        <member name="P:LtiAdvantage.Lti.ToolPlatformInstance.Url">
             <summary>
             $ToolPlatformInstance.url
             </summary>
@@ -3831,6 +3867,13 @@
             Helpers for <see cref="T:LtiAdvantage.Lti.Role"/> values.
             </summary>
         </member>
+        <member name="M:LtiAdvantage.Lti.RoleExtensions.ToUri(LtiAdvantage.Lti.Role)">
+            <summary>
+            Returns the role's full URI, as LTI messages and services write it
+            (<c>http://purl.imsglobal.org/vocab/lis/v2/membership#Learner</c> for
+            <see cref="F:LtiAdvantage.Lti.Role.ContextLearner"/>), or null for <see cref="F:LtiAdvantage.Lti.Role.Unknown"/>.
+            </summary>
+        </member>
         <member name="M:LtiAdvantage.Lti.RoleExtensions.TryParse(System.String,LtiAdvantage.Lti.Role@)">
             <summary>
             Parses a role the way LTI messages and services spell it: the full role URI
@@ -4319,7 +4362,12 @@
             <summary>The reviewed user's email.</summary>
         </member>
         <member name="P:LtiAdvantage.SubmissionReview.ForUserClaimValueType.Roles">
-            <summary>The roles of the reviewed user in the context.</summary>
+            <summary>The roles of the reviewed user in the context, as role URIs.</summary>
+            <remarks>
+            Strings, because a platform may send roles this library does not define. Use
+            <see cref="M:LtiAdvantage.Lti.RoleExtensions.TryParse(System.String,LtiAdvantage.Lti.Role@)"/> to read them as <see cref="T:LtiAdvantage.Lti.Role"/> values and
+            <see cref="M:LtiAdvantage.Lti.RoleExtensions.ToUri(LtiAdvantage.Lti.Role)"/> to write one.
+            </remarks>
         </member>
         <member name="P:LtiAdvantage.SubmissionReview.ForUserClaimValueType.PersonSourcedId">
             <summary>The person sourcedId of the reviewed user.</summary>

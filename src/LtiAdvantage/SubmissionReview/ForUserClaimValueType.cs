@@ -29,7 +29,12 @@ namespace LtiAdvantage.SubmissionReview
         [JsonPropertyName("email")]
         public string Email { get; set; }
 
-        /// <summary>The roles of the reviewed user in the context.</summary>
+        /// <summary>The roles of the reviewed user in the context, as role URIs.</summary>
+        /// <remarks>
+        /// Strings, because a platform may send roles this library does not define. Use
+        /// <see cref="Lti.RoleExtensions.TryParse"/> to read them as <see cref="Lti.Role"/> values and
+        /// <see cref="Lti.RoleExtensions.ToUri"/> to write one.
+        /// </remarks>
         [JsonPropertyName("roles")]
         public IList<string> Roles { get; set; }
 

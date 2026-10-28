@@ -15,6 +15,15 @@ namespace LtiAdvantage.Lti
             .ToDictionary(pair => pair.uri, pair => pair.role, StringComparer.Ordinal);
 
         /// <summary>
+        /// Returns the role's full URI, as LTI messages and services write it
+        /// (<c>http://purl.imsglobal.org/vocab/lis/v2/membership#Learner</c> for
+        /// <see cref="Role.ContextLearner"/>), or null for <see cref="Role.Unknown"/>.
+        /// </summary>
+        public static string ToUri(this Role role) =>
+            (((Enum) role).GetUris() ?? Array.Empty<string>())
+            .FirstOrDefault(uri => uri.StartsWith("http", StringComparison.Ordinal));
+
+        /// <summary>
         /// Parses a role the way LTI messages and services spell it: the full role URI
         /// (<c>http://purl.imsglobal.org/vocab/lis/v2/membership#Learner</c>), the simple name
         /// the specs allow for context roles (<c>Learner</c>), or the enum name (<c>ContextLearner</c>, any case).

@@ -136,6 +136,36 @@ namespace LtiAdvantage.UnitTests.Lti
             Assert.Equal("group-1,group-2", Substitute(substitutions, "$Membership.course.groupIds"));
         }
 
+        [Fact]
+        public void SubstituteTheToolPlatformVariables()
+        {
+            var substitutions = new CustomPropertySubstitutions
+            {
+                ToolPlatform = new ToolPlatform {ProductFamilyCode = "lms", Version = "1.2"},
+                ToolPlatformInstance = new ToolPlatformInstance {Guid = "guid-1", Name = "Campus"}
+            };
+
+            Assert.Equal("lms", Substitute(substitutions, "$ToolPlatform.productFamilyCode"));
+            Assert.Equal("guid-1", Substitute(substitutions, "$ToolPlatformInstance.guid"));
+            Assert.Equal("Campus", Substitute(substitutions, "$ToolPlatformInstance.name"));
+        }
+
+#pragma warning disable CS0618 // The misspelled names must keep working.
+        [Fact]
+        public void KeepTheMisspelledToolPlatformNamesWorking()
+        {
+            var substitutions = new CustomPropertySubstitutions
+            {
+                ToolPlatform = new ToolPlatfom {Version = "1.2"},
+                ToolPlatfomInstance = new ToolPlatfomInstance {Guid = "guid-1"}
+            };
+
+            Assert.Same(substitutions.ToolPlatformInstance, substitutions.ToolPlatfomInstance);
+            Assert.Equal("1.2", Substitute(substitutions, "$ToolPlatform.version"));
+            Assert.Equal("guid-1", Substitute(substitutions, "$ToolPlatformInstance.guid"));
+        }
+#pragma warning restore CS0618
+
         /// <summary>
         /// $Membership.role is a prefix of $Membership.role.scope.mentor.
         /// </summary>

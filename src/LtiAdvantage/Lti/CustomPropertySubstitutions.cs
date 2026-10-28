@@ -79,12 +79,23 @@ namespace LtiAdvantage.Lti
         /// <summary>
         /// Substitution values for Tool Platform variables.
         /// </summary>
-        public ToolPlatfom ToolPlatform { get; set; }
+        public ToolPlatform ToolPlatform { get; set; }
 
         /// <summary>
         /// Substitution values for Tool Platform Instance variables.
         /// </summary>
-        public ToolPlatfomInstance ToolPlatfomInstance { get; set; }
+        public ToolPlatformInstance ToolPlatformInstance { get; set; }
+
+        /// <summary>
+        /// Misspelled name of <see cref="ToolPlatformInstance"/>, kept for compatibility.
+        /// </summary>
+        [Obsolete("Use ToolPlatformInstance.")]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public ToolPlatformInstance ToolPlatfomInstance
+        {
+            get => ToolPlatformInstance;
+            set => ToolPlatformInstance = value;
+        }
 
         #endregion
 
@@ -345,13 +356,13 @@ namespace LtiAdvantage.Lti
             }
 
             // Tool Platform Instance variable substitutions
-            if (ToolPlatfomInstance != null)
+            if (ToolPlatformInstance != null)
             {
-                Add(variables, "$ToolPlatformInstance.contactEmail", ToolPlatfomInstance.ContactEmail);
-                Add(variables, "$ToolPlatformInstance.description", ToolPlatfomInstance.Description);
-                Add(variables, "$ToolPlatformInstance.guid", ToolPlatfomInstance.Guid);
-                Add(variables, "$ToolPlatformInstance.name", ToolPlatfomInstance.Name);
-                Add(variables, "$ToolPlatformInstance.url", ToolPlatfomInstance.Url);
+                Add(variables, "$ToolPlatformInstance.contactEmail", ToolPlatformInstance.ContactEmail);
+                Add(variables, "$ToolPlatformInstance.description", ToolPlatformInstance.Description);
+                Add(variables, "$ToolPlatformInstance.guid", ToolPlatformInstance.Guid);
+                Add(variables, "$ToolPlatformInstance.name", ToolPlatformInstance.Name);
+                Add(variables, "$ToolPlatformInstance.url", ToolPlatformInstance.Url);
             }
 
             return variables;
@@ -1268,7 +1279,7 @@ namespace LtiAdvantage.Lti
     /// <summary>
     /// Substitution values for Tool Platform variables.
     /// </summary>
-    public class ToolPlatfom
+    public class ToolPlatform
     {
         /// <summary>
         /// $ToolPlatform.productFamilyCode
@@ -1282,9 +1293,27 @@ namespace LtiAdvantage.Lti
     }
 
     /// <summary>
+    /// Misspelled name of <see cref="ToolPlatform"/>, kept for compatibility.
+    /// </summary>
+    [Obsolete("Use ToolPlatform.")]
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public class ToolPlatfom : ToolPlatform
+    {
+    }
+
+    /// <summary>
+    /// Misspelled name of <see cref="ToolPlatformInstance"/>, kept for compatibility.
+    /// </summary>
+    [Obsolete("Use ToolPlatformInstance.")]
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public class ToolPlatfomInstance : ToolPlatformInstance
+    {
+    }
+
+    /// <summary>
     /// Substitution values for Tool Platform Instance variables.
     /// </summary>
-    public class ToolPlatfomInstance
+    public class ToolPlatformInstance
     {
         /// <summary>
         /// $ToolPlatformInstance.contactEmail

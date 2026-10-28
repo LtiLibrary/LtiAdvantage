@@ -1,12 +1,17 @@
 # LtiAdvantage.IdentityModel
 
-LtiAdvantage.IdentityModel has an HttpClient extension method to request a token using JWT client credentials in the
-[IMS recommended format](https://www.imsglobal.org/spec/security/v1p0#using-json-web-tokens-with-oauth-2-0-client-credentials-grant)
-for client-credentials grant.
+LtiAdvantage.IdentityModel has the tool-side pieces of LTI Advantage:
 
-## .NET Standard
+- an HttpClient extension method to request a token using JWT client credentials in the
+  [IMS recommended format](https://www.imsglobal.org/spec/security/v1p0#using-json-web-tokens-with-oauth-2-0-client-credentials-grant)
+  for client-credentials grant;
+- `LtiTokenValidator`, which validates a launch's ID token, with `InMemoryNonceStore` for replay detection;
+- HttpClient extensions for calling Assignment and Grade Services, Names and Role Provisioning
+  Services and Course Groups (`HttpClientLtiServiceExtensions`), which follow paging and report
+  ProblemDetails errors;
+- the tool side of Dynamic Registration.
 
-This library targets `net10.0` and uses [IdentityModel](https://github.com/IdentityModel/IdentityModel2).
+This library targets `net10.0` and uses [IdentityModel](https://github.com/IdentityModel/IdentityModel).
 
 ## Getting Started
 
@@ -32,6 +37,8 @@ var credentials = RsaPemKeys.SigningCredentialsFromPem(privateKeyPem, keyId);
 does both steps. `RsaPemKeys` uses .NET's own PEM support; it reads PKCS#1, PKCS#8 and
 SubjectPublicKeyInfo keys.
 
-There are two sample applications you can reference for ideas:
-- [Sample Tool](https://github.com/andyfmiller/LtiAdvantageTool)
-- [Sample Platform](https://github.com/andyfmiller/LtiAdvantagePlatform)
+## Samples
+
+Two sample applications show the libraries in use:
+- [Sample Tool](https://github.com/LtiLibrary/LtiAdvantageTool)
+- [Sample Platform](https://github.com/LtiLibrary/LtiAdvantagePlatform)

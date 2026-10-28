@@ -14,7 +14,6 @@ using LtiAdvantage.CourseGroupsService;
 using LtiAdvantage.DynamicRegistration;
 using LtiAdvantage.Lti;
 using LtiAdvantage.NamesRoleProvisioningService;
-using LtiAdvantage.Utilities;
 
 namespace LtiAdvantage.IdentityModel.Client
 {
@@ -359,9 +358,7 @@ namespace LtiAdvantage.IdentityModel.Client
         private static string RoleUri(Role? role)
         {
             if (role == null) return null;
-            var uris = ((Enum) role.Value).GetUris();
-            return uris?.FirstOrDefault(u => u.StartsWith("http", StringComparison.Ordinal))
-                   ?? throw new ArgumentException($"Role {role} has no URI.", nameof(role));
+            return role.Value.ToUri() ?? throw new ArgumentException($"Role {role} has no URI.", nameof(role));
         }
     }
 }

@@ -35,6 +35,11 @@ namespace LtiAdvantage.Lti
         /// The resource_link claim identifying the assessment. Required on the Start Proctoring
         /// and Start Assessment messages.
         /// </summary>
+        /// <remarks>
+        /// For End Assessment, section 4.4 of the specification lists resource_link as neither
+        /// required nor optional, but the End Assessment example in section 6.1 includes it. Set it
+        /// when the tool needs to know which assessment ended.
+        /// </remarks>
         public ResourceLinkClaimValueType ResourceLink
         {
             get => this.GetClaimValue<ResourceLinkClaimValueType>(Constants.LtiClaims.ResourceLink);

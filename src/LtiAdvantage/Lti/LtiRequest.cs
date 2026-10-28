@@ -12,8 +12,13 @@ namespace LtiAdvantage.Lti
 {
     /// <inheritdoc />
     /// <summary>
-    /// The base class for LtiResourceLinkRequest and LtiDeepLinkingRequest.
+    /// The base class for every LTI message, holding the claims they all share.
     /// </summary>
+    /// <remarks>
+    /// Message types derive from it through <see cref="LtiPlatformLaunchRequest"/> (platform
+    /// launches that can carry service claims) or <see cref="LtiProctoringRequest"/> (the
+    /// proctoring messages), or directly, like the deep linking response.
+    /// </remarks>
     public abstract class LtiRequest : JwtPayload
     {
         #region Constructors

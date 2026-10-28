@@ -41,9 +41,9 @@ namespace LtiAdvantage.UnitTests.Lti
         }
 
         [Theory]
-        [InlineData(nameof(LtiServiceLaunchRequest.AssignmentGradeServices))]
-        [InlineData(nameof(LtiServiceLaunchRequest.NamesRoleService))]
-        [InlineData(nameof(LtiServiceLaunchRequest.CourseGroupsService))]
+        [InlineData(nameof(LtiPlatformLaunchRequest.AssignmentGradeServices))]
+        [InlineData(nameof(LtiPlatformLaunchRequest.NamesRoleService))]
+        [InlineData(nameof(LtiPlatformLaunchRequest.CourseGroupsService))]
         public void DeclareEachServiceClaimOnce(string property)
         {
             foreach (var messageType in new[]

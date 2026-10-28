@@ -3309,6 +3309,11 @@
             The resource_link claim identifying the assessment. Required on the Start Proctoring
             and Start Assessment messages.
             </summary>
+            <remarks>
+            For End Assessment, section 4.4 of the specification lists resource_link as neither
+            required nor optional, but the End Assessment example in section 6.1 includes it. Set it
+            when the tool needs to know which assessment ended.
+            </remarks>
         </member>
         <member name="P:LtiAdvantage.Lti.LtiProctoringRequest.AttemptNumber">
             <summary>
@@ -3333,8 +3338,13 @@
         <member name="T:LtiAdvantage.Lti.LtiRequest">
             <inheritdoc />
             <summary>
-            The base class for LtiResourceLinkRequest and LtiDeepLinkingRequest.
+            The base class for every LTI message, holding the claims they all share.
             </summary>
+            <remarks>
+            Message types derive from it through <see cref="T:LtiAdvantage.Lti.LtiPlatformLaunchRequest"/> (platform
+            launches that can carry service claims) or <see cref="T:LtiAdvantage.Lti.LtiProctoringRequest"/> (the
+            proctoring messages), or directly, like the deep linking response.
+            </remarks>
         </member>
         <member name="M:LtiAdvantage.Lti.LtiRequest.#ctor">
             <inheritdoc />

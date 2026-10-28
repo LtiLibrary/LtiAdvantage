@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 ﻿using System.Threading.Tasks;
 using LtiAdvantage.AspNetCore.NamesRoleProvisioningService;
 using LtiAdvantage.NamesRoleProvisioningService;
@@ -23,6 +23,9 @@ namespace LtiAdvantage.IntegrationTests.Controllers
 
         protected override Task<ActionResult<MembershipContainer>> OnGetMembershipAsync(GetMembershipRequest request)
         {
+            // Echo the role filter so tests can check how the query string was bound.
+            Response.Headers["x-role"] = request.Role?.ToString() ?? "";
+
             // rlid "check-cancellation" answers 400 unless the request carries the abort token.
             if (request.Rlid == "check-cancellation" && !request.CancellationToken.CanBeCanceled)
                 return Task.FromResult<ActionResult<MembershipContainer>>(new BadRequestResult());

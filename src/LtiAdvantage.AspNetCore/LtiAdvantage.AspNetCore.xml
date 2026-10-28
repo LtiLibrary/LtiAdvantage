@@ -313,8 +313,8 @@
             Returns the line items in a context.
             </summary>
             <param name="contextId">The context id.</param>
-            <param name="resourceLinkId">Optional resource link id filter.</param>
-            <param name="resourceId">Optional resource id filter.</param>
+            <param name="resourceLinkId">Optional resource link id filter (<c>resource_link_id</c>).</param>
+            <param name="resourceId">Optional resource id filter (<c>resource_id</c>).</param>
             <param name="tag">Optional tag filter.</param>
             <param name="limit">Optional limit on number of line items to return.</param>
             <returns>The line items.</returns>
@@ -351,7 +351,7 @@
             </summary>
             <param name="contextId">The context id.</param>
             <param name="lineItemId">The line item id.</param>
-            <param name="userId">Optional user id filter.</param>
+            <param name="userId">Optional user id filter (<c>user_id</c>).</param>
             <param name="limit">Optional limit to the number of results returned.</param>
             <returns>The results.</returns>
         </member>
@@ -957,7 +957,10 @@
             <param name="contextId">The context id.</param>
             <param name="limit">Optional limit to the number of members to return.</param>
             <param name="rlid">Optional resource link filter for members with access to resource link.</param>
-            <param name="role">Optional role filter for members that have the specified role.</param>
+            <param name="role">
+            Optional role filter for members that have the specified role. Accepts the full role URI,
+            the simple context role name (<c>Learner</c>) or the enum name (<c>ContextLearner</c>).
+            </param>
             <param name="groups">
             Optional Course Groups Service 1.0 request for each member's group enrollments.
             Only honoured when the caller also holds the Course Groups scope
@@ -977,6 +980,18 @@
             Returns <paramref name="result"/> with group enrollments withheld. Works on copies, so
             containers and members the override shares or caches are left untouched.
             </summary>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.RoleModelBinder">
+            <summary>
+            Binds a <see cref="T:LtiAdvantage.Lti.Role"/> query parameter from the full role URI the NRPS spec shows,
+            the simple context role name (<c>Learner</c>), or the enum name (<c>ContextLearner</c>).
+            </summary>
+            <remarks>
+            See https://www.imsglobal.org/spec/lti-nrps/v2p0#role-query-parameter.
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.RoleModelBinder.BindModelAsync(Microsoft.AspNetCore.Mvc.ModelBinding.ModelBindingContext)">
+            <inheritdoc />
         </member>
         <member name="T:LtiAdvantage.AspNetCore.OpenIdConnect.IOpenIdConfigurationController">
             <summary>

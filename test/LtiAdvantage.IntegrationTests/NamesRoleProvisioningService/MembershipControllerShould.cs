@@ -114,6 +114,38 @@ namespace LtiAdvantage.IntegrationTests.NamesRoleProvisioningService
             Assert.DoesNotContain("group_enrollments", body, StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        /// NRPS shows the full role URI in the role filter; the simple context role name and the
+        /// enum name work too.
+        /// </summary>
+        [Theory]
+        [InlineData("http%3A%2F%2Fpurl.imsglobal.org%2Fvocab%2Flis%2Fv2%2Fmembership%23Learner", "ContextLearner")]
+        [InlineData("http://purl.imsglobal.org/vocab/lis/v2/membership%23Instructor", "ContextInstructor")]
+        [InlineData("Learner", "ContextLearner")]
+        [InlineData("ContextLearner", "ContextLearner")]
+        [InlineData("http%3A%2F%2Fpurl.imsglobal.org%2Fvocab%2Flis%2Fv2%2Finstitution%2Fperson%23Learner", "InstitutionLearner")]
+        public async Task BindTheRoleFilter(string role, string expected)
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Nrps.MembershipReadonly);
+
+            var response = await _client.GetAsync(MembershipUrl + "?role=" + role);
+
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(expected, string.Join(",", response.Headers.GetValues("x-role")));
+        }
+
+        [Theory]
+        [InlineData("NotARole")]
+        [InlineData("3")]
+        public async Task ReturnBadRequest_ForAnUnknownRole(string role)
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Nrps.MembershipReadonly);
+
+            var response = await _client.GetAsync(MembershipUrl + "?role=" + role);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
         /// <summary>The override gets the request's abort token, so it can stop work for a caller that left.</summary>
         [Fact]
         public async Task PassTheRequestAbortedToken_ToTheOverride()

@@ -39,6 +39,20 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
             }
         }
 
+        /// <summary>AGS 2.0 names the results filter user_id; the old userId still works.</summary>
+        [Theory]
+        [InlineData("?user_id=user-1")]
+        [InlineData("?userId=user-1")]
+        public async Task BindTheUserIdFilter(string query)
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Ags.ResultReadonly);
+
+            var response = await _client.GetAsync(ResultsUrl + query);
+
+            response.EnsureSuccessStatusCode();
+            Assert.Equal("user-1", string.Join(",", response.Headers.GetValues("x-user-id")));
+        }
+
         public void Dispose()
         {
             _client?.Dispose();

@@ -117,6 +117,47 @@ namespace LtiAdvantage.IntegrationTests.AssignmentGradeServices
             Assert.Equal(statusCode, response.StatusCode);
         }
 
+        /// <summary>AGS 2.0 names the line item filters in snake_case.</summary>
+        [Fact]
+        public async Task BindTheSpecFilterNames()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Ags.LineItemReadonly);
+
+            var response = await _client.GetAsync(LineItemsUrl + "?resource_link_id=rl-1&resource_id=r-1&tag=final");
+
+            response.EnsureSuccessStatusCode();
+            Assert.Equal("rl-1", Header(response, "x-resource-link-id"));
+            Assert.Equal("r-1", Header(response, "x-resource-id"));
+            Assert.Equal("final", Header(response, "x-tag"));
+        }
+
+        /// <summary>The camelCase names 4.0.0 bound still work, so existing callers keep their filters.</summary>
+        [Fact]
+        public async Task StillBindTheOldFilterNames()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Ags.LineItemReadonly);
+
+            var response = await _client.GetAsync(LineItemsUrl + "?resourceLinkId=rl-1&resourceId=r-1");
+
+            response.EnsureSuccessStatusCode();
+            Assert.Equal("rl-1", Header(response, "x-resource-link-id"));
+            Assert.Equal("r-1", Header(response, "x-resource-id"));
+        }
+
+        [Fact]
+        public async Task PreferTheSpecFilterName_WhenBothAreSent()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Ags.LineItemReadonly);
+
+            var response = await _client.GetAsync(LineItemsUrl + "?resource_link_id=spec&resourceLinkId=old");
+
+            response.EnsureSuccessStatusCode();
+            Assert.Equal("spec", Header(response, "x-resource-link-id"));
+        }
+
+        private static string Header(HttpResponseMessage response, string name) =>
+            string.Join(",", response.Headers.GetValues(name));
+
         public void Dispose()
         {
             _client?.Dispose();

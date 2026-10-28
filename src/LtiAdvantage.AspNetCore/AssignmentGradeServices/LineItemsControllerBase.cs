@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using LtiAdvantage.AspNetCore.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
@@ -17,6 +18,7 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
     /// Implements the Assignment and Grade Services line items endpoint.
     /// </summary>
     [ApiController]
+    [ServiceExceptionFilter]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public abstract class LineItemsControllerBase : ControllerBase, ILineItemsController
@@ -85,38 +87,8 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
         [Route("context/{contextId}/lineitems.{format}")]
         public async Task<ActionResult<LineItem>> AddLineItemAsync([Required] string contextId, [Required] [FromBody] LineItem lineItem)
         {
-            try
-            {
-                _logger.LogDebug($"Entering {nameof(AddLineItemAsync)}.");
-
-                try
-                {
-                    var request = new AddLineItemRequest(contextId, lineItem);
-                    return await OnAddLineItemAsync(request).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
-                {
-                    // The caller went away. Let the framework abort the response rather than
-                    // reporting a server error the caller will never see.
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(OnAddLineItemAsync)}.");
-                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
-                    {
-                        Title = "An unexpected error occurred",
-                        Status = StatusCodes.Status500InternalServerError,
-                        Detail = _env.IsDevelopment()
-                            ? ex.Message + ex.StackTrace
-                            : ex.Message
-                    });
-                }
-            }
-            finally
-            {
-                _logger.LogDebug($"Exiting {nameof(AddLineItemAsync)}.");
-            }
+            var request = new AddLineItemRequest(contextId, lineItem) { CancellationToken = HttpContext.RequestAborted };
+            return await OnAddLineItemAsync(request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -135,38 +107,8 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
         [Route("context/{contextId}/lineitems/{lineItemId}.{format}")]
         public async Task<ActionResult> DeleteLineItemAsync([Required] string contextId, [Required] string lineItemId)
         {
-            try
-            {
-                _logger.LogDebug($"Entering {nameof(DeleteLineItemAsync)}.");
-
-                try
-                {
-                    var request = new DeleteLineItemRequest(contextId, lineItemId);
-                    return await OnDeleteLineItemAsync(request).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
-                {
-                    // The caller went away. Let the framework abort the response rather than
-                    // reporting a server error the caller will never see.
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(DeleteLineItemAsync)}.");
-                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
-                    {
-                        Title = "An unexpected error occurred",
-                        Status = StatusCodes.Status500InternalServerError,
-                        Detail = _env.IsDevelopment()
-                            ? ex.Message + ex.StackTrace
-                            : ex.Message
-                    });
-                }
-            }
-            finally 
-            {
-                _logger.LogDebug($"Entering {nameof(DeleteLineItemAsync)}.");
-            }
+            var request = new DeleteLineItemRequest(contextId, lineItemId) { CancellationToken = HttpContext.RequestAborted };
+            return await OnDeleteLineItemAsync(request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -187,38 +129,8 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
         [Route("context/{contextId}/lineitems/{lineItemId}.{format}")]
         public async Task<ActionResult<LineItem>> GetLineItemAsync([Required] string contextId, [Required] string lineItemId)
         {
-            try
-            {
-                _logger.LogDebug($"Entering {nameof(GetLineItemAsync)}.");
-
-                try
-                {
-                    var request = new GetLineItemRequest(contextId, lineItemId);
-                    return await OnGetLineItemAsync(request).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
-                {
-                    // The caller went away. Let the framework abort the response rather than
-                    // reporting a server error the caller will never see.
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(GetLineItemAsync)}.");
-                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
-                    {
-                        Title = "An unexpected error occurred",
-                        Status = StatusCodes.Status500InternalServerError,
-                        Detail = _env.IsDevelopment()
-                            ? ex.Message + ex.StackTrace
-                            : ex.Message
-                    });
-                }
-            }
-            finally
-            {
-                _logger.LogDebug($"Exiting {nameof(GetLineItemAsync)}.");
-            }
+            var request = new GetLineItemRequest(contextId, lineItemId) { CancellationToken = HttpContext.RequestAborted };
+            return await OnGetLineItemAsync(request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -246,38 +158,8 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
             [FromQuery] string tag = null,
             [FromQuery] int? limit = null)
         {
-            try
-            {
-                _logger.LogDebug($"Entering {nameof(GetLineItemsAsync)}.");
-
-                try
-                {
-                    var request = new GetLineItemsRequest(contextId, resourceLinkId, resourceId, tag, limit);
-                    return await OnGetLineItemsAsync(request).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
-                {
-                    // The caller went away. Let the framework abort the response rather than
-                    // reporting a server error the caller will never see.
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(OnGetLineItemsAsync)}.");
-                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
-                    {
-                        Title = "An unexpected error occurred",
-                        Status = StatusCodes.Status500InternalServerError,
-                        Detail = _env.IsDevelopment()
-                                 ? ex.Message + ex.StackTrace
-                                 : ex.Message
-                    });
-                }
-            }
-            finally
-            {
-                _logger.LogDebug($"Exiting {nameof(GetLineItemsAsync)}.");
-            }
+            var request = new GetLineItemsRequest(contextId, resourceLinkId, resourceId, tag, limit) { CancellationToken = HttpContext.RequestAborted };
+            return await OnGetLineItemsAsync(request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -298,38 +180,8 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
         [Route("context/{contextId}/lineitems/{lineItemId}.{format}")]
         public async Task<ActionResult> UpdateLineItemAsync([Required] string contextId, [Required] string lineItemId, [Required] LineItem lineItem)
         {
-            try
-            {
-                _logger.LogDebug($"Entering {nameof(UpdateLineItemAsync)}.");
-
-                try
-                {
-                    var request = new UpdateLineItemRequest(contextId, lineItemId, lineItem);
-                    return await OnUpdateLineItemAsync(request).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
-                {
-                    // The caller went away. Let the framework abort the response rather than
-                    // reporting a server error the caller will never see.
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(UpdateLineItemAsync)}.");
-                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
-                    {
-                        Title = "An unexpected error occurred",
-                        Status = StatusCodes.Status500InternalServerError,
-                        Detail = _env.IsDevelopment()
-                            ? ex.Message + ex.StackTrace
-                            : ex.Message
-                    });
-                }
-            }
-            finally
-            {
-                _logger.LogDebug($"Exiting {nameof(UpdateLineItemAsync)}.");
-            }
+            var request = new UpdateLineItemRequest(contextId, lineItemId, lineItem) { CancellationToken = HttpContext.RequestAborted };
+            return await OnUpdateLineItemAsync(request).ConfigureAwait(false);
         }
     }
 }

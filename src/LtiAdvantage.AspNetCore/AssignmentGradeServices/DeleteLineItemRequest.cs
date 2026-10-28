@@ -1,4 +1,5 @@
-﻿namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
+﻿using System.Threading;
+namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
 {
     /// <summary>
     /// Represents a DeleteLineItem request.
@@ -23,5 +24,11 @@
         /// Get or set the Id.
         /// </summary>
         public string LineItemId { get; }
+
+        /// <summary>
+        /// Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+        /// Pass it to database and HTTP calls so work for a caller that has gone away stops.
+        /// </summary>
+        public CancellationToken CancellationToken { get; init; }
     }
 }

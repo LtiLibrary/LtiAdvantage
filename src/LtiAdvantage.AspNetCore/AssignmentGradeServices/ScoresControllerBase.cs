@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using LtiAdvantage.AspNetCore.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -21,6 +22,7 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
     /// Implements the Assignment and Grade Services score publish service endpoint.
     /// </summary>
     [ApiController]
+    [ServiceExceptionFilter]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public abstract class ScoresControllerBase : ControllerBase, IScoresController
@@ -69,38 +71,8 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
         [Route("context/{contextId}/lineitems/{lineItemId}/scores.{format}")]
         public async Task<ActionResult<Score>> AddScoreAsync(string contextId, string lineItemId, [Required] [FromBody] Score score)
         {
-            try
-            {
-                _logger.LogDebug($"Entering {nameof(AddScoreAsync)}.");
-
-                try
-                {
-                    var request = new AddScoreRequest(contextId, lineItemId, score);
-                    return await OnAddScoreAsync(request).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
-                {
-                    // The caller went away. Let the framework abort the response rather than
-                    // reporting a server error the caller will never see.
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(AddScoreAsync)}.");
-                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
-                    {
-                        Title = "An unexpected error occurred",
-                        Status = StatusCodes.Status500InternalServerError,
-                        Detail = _env.IsDevelopment()
-                            ? ex.Message + ex.StackTrace
-                            : ex.Message
-                    });
-                }
-            }
-            finally
-            {
-                _logger.LogDebug($"Exiting {nameof(AddScoreAsync)}.");
-            }
+            var request = new AddScoreRequest(contextId, lineItemId, score) { CancellationToken = HttpContext.RequestAborted };
+            return await OnAddScoreAsync(request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -126,35 +98,8 @@ namespace LtiAdvantage.AspNetCore.AssignmentGradeServices
         public async Task<ActionResult<Score>> GetScoreAsync([Required] string contextId, 
             [Required] string lineItemId, [Required] string scoreId)
         {
-            try
-            {
-                _logger.LogDebug($"Entering {nameof(GetScoreAsync)}.");
-
-                try
-                {
-                    var request = new GetScoreRequest(contextId, lineItemId, scoreId);
-                    return await OnGetScoreAsync(request).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
-                {
-                    // The caller went away. Let the framework abort the response rather than
-                    // reporting a server error the caller will never see.
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Cannot get score.");
-                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
-                    {
-                        Title = ex.Message,
-                        Detail = ex.StackTrace
-                    });
-                }
-            }
-            finally
-            {
-                _logger.LogDebug($"Exiting {nameof(GetScoreAsync)}.");
-            }
+            var request = new GetScoreRequest(contextId, lineItemId, scoreId) { CancellationToken = HttpContext.RequestAborted };
+            return await OnGetScoreAsync(request).ConfigureAwait(false);
         }
     }
 }

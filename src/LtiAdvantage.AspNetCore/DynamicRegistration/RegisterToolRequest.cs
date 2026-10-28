@@ -1,3 +1,4 @@
+using System.Threading;
 using LtiAdvantage.DynamicRegistration;
 
 namespace LtiAdvantage.AspNetCore.DynamicRegistration
@@ -11,5 +12,11 @@ namespace LtiAdvantage.AspNetCore.DynamicRegistration
 
         /// <summary>The submitted tool configuration. The override should populate <see cref="ToolConfiguration.ClientId"/>.</summary>
         public ToolConfiguration Tool { get; }
+
+        /// <summary>
+        /// Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+        /// Pass it to database and HTTP calls so work for a caller that has gone away stops.
+        /// </summary>
+        public CancellationToken CancellationToken { get; init; }
     }
 }

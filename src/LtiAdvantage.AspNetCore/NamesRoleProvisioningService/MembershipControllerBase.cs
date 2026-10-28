@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using LtiAdvantage.AspNetCore.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -20,6 +21,7 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
     /// Implements the Names and Role Provisioning Service membership endpoint.
     /// </summary>
     [ApiController]
+    [ServiceExceptionFilter]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public abstract class MembershipControllerBase : ControllerBase, IMembershipController
@@ -68,43 +70,13 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
         public async Task<ActionResult<MembershipContainer>> GetMembershipAsync([Required] string contextId,
             int? limit = null, string rlid = null, Role? role = null, bool groups = false)
         {
-            try
-            {
-                _logger.LogDebug($"Entering {nameof(GetMembershipAsync)}.");
+            var includeGroups = groups && await CallerHoldsGroupsScopeAsync().ConfigureAwait(false);
+            var request = new GetMembershipRequest(contextId, limit, rlid, role, includeGroups) { CancellationToken = HttpContext.RequestAborted };
+            var result = await OnGetMembershipAsync(request).ConfigureAwait(false);
 
-                try
-                {
-                    var includeGroups = groups && await CallerHoldsGroupsScopeAsync().ConfigureAwait(false);
-                    var request = new GetMembershipRequest(contextId, limit, rlid, role, includeGroups);
-                    var result = await OnGetMembershipAsync(request).ConfigureAwait(false);
-
-                    // Enforce, don't just hint: without the groups scope no group data leaves,
-                    // even if the override loaded it anyway.
-                    return includeGroups ? result : StripGroupEnrollments(result);
-                }
-                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
-                {
-                    // The caller went away. Let the framework abort the response rather than
-                    // reporting a server error the caller will never see.
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(GetMembershipAsync)}.");
-                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
-                    {
-                        Title = "An unexpected error occurred",
-                        Status = StatusCodes.Status500InternalServerError,
-                        Detail = _env.IsDevelopment()
-                            ? ex.Message + ex.StackTrace
-                            : null // Exception messages can reveal configuration; Development only.
-                    });
-                }
-            }
-            finally
-            {
-                _logger.LogDebug($"Exiting {nameof(GetMembershipAsync)}.");
-            }
+            // Enforce, don't just hint: without the groups scope no group data leaves,
+            // even if the override loaded it anyway.
+            return includeGroups ? result : StripGroupEnrollments(result);
         }
 
         /// <summary>

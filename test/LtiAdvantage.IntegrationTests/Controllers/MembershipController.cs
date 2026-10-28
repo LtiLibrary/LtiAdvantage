@@ -23,6 +23,10 @@ namespace LtiAdvantage.IntegrationTests.Controllers
 
         protected override Task<ActionResult<MembershipContainer>> OnGetMembershipAsync(GetMembershipRequest request)
         {
+            // rlid "check-cancellation" answers 400 unless the request carries the abort token.
+            if (request.Rlid == "check-cancellation" && !request.CancellationToken.CanBeCanceled)
+                return Task.FromResult<ActionResult<MembershipContainer>>(new BadRequestResult());
+
             // rlid "shared-member" returns one cached Member that always has group enrollments, and
             // "json-result" returns it in a JsonResult, to check what the base class strips.
             if (request.Rlid == "shared-member" || request.Rlid == "json-result")

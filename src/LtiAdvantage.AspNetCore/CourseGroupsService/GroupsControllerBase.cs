@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using LtiAdvantage.AspNetCore.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,7 @@ namespace LtiAdvantage.AspNetCore.CourseGroupsService
     /// See https://www.imsglobal.org/spec/lti-gs/v1p0#groups-endpoint.
     /// </summary>
     [ApiController]
+    [ServiceExceptionFilter]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public abstract class GroupsControllerBase : ControllerBase, IGroupsController
@@ -58,38 +60,8 @@ namespace LtiAdvantage.AspNetCore.CourseGroupsService
         public async Task<ActionResult<ContextGroupContainer>> GetGroupsAsync([Required] string contextId,
             [FromQuery(Name = "user_id")] string userId = null, int? limit = null)
         {
-            try
-            {
-                _logger.LogDebug($"Entering {nameof(GetGroupsAsync)}.");
-
-                try
-                {
-                    var request = new GetGroupsRequest(contextId, userId, limit);
-                    return await OnGetGroupsAsync(request).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
-                {
-                    // The caller went away. Let the framework abort the response rather than
-                    // reporting a server error the caller will never see.
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"An unexpected error occurred in {nameof(GetGroupsAsync)}.");
-                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
-                    {
-                        Title = "An unexpected error occurred",
-                        Status = StatusCodes.Status500InternalServerError,
-                        Detail = _env.IsDevelopment()
-                            ? ex.Message + ex.StackTrace
-                            : null // Exception messages can reveal configuration; Development only.
-                    });
-                }
-            }
-            finally
-            {
-                _logger.LogDebug($"Exiting {nameof(GetGroupsAsync)}.");
-            }
+            var request = new GetGroupsRequest(contextId, userId, limit) { CancellationToken = HttpContext.RequestAborted };
+            return await OnGetGroupsAsync(request).ConfigureAwait(false);
         }
     }
 }

@@ -24,6 +24,12 @@
             The line item.
             </summary>
         </member>
+        <member name="P:LtiAdvantage.AspNetCore.AssignmentGradeServices.AddLineItemRequest.CancellationToken">
+            <summary>
+            Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+            Pass it to database and HTTP calls so work for a caller that has gone away stops.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.AssignmentGradeServices.AddScoreRequest">
             <summary>
             Represents a create score request.
@@ -49,6 +55,12 @@
             The score.
             </summary>
         </member>
+        <member name="P:LtiAdvantage.AspNetCore.AssignmentGradeServices.AddScoreRequest.CancellationToken">
+            <summary>
+            Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+            Pass it to database and HTTP calls so work for a caller that has gone away stops.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.AssignmentGradeServices.DeleteLineItemRequest">
             <summary>
             Represents a DeleteLineItem request.
@@ -69,6 +81,12 @@
             Get or set the Id.
             </summary>
         </member>
+        <member name="P:LtiAdvantage.AspNetCore.AssignmentGradeServices.DeleteLineItemRequest.CancellationToken">
+            <summary>
+            Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+            Pass it to database and HTTP calls so work for a caller that has gone away stops.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.AssignmentGradeServices.GetLineItemRequest">
             <summary>
             Represents a GetLineItem request.
@@ -87,6 +105,12 @@
         <member name="P:LtiAdvantage.AspNetCore.AssignmentGradeServices.GetLineItemRequest.LineItemId">
             <summary>
             Get or set the line item Id.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.AssignmentGradeServices.GetLineItemRequest.CancellationToken">
+            <summary>
+            Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+            Pass it to database and HTTP calls so work for a caller that has gone away stops.
             </summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.AssignmentGradeServices.GetLineItemsRequest">
@@ -124,6 +148,12 @@
             Get or set the tag filter.
             </summary>
         </member>
+        <member name="P:LtiAdvantage.AspNetCore.AssignmentGradeServices.GetLineItemsRequest.CancellationToken">
+            <summary>
+            Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+            Pass it to database and HTTP calls so work for a caller that has gone away stops.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.AssignmentGradeServices.GetResultsRequest">
             <summary>
             Represents a GetResults request.
@@ -154,6 +184,12 @@
             Get or set the user ID filter.
             </summary>
         </member>
+        <member name="P:LtiAdvantage.AspNetCore.AssignmentGradeServices.GetResultsRequest.CancellationToken">
+            <summary>
+            Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+            Pass it to database and HTTP calls so work for a caller that has gone away stops.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.AssignmentGradeServices.GetScoreRequest">
             <summary>
             Represents a Get Score request.
@@ -180,6 +216,12 @@
         <member name="P:LtiAdvantage.AspNetCore.AssignmentGradeServices.GetScoreRequest.ScoreId">
             <summary>
             Get or set the score id.
+            </summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.AssignmentGradeServices.GetScoreRequest.CancellationToken">
+            <summary>
+            Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+            Pass it to database and HTTP calls so work for a caller that has gone away stops.
             </summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.AssignmentGradeServices.ILineItemsController">
@@ -383,6 +425,12 @@
             Get or set the line item id.
             </summary>
         </member>
+        <member name="P:LtiAdvantage.AspNetCore.AssignmentGradeServices.UpdateLineItemRequest.CancellationToken">
+            <summary>
+            Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+            Pass it to database and HTTP calls so work for a caller that has gone away stops.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupSetsRequest">
             <summary>
             Represents a GetGroupSets request.
@@ -410,6 +458,12 @@
             of group sets to return.
             See https://www.imsglobal.org/spec/lti-gs/v1p0#limit-query-parameter.
             </remarks>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupSetsRequest.CancellationToken">
+            <summary>
+            Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+            Pass it to database and HTTP calls so work for a caller that has gone away stops.
+            </summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupsRequest">
             <summary>
@@ -449,6 +503,12 @@
             of groups to return.
             See https://www.imsglobal.org/spec/lti-gs/v1p0#limit-query-parameter.
             </remarks>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.CourseGroupsService.GetGroupsRequest.CancellationToken">
+            <summary>
+            Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+            Pass it to database and HTTP calls so work for a caller that has gone away stops.
+            </summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.CourseGroupsService.GroupsControllerBase">
             <inheritdoc cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
@@ -613,6 +673,12 @@
         </member>
         <member name="P:LtiAdvantage.AspNetCore.DynamicRegistration.RegisterToolRequest.Tool">
             <summary>The submitted tool configuration. The override should populate <see cref="P:LtiAdvantage.DynamicRegistration.ToolConfiguration.ClientId"/>.</summary>
+        </member>
+        <member name="P:LtiAdvantage.AspNetCore.DynamicRegistration.RegisterToolRequest.CancellationToken">
+            <summary>
+            Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+            Pass it to database and HTTP calls so work for a caller that has gone away stops.
+            </summary>
         </member>
         <member name="T:LtiAdvantage.AspNetCore.DynamicRegistration.RegistrationError">
             <summary>
@@ -858,6 +924,12 @@
             See https://www.imsglobal.org/spec/lti-gs/v1p0#membership-service-with-groups.
             </remarks>
         </member>
+        <member name="P:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.GetMembershipRequest.CancellationToken">
+            <summary>
+            Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+            Pass it to database and HTTP calls so work for a caller that has gone away stops.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.IMembershipController">
             <summary>
             Marker for ILogger dependency injection.
@@ -1013,6 +1085,12 @@
             tool is actually proctoring.
             </remarks>
         </member>
+        <member name="P:LtiAdvantage.AspNetCore.Proctoring.ControlAssessmentRequest.CancellationToken">
+            <summary>
+            Signalled when the caller disconnects (the request's <c>RequestAborted</c> token).
+            Pass it to database and HTTP calls so work for a caller that has gone away stops.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.Proctoring.IAssessmentControlController">
             <summary>
             Marker for ILogger dependency injection.
@@ -1047,6 +1125,21 @@
             </summary>
             <param name="policyName"></param>
             <returns></returns>
+        </member>
+        <member name="T:LtiAdvantage.AspNetCore.Utilities.ServiceExceptionFilterAttribute">
+            <summary>
+            The error contract shared by the LTI service controller bases: an exception thrown by an
+            action (including the implementer's <c>On…Async</c> override) is logged and answered with a
+            500 <see cref="T:Microsoft.AspNetCore.Mvc.ProblemDetails"/>. Exception details are only included in Development,
+            because messages can reveal configuration (connection strings, host names, paths).
+            </summary>
+            <remarks>
+            A cancellation caused by the client disconnecting is not handled: it propagates, so the
+            framework aborts the response instead of logging a server error nobody will see.
+            </remarks>
+        </member>
+        <member name="M:LtiAdvantage.AspNetCore.Utilities.ServiceExceptionFilterAttribute.OnException(Microsoft.AspNetCore.Mvc.Filters.ExceptionContext)">
+            <inheritdoc />
         </member>
         <member name="T:Microsoft.Extensions.DependencyInjection.DependencyInjectionExtensions">
             <summary>

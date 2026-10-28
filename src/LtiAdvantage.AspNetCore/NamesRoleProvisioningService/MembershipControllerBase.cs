@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using LtiAdvantage.Lti;
 using LtiAdvantage.NamesRoleProvisioningService;
@@ -79,8 +80,7 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
 
                     // Enforce, don't just hint: without the groups scope no group data leaves,
                     // even if the override loaded it anyway.
-                    if (!includeGroups) StripGroupEnrollments(result);
-                    return result;
+                    return includeGroups ? result : StripGroupEnrollments(result);
                 }
                 catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
                 {
@@ -133,15 +133,32 @@ namespace LtiAdvantage.AspNetCore.NamesRoleProvisioningService
             }
         }
 
-        private static void StripGroupEnrollments(ActionResult<MembershipContainer> result)
+        /// <summary>
+        /// Returns <paramref name="result"/> with group enrollments withheld. Works on copies, so
+        /// containers and members the override shares or caches are left untouched.
+        /// </summary>
+        private static ActionResult<MembershipContainer> StripGroupEnrollments(ActionResult<MembershipContainer> result)
         {
-            var container = result.Value ?? (result.Result as ObjectResult)?.Value as MembershipContainer;
-            if (container?.Members == null) return;
+            if (result.Value != null) return WithoutGroupEnrollments(result.Value);
 
-            foreach (var member in container.Members)
+            switch (result.Result)
             {
-                if (member != null) member.GroupEnrollments = null;
+                case ObjectResult objectResult when objectResult.Value is MembershipContainer container:
+                    objectResult.Value = WithoutGroupEnrollments(container);
+                    break;
+                case JsonResult jsonResult when jsonResult.Value is MembershipContainer container:
+                    jsonResult.Value = WithoutGroupEnrollments(container);
+                    break;
             }
+
+            return result;
         }
+
+        private static MembershipContainer WithoutGroupEnrollments(MembershipContainer container) => new()
+        {
+            Id = container.Id,
+            Context = container.Context,
+            Members = container.Members?.Select(m => m?.WithoutGroupEnrollments()).ToList()
+        };
     }
 }

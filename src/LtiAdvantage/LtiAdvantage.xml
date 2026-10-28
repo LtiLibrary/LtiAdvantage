@@ -3887,6 +3887,12 @@
             Service 1.0 for that same user.
             </summary>
         </member>
+        <member name="M:LtiAdvantage.NamesRoleProvisioningService.Member.WithoutGroupEnrollments">
+            <summary>
+            A shallow copy of this member without <see cref="P:LtiAdvantage.NamesRoleProvisioningService.Member.GroupEnrollments"/>. Used to withhold
+            group data without changing objects the caller may share or cache.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.NamesRoleProvisioningService.MembershipContainer">
             <summary>
             Represents the results returned by the Membership service.

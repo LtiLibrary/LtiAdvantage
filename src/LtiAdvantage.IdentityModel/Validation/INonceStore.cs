@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,6 +20,11 @@ namespace LtiAdvantage.IdentityModel.Validation
         /// Atomically records the nonce and reports whether it had already been used.
         /// </summary>
         /// <param name="nonce">The nonce from the ID token.</param>
+        /// <param name="expiresAt">
+        /// When the token carrying the nonce expires (UTC). The entry must be kept at least until
+        /// then plus the validator's clock skew; after that a replay would fail the lifetime check
+        /// anyway, so the store may drop it.
+        /// </param>
         /// <param name="cancellationToken">Optional cancellation token.</param>
         /// <returns>
         /// True if the nonce had not been seen before and is now recorded; false if it was
@@ -28,6 +34,6 @@ namespace LtiAdvantage.IdentityModel.Validation
         /// Implementations must make the check and the record a single atomic operation.
         /// A read followed by a separate write lets two concurrent replays both succeed.
         /// </remarks>
-        Task<bool> TryConsumeAsync(string nonce, CancellationToken cancellationToken = default);
+        Task<bool> TryConsumeAsync(string nonce, DateTime expiresAt, CancellationToken cancellationToken = default);
     }
 }

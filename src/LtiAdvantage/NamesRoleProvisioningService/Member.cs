@@ -118,5 +118,16 @@ namespace LtiAdvantage.NamesRoleProvisioningService
         /// </summary>
         [JsonPropertyName("lti11_legacy_user_id")]
         public string Lti11LegacyUserId { get; set; }
+
+        /// <summary>
+        /// A shallow copy of this member without <see cref="GroupEnrollments"/>. Used to withhold
+        /// group data without changing objects the caller may share or cache.
+        /// </summary>
+        public Member WithoutGroupEnrollments()
+        {
+            var copy = (Member) MemberwiseClone();
+            copy.GroupEnrollments = null;
+            return copy;
+        }
     }
 }

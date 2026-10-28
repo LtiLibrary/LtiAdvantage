@@ -493,7 +493,7 @@ namespace LtiAdvantage.UnitTests.Validation
 
         private sealed class ThrowingNonceStore : INonceStore
         {
-            public Task<bool> TryConsumeAsync(string nonce, CancellationToken cancellationToken = default) =>
+            public Task<bool> TryConsumeAsync(string nonce, DateTime expiresAt, CancellationToken cancellationToken = default) =>
                 throw new InvalidOperationException("nonce store unavailable");
         }
 
@@ -600,6 +600,21 @@ namespace LtiAdvantage.UnitTests.Validation
             Assert.True(first.IsValid, first.Error);
             Assert.True(second.IsValid, second.Error);
             Assert.Equal(1, platform.FetchCount);
+        }
+
+        /// <summary>The nonce store is told when the token expires, so it knows how long to keep the nonce.</summary>
+        [Fact]
+        public async Task PassTheTokenExpiry_ToTheNonceStore()
+        {
+            var platform = new FakePlatform("key-1");
+            var store = new InMemoryNonceStore();
+            var validator = CreateValidator(platform, options => options.NonceStore = store);
+            var expires = DateTime.UtcNow.AddMinutes(7);
+
+            Assert.True((await validator.ValidateAsync(platform.CreateIdToken(expires: expires))).IsValid);
+
+            Assert.NotNull(store.LastExpiresAt);
+            Assert.True(Math.Abs((store.LastExpiresAt.Value - expires).TotalSeconds) < 2);
         }
 
         [Fact]
@@ -751,8 +766,11 @@ namespace LtiAdvantage.UnitTests.Validation
         {
             private readonly HashSet<string> _seen = new(StringComparer.Ordinal);
 
-            public Task<bool> TryConsumeAsync(string nonce, CancellationToken cancellationToken = default)
+            public DateTime? LastExpiresAt { get; private set; }
+
+            public Task<bool> TryConsumeAsync(string nonce, DateTime expiresAt, CancellationToken cancellationToken = default)
             {
+                LastExpiresAt = expiresAt;
                 lock (_seen)
                 {
                     return Task.FromResult(_seen.Add(nonce));

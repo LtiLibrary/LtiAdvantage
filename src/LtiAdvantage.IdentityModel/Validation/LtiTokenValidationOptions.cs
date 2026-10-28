@@ -70,8 +70,8 @@ namespace LtiAdvantage.IdentityModel.Validation
 
         /// <summary>
         /// Accept tokens without replay detection when no <see cref="NonceStore"/> is set.
-        /// Defaults to false, so a missing store fails when the validator is constructed rather
-        /// than silently letting replayed tokens through.
+        /// Defaults to false, so while <see cref="RequireNonce"/> is true a missing store fails when
+        /// the validator is constructed rather than silently letting replayed tokens through.
         /// </summary>
         /// <remarks>
         /// Only set this when replays are prevented elsewhere (for example the OIDC state check
@@ -82,6 +82,11 @@ namespace LtiAdvantage.IdentityModel.Validation
         /// <summary>
         /// Whether the "nonce" claim must be present. Defaults to true, as LTI 1.3 requires.
         /// </summary>
+        /// <remarks>
+        /// Setting this to false also lifts the requirement for a <see cref="NonceStore"/>: without
+        /// one, a token that does carry a nonce is not checked for replay. Only turn it off for a
+        /// platform that is known to omit the nonce.
+        /// </remarks>
         public bool RequireNonce { get; set; } = true;
 
         /// <summary>

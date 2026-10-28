@@ -900,6 +900,12 @@
             Whether the caller's token also grants the Course Groups Service scope.
             </summary>
         </member>
+        <member name="M:LtiAdvantage.AspNetCore.NamesRoleProvisioningService.MembershipControllerBase.StripGroupEnrollments(Microsoft.AspNetCore.Mvc.ActionResult{LtiAdvantage.NamesRoleProvisioningService.MembershipContainer})">
+            <summary>
+            Returns <paramref name="result"/> with group enrollments withheld. Works on copies, so
+            containers and members the override shares or caches are left untouched.
+            </summary>
+        </member>
         <member name="T:LtiAdvantage.AspNetCore.OpenIdConnect.IOpenIdConfigurationController">
             <summary>
             Marker for ILogger dependency injection.

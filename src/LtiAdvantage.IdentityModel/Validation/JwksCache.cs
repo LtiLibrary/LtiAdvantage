@@ -181,7 +181,9 @@ namespace LtiAdvantage.IdentityModel.Validation
             {
                 lock (_gate)
                 {
-                    if (_entries.TryGetValue(jwksUri, out var entry) && !IsTooStale(entry, startedAt))
+                    // Judge staleness now, not when the fetch started: a fetch can hang for the whole
+                    // HttpClient timeout.
+                    if (_entries.TryGetValue(jwksUri, out var entry) && !IsTooStale(entry, DateTimeOffset.UtcNow))
                     {
                         // Keep serving the keys we have; the next attempt waits the minimum interval.
                         entry.LastAttemptAt = startedAt;

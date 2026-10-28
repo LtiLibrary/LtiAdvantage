@@ -281,7 +281,7 @@ namespace LtiAdvantage.IdentityModel.Validation
             }
 
             var firstUse = await _options.NonceStore
-                .TryConsumeAsync(nonce, cancellationToken)
+                .TryConsumeAsync(nonce, jwt.ValidTo, cancellationToken)
                 .ConfigureAwait(false);
 
             return firstUse

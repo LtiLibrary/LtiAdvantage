@@ -87,6 +87,33 @@ namespace LtiAdvantage.IntegrationTests.NamesRoleProvisioningService
             Assert.DoesNotContain("group_enrollments", await response.Content.ReadAsStringAsync());
         }
 
+        /// <summary>
+        /// Withholding groups from one caller must not change the objects the override shares:
+        /// a later caller with the groups scope still sees the enrollments.
+        /// </summary>
+        [Fact]
+        public async Task NotChangeSharedMembers_WhenWithholdingGroups()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Nrps.MembershipReadonly);
+            var withheld = await _client.GetAsync(MembershipUrl + "?groups=true&rlid=shared-member");
+
+            Assert.DoesNotContain("group_enrollments", await withheld.Content.ReadAsStringAsync());
+            Assert.NotNull(Controllers.MembershipController.SharedMember.GroupEnrollments);
+        }
+
+        [Fact]
+        public async Task StripGroupEnrollments_FromAJsonResultToo()
+        {
+            _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Nrps.MembershipReadonly);
+
+            var response = await _client.GetAsync(MembershipUrl + "?groups=true&rlid=json-result");
+
+            response.EnsureSuccessStatusCode();
+            var body = await response.Content.ReadAsStringAsync();
+            Assert.Contains("shared-user", body);
+            Assert.DoesNotContain("group_enrollments", body, StringComparison.OrdinalIgnoreCase);
+        }
+
         public void Dispose()
         {
             _client?.Dispose();

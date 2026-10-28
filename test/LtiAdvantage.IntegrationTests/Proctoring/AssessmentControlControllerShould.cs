@@ -75,6 +75,7 @@ namespace LtiAdvantage.IntegrationTests.Proctoring
         [InlineData("attempt_number")]
         [InlineData("incident_time")]
         [InlineData("incident_severity")]
+        [InlineData("extra_time")]
         public async Task Reject_MissingRequiredFields(string field)
         {
             _client.DefaultRequestHeaders.Add("x-test-scope", Constants.LtiScopes.Ap.ControlAll);
@@ -86,6 +87,7 @@ namespace LtiAdvantage.IntegrationTests.Proctoring
                 case "attempt_number": request.AttemptNumber = null; break;
                 case "incident_time": request.IncidentTime = null; break;
                 case "incident_severity": request.IncidentSeverity = 1.5; break;
+                case "extra_time": request.ExtraTime = -30; break;
             }
 
             var response = await PostAsync(request);

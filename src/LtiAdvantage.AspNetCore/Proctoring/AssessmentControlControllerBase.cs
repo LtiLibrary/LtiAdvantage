@@ -147,6 +147,7 @@ namespace LtiAdvantage.AspNetCore.Proctoring
             if (control.AttemptNumber == null) problems.Add("attempt_number is required.");
             if (control.IncidentTime == null) problems.Add("incident_time is required.");
             if (control.IncidentSeverity is < 0 or > 1) problems.Add("incident_severity must be between 0 and 1.");
+            if (control.ExtraTime is < 0) problems.Add("extra_time must not be negative.");
             return problems;
         }
     }

@@ -18,9 +18,12 @@ namespace LtiAdvantage.Utilities
     {
         // Platforms are not consistent about quoting numbers (the Proctoring spec's own examples
         // send attempt_number both as 1 and as "1"), so claim values accept both when read.
+        // Names are matched ignoring case so content items written by 4.0.0, which used
+        // "Width", "Height" and "ExpiresAt", still read.
         private static readonly JsonSerializerOptions ReadSettings = new JsonSerializerOptions
         {
-            NumberHandling = JsonNumberHandling.AllowReadingFromString
+            NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            PropertyNameCaseInsensitive = true
         };
 
         private static readonly JsonSerializerOptions Settings = new JsonSerializerOptions

@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.IdentityModel.Tokens.Jwt;
@@ -53,13 +54,9 @@ namespace LtiAdvantage.UnitTests.DeepLinking
         public void RoundTripTheSpecContentItems()
         {
             var json = TestUtils.LoadReferenceJsonFile("DeepLinkingContentItems");
-            var payload = new JwtPayload();
-            foreach (var item in JsonNode.Parse(json)!.AsArray())
-            {
-                payload.AddClaim(new System.Security.Claims.Claim(Constants.LtiClaims.ContentItems,
-                    item!.ToJsonString(), System.IdentityModel.Tokens.Jwt.JsonClaimValueTypes.Json));
-            }
+            var response = new LtiDeepLinkingResponse { ContentItems = JsonSerializer.Deserialize<ContentItem[]>(json) };
 
+            var payload = WriteAndReadToken(response);
             var items = new LtiDeepLinkingResponse(payload).ContentItems;
 
             Assert.Equal(100, items[0].Icon.Width);
@@ -69,12 +66,28 @@ namespace LtiAdvantage.UnitTests.DeepLinking
             Assert.Equal(600, items[2].Height);
             Assert.Equal(new DateTime(2018, 3, 6, 20, 5, 2, DateTimeKind.Utc), items[3].ExpiresAt?.ToUniversalTime());
 
-            var written = JsonSerializer.Serialize(new LtiDeepLinkingResponse { ContentItems = items }.ContentItems,
-                new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull });
+            // What the library wrote into the token uses the spec names.
+            var written = JsonNode.Parse(payload.SerializeToJson())![Constants.LtiClaims.ContentItems]!.ToJsonString();
             JsonAssert.Equal(json, written);
-            Assert.DoesNotContain("\"Width\"", written);
-            Assert.DoesNotContain("\"Height\"", written);
-            Assert.DoesNotContain("\"ExpiresAt\"", written);
+            Assert.Equal(KeysOf(JsonNode.Parse(json)), KeysOf(JsonNode.Parse(written)));
+        }
+
+        /// <summary>Content items written by 4.0.0 used capitalised names; those still read.</summary>
+        [Fact]
+        public void ReadContentItems_WrittenWithTheOldNames()
+        {
+            var payload = new JwtPayload();
+            payload.AddClaim(new Claim(Constants.LtiClaims.ContentItems,
+                "{\"type\":\"image\",\"url\":\"https://example.com/i.png\",\"Width\":800,\"Height\":600," +
+                "\"ExpiresAt\":\"2018-03-06T20:05:02Z\",\"icon\":{\"url\":\"https://example.com/icon.png\",\"Width\":16,\"Height\":16}}",
+                JsonClaimValueTypes.Json));
+
+            var item = Assert.Single(new LtiDeepLinkingResponse(payload).ContentItems);
+
+            Assert.Equal(800, item.Width);
+            Assert.Equal(600, item.Height);
+            Assert.NotNull(item.ExpiresAt);
+            Assert.Equal(16, item.Icon.Width);
         }
 
         /// <summary>An icon without dimensions is written without them, not as 0 x 0.</summary>
@@ -88,14 +101,31 @@ namespace LtiAdvantage.UnitTests.DeepLinking
                     new LinkItem { Url = "https://tool.example.com", Icon = new ImageProperty { Url = "https://tool.example.com/icon.png" } }
                 }
             };
-            var jwt = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(new JwtHeader(), response));
-            var payload = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Payload;
+
+            var payload = WriteAndReadToken(response);
 
             var item = Assert.Single(new LtiDeepLinkingResponse(payload).ContentItems);
             Assert.Null(item.Icon.Width);
             Assert.Null(item.Icon.Height);
-            Assert.DoesNotContain("eight", payload.SerializeToJson());
-            Assert.DoesNotContain("idth", payload.SerializeToJson());
+            var icon = JsonNode.Parse(payload.SerializeToJson())![Constants.LtiClaims.ContentItems]![0]!["icon"]!.AsObject();
+            Assert.Equal(new[] { "url" }, icon.Select(p => p.Key).ToArray());
+        }
+
+        private static JwtPayload WriteAndReadToken(JwtPayload payload)
+        {
+            var jwt = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(new JwtHeader(), payload));
+            return new JwtSecurityTokenHandler().ReadJwtToken(jwt).Payload;
+        }
+
+        /// <summary>Every property path in the JSON, so extra or renamed keys show up.</summary>
+        private static string[] KeysOf(JsonNode node, string path = "$")
+        {
+            return node switch
+            {
+                JsonObject o => o.SelectMany(p => new[] { path + "." + p.Key }.Concat(KeysOf(p.Value, path + "." + p.Key))).OrderBy(k => k).ToArray(),
+                JsonArray a => a.SelectMany((n, i) => KeysOf(n, path + "[" + i + "]")).ToArray(),
+                _ => Array.Empty<string>()
+            };
         }
 
         private static void AssertContentItems(ContentItem[] items)

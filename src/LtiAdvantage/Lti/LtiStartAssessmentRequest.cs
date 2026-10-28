@@ -20,7 +20,7 @@ namespace LtiAdvantage.Lti
     /// <see cref="LtiStartProctoringRequest.SessionData"/> unchanged.
     /// </remarks>
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    public class LtiStartAssessmentRequest : LtiRequest
+    public class LtiStartAssessmentRequest : LtiProctoringRequest
     {
         /// <inheritdoc />
         /// <summary>
@@ -52,22 +52,6 @@ namespace LtiAdvantage.Lti
         {
         }
 
-        /// <summary>The resource_link claim identifying the assessment. Required.</summary>
-        public ResourceLinkClaimValueType ResourceLink
-        {
-            get => this.GetClaimValue<ResourceLinkClaimValueType>(Constants.LtiClaims.ResourceLink);
-            set => this.SetClaimValue(Constants.LtiClaims.ResourceLink, value);
-        }
-
-        /// <summary>
-        /// The attempt this proctoring session covers, starting at 1. Required.
-        /// </summary>
-        public int? AttemptNumber
-        {
-            get => this.GetClaimValue<int?>(Constants.LtiClaims.AttemptNumber);
-            set => this.SetClaimValue(Constants.LtiClaims.AttemptNumber, value);
-        }
-
         /// <summary>
         /// The opaque value the platform issued on the
         /// <see cref="LtiStartProctoringRequest"/>, echoed back unchanged. Required.
@@ -95,16 +79,6 @@ namespace LtiAdvantage.Lti
         {
             get => this.GetClaimValue<VerifiedUserClaimValueType>(Constants.LtiClaims.VerifiedUser);
             set => this.SetClaimValue(Constants.LtiClaims.VerifiedUser, value);
-        }
-
-        /// <summary>
-        /// Opaque proctoring configuration the tool asks the platform to store for later
-        /// launches of this attempt.
-        /// </summary>
-        public ProctoringSettingsClaimValueType ProctoringSettings
-        {
-            get => this.GetClaimValue<ProctoringSettingsClaimValueType>(Constants.LtiClaims.ProctoringSettings);
-            set => this.SetClaimValue(Constants.LtiClaims.ProctoringSettings, value);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using LtiAdvantage.CourseGroupsService;
+using LtiAdvantage.DeepLinking;
 using LtiAdvantage.Lti;
 using LtiAdvantage.NamesRoleProvisioningService;
 using Xunit;
@@ -72,16 +73,34 @@ namespace LtiAdvantage.UnitTests.CourseGroupsService
             const string namesRoleService = nameof(LtiResourceLinkRequest.NamesRoleService);
             const string assignmentGradeServices = nameof(LtiResourceLinkRequest.AssignmentGradeServices);
 
-            foreach (var messageType in new[] {typeof(LtiResourceLinkRequest), typeof(LtiSubmissionReviewRequest)})
+            var platformLaunches = new[]
+            {
+                typeof(LtiResourceLinkRequest),
+                typeof(LtiSubmissionReviewRequest),
+                typeof(LtiDeepLinkingRequest)
+            };
+            foreach (var messageType in platformLaunches)
             {
                 Assert.NotNull(messageType.GetProperty(groupsService));
                 Assert.NotNull(messageType.GetProperty(namesRoleService));
                 Assert.NotNull(messageType.GetProperty(assignmentGradeServices));
             }
 
-            // Not on the shared base, and so not on the tool-authored proctoring message.
+            // Not on the shared base, and so not on the proctoring messages: the Proctoring
+            // specification lists no service claim, and Start Assessment travels tool to platform.
             Assert.Null(typeof(LtiRequest).GetProperty(groupsService));
-            Assert.Null(typeof(LtiStartAssessmentRequest).GetProperty(groupsService));
+            var proctoringMessages = new[]
+            {
+                typeof(LtiStartProctoringRequest),
+                typeof(LtiStartAssessmentRequest),
+                typeof(LtiEndAssessmentRequest)
+            };
+            foreach (var messageType in proctoringMessages)
+            {
+                Assert.Null(messageType.GetProperty(groupsService));
+                Assert.Null(messageType.GetProperty(namesRoleService));
+                Assert.Null(messageType.GetProperty(assignmentGradeServices));
+            }
         }
 
         [Fact]

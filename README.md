@@ -96,6 +96,26 @@ Two sample applications show the libraries in use:
 | LtiAdvantage.OIDC | [![Nuget](https://img.shields.io/nuget/v/LtiAdvantage.OIDC)](https://www.nuget.org/packages/LtiAdvantage.OIDC) |  [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/LtiAdvantage.OIDC)](https://www.nuget.org/packages/LtiAdvantage.OIDC/absoluteLatest) |
 | LtiAdvantage.AspNetCore | [![Nuget](https://img.shields.io/nuget/v/LtiAdvantage.AspNetCore)](https://www.nuget.org/packages/LtiAdvantage.AspNetCore) |  [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/LtiAdvantage.IdentityServer4)](https://www.nuget.org/packages/LtiAdvantage.AspNetCore/absoluteLatest) |
 
+## Releasing
+
+Package versions come from [MinVer](https://github.com/adamralph/minver) and the `v*` git tags
+(`MinVerTagPrefix` is `v`). The project files do not store a version.
+
+A merge to `master` updates a draft GitHub release. Review that draft and press Publish.
+Publishing creates the `v*` tag, and the existing CI workflow then publishes the NuGet packages.
+The draft is not published on its own, and it does not create the tag. The next merge rewrites
+the draft, so publish before another pull request lands if you have edited the notes.
+
+Label the pull request to choose the bump: `breaking` is a major version, `enhancement` or
+`feature` is a minor version, and every other merge, including Dependabot updates
+(`dependencies`), is a patch. `enhancement`, `bug`, and `dependencies` already exist; add
+`breaking` and `feature` before relying on those labels.
+
+The libraries stay on the current .NET LTS (10.x). Dependabot still opens minor and patch
+updates for the .NET 10 packages, and it does not open major updates for packages that version
+with the .NET SDK. `Microsoft.IdentityModel.*` and `System.IdentityModel.Tokens.Jwt` use their
+own version line (8.x today) and are not held to that rule, and neither is `Microsoft.NET.Test.Sdk`.
+
 ## Build Status
 
 | CI | Env | Status |

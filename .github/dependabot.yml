@@ -15,7 +15,48 @@ updates:
         update-types:
           - "minor"
           - "patch"
-    # Major updates still get their own PR so breaking changes can be reviewed.
+    # Major updates of packages that do not follow the .NET release still get
+    # their own PR. The families below version with the .NET SDK (10.x on the
+    # current LTS); a semver-major bump is the next .NET release, so it is
+    # ignored. Minor and patch updates of those packages still open.
+    #
+    # Not ignored, after checking the version line:
+    # - Microsoft.IdentityModel.* is 8.x while .NET is 10. A support window may
+    #   mention a .NET LTS, but the package major is not the .NET major.
+    # - System.IdentityModel.Tokens.Jwt is that same 8.x line, so it is not
+    #   covered by a blanket System.* ignore.
+    # - Microsoft.NET.Test.Sdk is 18.x.
+    # - System.ComponentModel.Annotations is frozen at 5.0.0.
+    # Microsoft.AspNetCore.* also matches the abandoned
+    # Microsoft.AspNetCore.Mvc.Api.Analyzers 2.2 package. That only suppresses
+    # a major of an analyzer that is not on the 10.x line.
+    ignore:
+      - dependency-name: "Microsoft.Extensions.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.AspNetCore.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.NETCore.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.Collections.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.Diagnostics.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.Formats.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.IO.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.Linq.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.Net.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.Reflection.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.Security.Cryptography.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.Text.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.Threading.*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"

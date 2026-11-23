@@ -1,0 +1,54 @@
+name-template: '$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+# Existing tags are v4.1.0. The prefix is stripped before the version is parsed
+# and is not added twice: tag-template supplies the single leading v.
+tag-prefix: 'v'
+change-template: '- $TITLE (#$NUMBER)'
+# A draft is never published from this file. prerelease-identifier is omitted
+# because setting one turns prerelease on.
+prerelease: false
+template: |
+  $CHANGES
+categories:
+  - title: 'Breaking changes'
+    semver-increment: major
+    exclusive: true
+    when:
+      labels:
+        - 'breaking'
+  # enhancement and feature share this section with bugs. The category itself
+  # stays a patch bump; the version-resolver entries below raise
+  # enhancement/feature to minor. A minor on this whole section would treat
+  # bug fixes as minor releases.
+  - title: 'Fixed and added'
+    exclusive: true
+    when:
+      labels:
+        - 'enhancement'
+        - 'feature'
+        - 'bug'
+  - title: 'Dependencies'
+    semver-increment: patch
+    exclusive: true
+    when:
+      labels:
+        - 'dependencies'
+  - type: 'version-resolver'
+    semver-increment: major
+    when:
+      labels:
+        - 'breaking'
+  - type: 'version-resolver'
+    semver-increment: minor
+    when:
+      labels:
+        - 'enhancement'
+        - 'feature'
+  - type: 'version-resolver'
+    semver-increment: patch
+    when:
+      labels:
+        - 'dependencies'
+  # Anything else, including an unlabeled pull request, is a patch.
+  - type: 'version-resolver'
+    semver-increment: patch
